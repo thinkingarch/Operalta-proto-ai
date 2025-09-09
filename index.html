@@ -93,15 +93,21 @@
             padding-left: 1rem;
             margin-top: 0.5rem;
         }
-        .hover-invert { transition: all 0.2s ease; }
-        .hover-invert:hover { background: #111827; color: #fff; }
-
+        
         /* Modal Styles */
         .modal-overlay {
             transition: opacity 0.3s ease;
         }
         .modal-content {
             transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+        
+        /* Playbook Category Filter */
+        .playbook-category-btn { transition: all 0.2s ease; }
+        .playbook-category-btn.active {
+            background-color: var(--accent);
+            color: white;
+            font-weight: 600;
         }
     </style>
      <script type="importmap">
@@ -212,15 +218,15 @@
                             <h1 class="text-2xl sm:text-3xl font-bold tracking-tight">Playbook Library</h1>
                             <p class="text-gray-500 mt-1 mono text-sm">1,247+ proven strategies from top-tier companies.</p>
                         </div>
-                        <span class="text-sm mono hidden sm:block">Filter by category ↓</span>
                     </header>
-                    <div class="grid grid-cols-3 md:grid-cols-6 gap-2 text-center mb-12">
-                        <div class="hover-invert border border-gray-300 aspect-square flex flex-col items-center justify-center cursor-pointer p-2 rounded-md"><span class="text-2xl mb-1">⬆</span><span class="text-xs font-bold">GROWTH</span><span class="mono text-xs">247</span></div>
-                        <div class="hover-invert border border-gray-300 aspect-square flex flex-col items-center justify-center cursor-pointer p-2 rounded-md"><span class="text-2xl mb-1">◐</span><span class="text-xs font-bold">HIRING</span><span class="mono text-xs">189</span></div>
-                        <div class="hover-invert border border-gray-300 aspect-square flex flex-col items-center justify-center cursor-pointer p-2 rounded-md"><span class="text-2xl mb-1">◈</span><span class="text-xs font-bold">FUNDRAISING</span><span class="mono text-xs">312</span></div>
-                        <div class="hover-invert border border-gray-300 aspect-square flex flex-col items-center justify-center cursor-pointer p-2 rounded-md"><span class="text-2xl mb-1">◉</span><span class="text-xs font-bold">PRODUCT</span><span class="mono text-xs">156</span></div>
-                        <div class="hover-invert border border-gray-300 aspect-square flex flex-col items-center justify-center cursor-pointer p-2 rounded-md"><span class="text-2xl mb-1">▣</span><span class="text-xs font-bold">SALES</span><span class="mono text-xs">203</span></div>
-                        <div class="hover-invert border border-gray-300 aspect-square flex flex-col items-center justify-center cursor-pointer p-2 rounded-md"><span class="text-2xl mb-1">◊</span><span class="text-xs font-bold">LEGAL</span><span class="mono text-xs">140</span></div>
+                     <div id="playbook-category-filters" class="flex flex-wrap gap-2 mb-8">
+                        <button class="playbook-category-btn active px-3 py-1 text-sm border border-gray-300 rounded-full" data-category="ALL">ALL</button>
+                        <button class="playbook-category-btn px-3 py-1 text-sm border border-gray-300 rounded-full" data-category="Growth">GROWTH</button>
+                        <button class="playbook-category-btn px-3 py-1 text-sm border border-gray-300 rounded-full" data-category="Hiring">HIRING</button>
+                        <button class="playbook-category-btn px-3 py-1 text-sm border border-gray-300 rounded-full" data-category="Fundraising">FUNDRAISING</button>
+                        <button class="playbook-category-btn px-3 py-1 text-sm border border-gray-300 rounded-full" data-category="Product">PRODUCT</button>
+                        <button class="playbook-category-btn px-3 py-1 text-sm border border-gray-300 rounded-full" data-category="Sales">SALES</button>
+                        <button class="playbook-category-btn px-3 py-1 text-sm border border-gray-300 rounded-full" data-category="Legal">LEGAL</button>
                     </div>
                      <div id="ceo-playbook-list" class="grid grid-cols-1 md:grid-cols-3 gap-8">
                         <!-- Playbook content will be injected here by JS -->
@@ -263,18 +269,10 @@
 
                     <div class="mb-8 bg-white border border-gray-200 rounded-lg p-6">
                         <h2 class="font-bold mb-4">Portfolio Health Overview</h2>
-                        <div class="flex items-center space-x-4 text-sm mb-4">
-                            <div class="font-semibold">75% On Track</div>
-                            <div class="flex-1 bg-gray-200 rounded-full h-2.5">
-                                <div class="bg-green-500 h-2.5 rounded-l-full" style="width: 75%"></div>
-                                <div class="bg-yellow-400 h-2.5" style="width: 15%"></div>
-                                <div class="bg-red-500 h-2.5 rounded-r-full" style="width: 10%"></div>
-                            </div>
-                        </div>
-                         <div class="flex space-x-4 text-xs mono">
-                            <div class="flex items-center"><span class="w-3 h-3 bg-green-500 rounded-full mr-2"></span>On Track (3)</div>
-                            <div class="flex items-center"><span class="w-3 h-3 bg-yellow-400 rounded-full mr-2"></span>Needs Attention (1)</div>
-                            <div class="flex items-center"><span class="w-3 h-3 bg-red-500 rounded-full mr-2"></span>At Risk (0)</div>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
+                            <div><p class="text-3xl font-bold text-green-600">3</p><p class="text-sm text-gray-500">On Track</p></div>
+                            <div><p class="text-3xl font-bold text-yellow-500">1</p><p class="text-sm text-gray-500">Needs Attention</p></div>
+                            <div><p class="text-3xl font-bold text-red-600">0</p><p class="text-sm text-gray-500">At Risk</p></div>
                         </div>
                     </div>
                     
@@ -283,6 +281,7 @@
                         <ul class="space-y-3 text-sm">
                             <li class="flex items-start gap-3"><span class="text-purple-600 mt-1">◈</span><span><strong>Positive Trend:</strong> 3 companies mentioned successful enterprise pilots this week, suggesting strong Q4 pipeline.</span></li>
                             <li class="flex items-start gap-3"><span class="text-yellow-600 mt-1">!</span><span><strong>Potential Risk:</strong> 2 companies in the B2C space noted rising customer acquisition costs (CAC). <a href="#" class="text-purple-700 underline">Suggest "Growth Hacking" playbook</a>.</span></li>
+                            <li class="flex items-start gap-3"><span class="text-blue-600 mt-1">→</span><span><strong>Opportunity:</strong> Innovate Inc. and Synergy AI are both hiring for senior product roles. Consider an introduction between their VPs of Product to share best practices.</span></li>
                         </ul>
                     </div>
 
@@ -589,6 +588,7 @@
                 ceoNav: document.getElementById('ceo-nav'),
                 vcNav: document.getElementById('vc-nav'),
                 ceoPlaybookList: document.getElementById('ceo-playbook-list'),
+                playbookCategoryFilters: document.getElementById('playbook-category-filters'),
 
                 pages: {
                      dashboard: document.getElementById('page-dashboard'), recording: document.getElementById('page-recording'), reports: document.getElementById('page-reports'), playbooks: document.getElementById('page-playbooks'), integrations: document.getElementById('page-integrations'), settings: document.getElementById('page-settings'),
@@ -614,27 +614,29 @@
 
             const db = {
                 reports: {
-                    w36: { title: 'Weekly Update - W36', date: 'Sep 5, 2025', content: '<h3>Wins</h3><ul><li>Strong month with 23% MoM growth.</li><li>Closed 3 enterprise deals totaling €240k in new ARR.</li></ul><h3>Challenges</h3><ul><li>Engineering hiring remains top priority.</li></ul>' },
-                    w35: { title: 'Weekly Update - W35', date: 'Aug 29, 2025', content: '<h3>Wins</h3><ul><li>Onboarded 2 major enterprise clients: Globex Corp and Innovate LLC.</li><li>Successful launch of the new analytics dashboard.</li></ul><h3>Next Steps</h3><ul><li>Begin planning for Series A raise in Q1 2026.</li></ul>' },
-                    w34: { title: 'Weekly Update - W34', date: 'Aug 22, 2025', content: '<h3>Challenges</h3><ul><li>Unexpected churn from a mid-market customer.</li><li>Technical debt is slowing down feature development.</li></ul>' },
-                    innovate: { title: 'Weekly Update - Innovate Inc.', date: 'Sep 5, 2025', content: '<h3>Wins</h3><ul><li>Product-market fit scores are at an all-time high after the v2.1 launch.</li><li>Closed a strategic partnership with a major distributor.</li></ul>' },
-                    quantum: { title: 'Weekly Update - QuantumLeap', date: 'Sep 5, 2025', content: '<h3>Challenges</h3><ul><li>Marketing experiment with paid social showed higher than expected CAC.</li><li>Key engineering hire resigned.</li></ul><h3>Next Steps</h3><ul><li>Focusing on organic channels for Q4.</li><li>Opening up search for a new lead engineer.</li></ul>' },
-                    synergy: { title: 'Weekly Update - Synergy AI', date: 'Sep 5, 2025', content: '<h3>Wins</h3><ul><li>Landed our first F500 customer.</li><li>Team morale is very high after the offsite.</li></ul>' },
+                    w36: { title: 'Weekly Update - W36', date: 'Sep 5, 2025', metrics: { arr: '€1.2M', growth: '+23%', runway: '18mo' }, content: '<h3>Wins</h3><ul><li>Strong month with 23% MoM growth.</li><li>Closed 3 enterprise deals totaling €240k in new ARR.</li></ul><h3>Challenges</h3><ul><li>Engineering hiring remains top priority.</li></ul>' },
+                    w35: { title: 'Weekly Update - W35', date: 'Aug 29, 2025', metrics: { arr: '€1.1M', growth: '+15%', runway: '19mo' }, content: '<h3>Wins</h3><ul><li>Onboarded 2 major enterprise clients: Globex Corp and Innovate LLC.</li><li>Successful launch of the new analytics dashboard.</li></ul><h3>Next Steps</h3><ul><li>Begin planning for Series A raise in Q1 2026.</li></ul>' },
+                    w34: { title: 'Weekly Update - W34', date: 'Aug 22, 2025', metrics: { arr: '€1.05M', growth: '+5%', runway: '20mo' }, content: '<h3>Challenges</h3><ul><li>Unexpected churn from a mid-market customer.</li><li>Technical debt is slowing down feature development.</li></ul>' },
+                    innovate: { title: 'Weekly Update - Innovate Inc.', date: 'Sep 5, 2025', metrics: { arr: '€2.1M', growth: '+18%', runway: '24mo' }, content: '<h3>Wins</h3><ul><li>Product-market fit scores are at an all-time high after the v2.1 launch.</li><li>Closed a strategic partnership with a major distributor.</li></ul>' },
+                    quantum: { title: 'Weekly Update - QuantumLeap', date: 'Sep 5, 2025', metrics: { arr: '€800K', growth: '-5%', runway: '9mo' }, content: '<h3>Challenges</h3><ul><li>Marketing experiment with paid social showed higher than expected CAC.</li><li>Key engineering hire resigned.</li></ul><h3>Next Steps</h3><ul><li>Focusing on organic channels for Q4.</li><li>Opening up search for a new lead engineer.</li></ul>' },
+                    synergy: { title: 'Weekly Update - Synergy AI', date: 'Sep 5, 2025', metrics: { arr: '€4.5M', growth: '+25%', runway: '16mo' }, content: '<h3>Wins</h3><ul><li>Landed our first F500 customer.</li><li>Team morale is very high after the offsite.</li></ul>' },
                 },
                 playbooks: {
-                    // Growth
                     'plg': { category: 'Growth', title: 'Product-Led Growth Engine', company: 'SLACK', content: '<h3>Key Idea</h3><p>Focus on making the product itself the primary driver of user acquisition, conversion, and expansion.</p><ul><li>Freemium model to reduce friction.</li><li>Seamless user onboarding.</li><li>Built-in virality (e.g., inviting colleagues).</li></ul>' },
                     'outbound': { category: 'Growth', title: 'Outbound Sales Cadence', company: 'HUBSPOT', content: '<h3>Key Idea</h3><p>A structured sequence of touchpoints (email, call, social) to engage prospects.</p><ol><li>Day 1: Personalized Email</li><li>Day 3: LinkedIn Connection Request</li><li>Day 5: Follow-up Email + Call</li></ol>' },
                     'content-marketing': { category: 'Growth', title: 'Content Marketing Flywheel', company: 'Ahrefs', content: '<h3>Key Idea</h3><p>Create high-quality, SEO-optimized content that solves user problems to attract organic traffic, which in turn builds brand authority and drives leads.</p>' },
-                     // Hiring
                     'eng-hiring': { category: 'Hiring', title: 'Scaling Engineering Teams', company: 'REVOLUT', content: `<h3>Key Principles</h3><ul><li><strong>Hire for Slope, Not Just Experience:</strong> Look for candidates with a steep learning curve and high potential, not just years on a resume.</li><li><strong>Bar Raiser Interviews:</strong> Involve a senior engineer from a different team in the final interview loop to maintain a consistently high bar for talent.</li><li><strong>Practical Problem Solving:</strong> Use a take-home project or a pair-programming session that mirrors real-world work.</li></ul>` },
                     'remote': { category: 'Hiring', title: 'Remote Transformation', company: 'GITLAB', content: '<h3>Key Idea</h3><p>Build a thriving, productive company with no physical offices.</p><ul><li>Document everything in a central handbook.</li><li>Promote asynchronous communication.</li><li>Invest in tools for remote collaboration.</li></ul>' },
                     'culture-deck': { category: 'Hiring', title: 'The Netflix Culture Deck', company: 'NETFLIX', content: '<h3>Key Idea</h3><p>Clearly articulate your company culture and values to attract the right talent and repel the wrong talent. Focus on "Freedom and Responsibility".</p>' },
-                    // Fundraising
                     'seed-deck': { category: 'Fundraising', title: 'The Perfect Seed Deck', company: 'Y COMBINATOR', content: `<h3>The 10-Slide Structure</h3><ol><li>Title</li><li>Problem</li><li>Solution</li><li>Market Size</li><li>Product</li><li>Traction</li><li>Team</li><li>Competition</li><li>Business Model</li><li>The Ask</li></ol>` },
                     'board-meeting': { category: 'Fundraising', title: 'Board Meeting Excellence', company: 'SPOTIFY', content: '<h3>Key Idea</h3><p>Structure board meetings around strategic decisions, not just updates.</p><ul><li>Send materials 48 hours in advance.</li><li>Focus 80% of time on forward-looking strategy.</li><li>Use a data-driven appendix for metrics.</li></ul>' },
                     'data-room': { category: 'Fundraising', title: 'Building a Due Diligence Data Room', company: 'SEQUOIA', content: '<h3>Key Idea</h3><p>Proactively organize all essential company documents (financials, legal, team, product) in a secure online folder to streamline the fundraising due diligence process.</p>' },
-                     // VC Playbooks
+                    'product-docs': { category: 'Product', title: 'Writing Great Product Docs', company: 'INTERCOM', content: '<h3>Key Idea</h3><p>Structure product docs around the "Why, What, and How" to ensure clarity for the entire team.</p><ul><li><strong>Why:</strong> The problem you are solving and for whom.</li><li><strong>What:</strong> The scope of the feature, including user stories and success metrics.</li><li><strong>How:</strong> High-level technical approach and design mocks.</li></ul>' },
+                    'user-interviews': { category: 'Product', title: 'Effective User Interviews', company: 'STRIPE', content: '<h3>Key Idea</h3><p>Ask open-ended questions about past behavior, not future intentions. Focus on understanding their problems deeply rather than pitching your solution.</p>' },
+                    'enterprise-sales': { category: 'Sales', title: 'Enterprise Sales Playbook', company: 'SALESFORCE', content: '<h3>Key Idea</h3><p>Navigate complex sales cycles by mapping the organization, identifying the champion, economic buyer, and technical buyer, and building consensus across the buying committee.</p>' },
+                    'saas-pricing': { category: 'Sales', title: 'Value-Based SaaS Pricing', company: 'TWILIO', content: '<h3>Key Idea</h3><p>Price your product based on the value it delivers to the customer segment, not on your costs or competitor prices. Common models include per-user, usage-based, and tiered pricing.</p>' },
+                    'cap-table': { category: 'Legal', title: 'Cap Table Management', company: 'CARTA', content: '<h3>Key Idea</h3><p>Maintain a clean and accurate capitalization table from day one. It is the single source of truth for company ownership and is critical for fundraising and employee equity.</p>' },
+                    'nda': { category: 'Legal', title: 'When to Use an NDA', company: 'WILSON SONSINI', content: '<h3>Key Idea</h3><p>Use Non-Disclosure Agreements sparingly. They are standard for M&A or deep strategic partnerships, but create unnecessary friction when talking to most VCs or potential hires.</p>' },
                     'board-meetings': { title: "Our Guide to Board Meetings", content: "<h3>The Atomic Ventures Board Meeting Framework</h3><p>The essential template and best practices for running an effective board meeting that drives decisions, not just reporting.</p><ol><li><strong>Pre-Meeting:</strong> Send a concise pre-read 72 hours in advance, highlighting key decisions needed.</li><li><strong>Meeting Structure:</strong> 10% review of past performance, 60% strategic discussion on 2-3 key topics, 30% open discussion and administrative.</li><li><strong>Post-Meeting:</strong> Send minutes and action items within 24 hours.</li></ol>" },
                     'term-sheet': { title: "Term Sheet Negotiation 101", content: "<h3>Key Terms for Founders</h3><p>Key terms and strategies for a successful fundraise, focusing on founder-friendly outcomes.</p><ul><li><strong>Valuation:</strong> Understand pre-money vs. post-money.</li><li><strong>Liquidation Preference:</strong> Aim for 1x, non-participating.</li><li><strong>Board Composition:</strong> Ensure founder control or a balanced board.</li><li><strong>Vesting:</strong> Standard is 4-year vest with a 1-year cliff.</li></ul>" }
                 }
@@ -667,7 +669,7 @@
                         showPage('recording'); ui.recordingInterface.classList.add('hidden'); ui.processingState.classList.remove('hidden'); ui.completedState.classList.add('hidden'); ui.processingStatus.textContent = 'Transcribing audio...';
                     },
                     onProcessingComplete: (polishedHtml, rawText) => {
-                        latestGeneratedReport = { title: `Weekly Update - ${new Date().toLocaleDateString()}`, content: polishedHtml };
+                        latestGeneratedReport = { title: `Weekly Update - ${new Date().toLocaleDateString()}`, content: polishedHtml, metrics: { arr: '€1.2M', growth: '+23%', runway: '18mo' } };
                         ui.rawTranscriptionOutput.textContent = rawText;
                         ui.polishedNoteOutput.innerHTML = polishedHtml;
                         ui.summaryOutput.innerHTML = polishedHtml;
@@ -746,13 +748,22 @@
 
             function showViewReportModal(reportId) {
                 const report = db.reports[reportId]; if (!report) return;
-                const content = document.createElement('div'); content.innerHTML = `<div class="prose prose-sm max-w-none">${report.content}</div>`;
+                const content = document.createElement('div');
+                const growthClass = report.metrics.growth.startsWith('+') ? 'text-green-600' : 'text-red-600';
+                content.innerHTML = `
+                    <div class="grid grid-cols-3 gap-4 mb-6 text-center">
+                        <div><p class="font-bold text-2xl">${report.metrics.arr}</p><p class="text-xs text-gray-600">ARR</p></div>
+                        <div><p class="font-bold text-2xl ${growthClass}">${report.metrics.growth}</p><p class="text-xs text-gray-600">MoM Growth</p></div>
+                        <div><p class="font-bold text-2xl">${report.metrics.runway}</p><p class="text-xs text-gray-600">Runway</p></div>
+                    </div>
+                    <div class="prose prose-sm max-w-none">${report.content}</div>`;
                 showModal(report.title, content);
             }
 
             function showPlaybookModal(playbookId) {
                 const playbook = db.playbooks[playbookId]; if (!playbook) return;
-                const content = document.createElement('div'); content.innerHTML = `<div class="prose prose-sm max-w-none">${playbook.content}</div>`;
+                const content = document.createElement('div');
+                content.innerHTML = `<div class="prose prose-sm max-w-none">${playbook.content}</div>`;
                 showModal(playbook.title, content);
             }
             
@@ -772,12 +783,12 @@
                  content.querySelector('#share-playbook-btn').addEventListener('click', () => alert('Playbook shared with portfolio!'));
             }
             
-            function populateCeoPlaybooks() {
-                const categories = {
-                    'Growth': [], 'Hiring': [], 'Fundraising': [], 'Product': [], 'Sales': [], 'Legal': []
-                };
-                 Object.entries(db.playbooks).forEach(([id, playbook]) => {
-                    if(playbook.category) {
+            function populateCeoPlaybooks(filter = 'ALL') {
+                const categories = {};
+                Object.values(db.playbooks).forEach(p => { if(p.category) { categories[p.category] = [] } });
+                
+                Object.entries(db.playbooks).forEach(([id, playbook]) => {
+                    if (playbook.category && (filter === 'ALL' || filter === playbook.category)) {
                         const html = `<li class="group cursor-pointer playbook-link" data-playbook-id="${id}"><div class="flex justify-between hover:bg-gray-50 px-2 py-1 -mx-2 rounded"><span>${playbook.title}</span><span class="mono text-xs">${playbook.company}</span></div></li>`;
                         categories[playbook.category].push(html);
                     }
@@ -816,6 +827,14 @@
             ui.modalCloseBtn.addEventListener('click', hideModal);
             ui.modalOverlay.addEventListener('click', hideModal);
             
+            ui.playbookCategoryFilters.addEventListener('click', (e) => {
+                if (e.target.tagName === 'BUTTON') {
+                    ui.playbookCategoryFilters.querySelectorAll('button').forEach(btn => btn.classList.remove('active'));
+                    e.target.classList.add('active');
+                    populateCeoPlaybooks(e.target.dataset.category);
+                }
+            });
+
             // Initial Load
             const savedApiKey = localStorage.getItem('geminiApiKey');
             if (savedApiKey) ui.apiKeyInput.value = savedApiKey;
