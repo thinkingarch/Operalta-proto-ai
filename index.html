@@ -95,6 +95,14 @@
         }
         .hover-invert { transition: all 0.2s ease; }
         .hover-invert:hover { background: #111827; color: #fff; }
+
+        /* Modal Styles */
+        .modal-overlay {
+            transition: opacity 0.3s ease;
+        }
+        .modal-content {
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
     </style>
      <script type="importmap">
       {
@@ -175,7 +183,7 @@
                 <div id="page-recording" class="hidden p-4 sm:p-8 md:p-12">
                     <header class="mb-8"><h1 class="text-2xl sm:text-3xl font-bold tracking-tight">New Weekly Update</h1></header>
                     <div id="processing-state" class="hidden text-center py-16"><div class="inline-block w-8 h-8 border-2 border-purple-700 border-t-transparent rounded-full animate-spin mb-4"></div><h3 id="processing-status" class="font-bold">Processing audio...</h3><p class="text-sm text-gray-600 mt-2">This usually takes less than a minute.</p></div>
-                     <div id="completed-state" class="hidden grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12"><div><h4 class="font-bold text-sm mb-2">AI Transcription & Analysis</h4><div id="raw-transcription-output" class="bg-gray-50 p-4 rounded-md max-h-96 overflow-y-auto text-sm text-gray-700 leading-relaxed italic"></div><h4 class="font-bold text-sm mb-2 mt-6">Key Insights Extracted</h4><div id="polished-note-output" class="text-sm text-gray-700 leading-relaxed prose prose-sm max-w-none"></div></div><div class="mt-8 lg:mt-0"><div class="flex items-center justify-between mb-2"><h4 class="font-bold text-sm">Draft: Weekly Investor Update</h4><span class="text-xs bg-purple-100 text-purple-800 px-2 py-0.5 rounded-full">AI-Generated</span></div><div class="bg-white border border-gray-200 p-6 rounded-md shadow-inner"><div class="mb-4"><h4 class="font-bold mb-2">Executive Summary</h4><div id="summary-output" class="text-sm text-gray-700 leading-relaxed prose prose-sm max-w-none"><p>Your AI-generated summary will appear here.</p></div></div><div class="grid grid-cols-3 gap-2 sm:gap-4 mb-4"><div class="text-center p-3 bg-gray-50 rounded"><p class="font-bold text-lg">€1.2M</p><p class="text-xs text-gray-600">ARR</p></div><div class="text-center p-3 bg-gray-50 rounded"><p class="font-bold text-lg text-green-600">+23%</p><p class="text-xs text-gray-600">Growth</p></div><div class="text-center p-3 bg-gray-50 rounded"><p class="font-bold text-lg">18mo</p><p class="text-xs text-gray-600">Runway</p></div></div><p class="text-xs text-gray-500 mono mb-4">Metrics synced from Stripe & Notion.</p><button class="w-full bg-purple-700 text-white py-2 text-sm font-bold hover:bg-purple-800 transition-colors rounded-md">Finalize & Share Report →</button></div></div></div>
+                     <div id="completed-state" class="hidden grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12"><div><h4 class="font-bold text-sm mb-2">AI Transcription & Analysis</h4><div id="raw-transcription-output" class="bg-gray-50 p-4 rounded-md max-h-96 overflow-y-auto text-sm text-gray-700 leading-relaxed italic"></div><h4 class="font-bold text-sm mb-2 mt-6">Key Insights Extracted</h4><div id="polished-note-output" class="text-sm text-gray-700 leading-relaxed prose prose-sm max-w-none"></div></div><div class="mt-8 lg:mt-0"><div class="flex items-center justify-between mb-2"><h4 class="font-bold text-sm">Draft: Weekly Investor Update</h4><span class="text-xs bg-purple-100 text-purple-800 px-2 py-0.5 rounded-full">AI-Generated</span></div><div class="bg-white border border-gray-200 p-6 rounded-md shadow-inner"><div class="mb-4"><h4 class="font-bold mb-2">Executive Summary</h4><div id="summary-output" class="text-sm text-gray-700 leading-relaxed prose prose-sm max-w-none"><p>Your AI-generated summary will appear here.</p></div></div><div class="grid grid-cols-3 gap-2 sm:gap-4 mb-4"><div class="text-center p-3 bg-gray-50 rounded"><p class="font-bold text-lg">€1.2M</p><p class="text-xs text-gray-600">ARR</p></div><div class="text-center p-3 bg-gray-50 rounded"><p class="font-bold text-lg text-green-600">+23%</p><p class="text-xs text-gray-600">Growth</p></div><div class="text-center p-3 bg-gray-50 rounded"><p class="font-bold text-lg">18mo</p><p class="text-xs text-gray-600">Runway</p></div></div><p class="text-xs text-gray-500 mono mb-4">Metrics synced from Stripe & Notion.</p><button id="finalize-report-btn" class="w-full bg-purple-700 text-white py-2 text-sm font-bold hover:bg-purple-800 transition-colors rounded-md">Finalize & Share Report →</button></div></div></div>
                 </div>
 
                 <div id="page-reports" class="hidden p-4 sm:p-8 md:p-12">
@@ -184,15 +192,15 @@
                             <h1 class="text-2xl sm:text-3xl font-bold tracking-tight">Reports</h1>
                             <p class="text-gray-500 mt-1 mono text-sm">History of all generated investor updates.</p>
                         </div>
-                        <button class="bg-purple-700 text-white px-4 py-2 text-sm font-bold hover:bg-purple-800 transition-colors rounded-md">New Report</button>
+                        <button id="new-report-btn" class="bg-purple-700 text-white px-4 py-2 text-sm font-bold hover:bg-purple-800 transition-colors rounded-md">New Report</button>
                     </header>
                     <div class="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
                         <table class="w-full text-sm">
                             <thead class="bg-gray-50"><tr class="text-left text-xs text-gray-500 uppercase tracking-wider"><th class="p-4 font-semibold">Date</th><th class="p-4 font-semibold">Title</th><th class="p-4 font-semibold">Status</th><th class="p-4 font-semibold hidden md:table-cell">Key Metric</th><th class="p-4"></th></tr></thead>
                             <tbody class="divide-y divide-gray-200">
-                                <tr><td class="p-4">Sep 5, 2025</td><td class="p-4 font-semibold">Weekly Update - W36</td><td class="p-4"><span class="px-2 py-1 text-xs font-semibold text-green-800 bg-green-100 rounded-full">Sent</span></td><td class="p-4 hidden md:table-cell">23% MoM Growth</td><td class="p-4 text-right"><a href="#" class="text-purple-700 hover:underline">View</a></td></tr>
-                                <tr><td class="p-4">Aug 29, 2025</td><td class="p-4 font-semibold">Weekly Update - W35</td><td class="p-4"><span class="px-2 py-1 text-xs font-semibold text-green-800 bg-green-100 rounded-full">Sent</span></td><td class="p-4 hidden md:table-cell">Onboarded 2 Enterprise clients</td><td class="p-4 text-right"><a href="#" class="text-purple-700 hover:underline">View</a></td></tr>
-                                 <tr><td class="p-4">Aug 22, 2025</td><td class="p-4 font-semibold">Weekly Update - W34</td><td class="p-4"><span class="px-2 py-1 text-xs font-semibold text-yellow-800 bg-yellow-100 rounded-full">Draft</span></td><td class="p-4 hidden md:table-cell">Hiring top priority</td><td class="p-4 text-right"><a href="#" class="text-purple-700 hover:underline">View</a></td></tr>
+                                <tr><td class="p-4">Sep 5, 2025</td><td class="p-4 font-semibold">Weekly Update - W36</td><td class="p-4"><span class="px-2 py-1 text-xs font-semibold text-green-800 bg-green-100 rounded-full">Sent</span></td><td class="p-4 hidden md:table-cell">23% MoM Growth</td><td class="p-4 text-right"><a href="#" class="text-purple-700 hover:underline view-report-link" data-report-id="w36">View</a></td></tr>
+                                <tr><td class="p-4">Aug 29, 2025</td><td class="p-4 font-semibold">Weekly Update - W35</td><td class="p-4"><span class="px-2 py-1 text-xs font-semibold text-green-800 bg-green-100 rounded-full">Sent</span></td><td class="p-4 hidden md:table-cell">Onboarded 2 Enterprise clients</td><td class="p-4 text-right"><a href="#" class="text-purple-700 hover:underline view-report-link" data-report-id="w35">View</a></td></tr>
+                                 <tr><td class="p-4">Aug 22, 2025</td><td class="p-4 font-semibold">Weekly Update - W34</td><td class="p-4"><span class="px-2 py-1 text-xs font-semibold text-yellow-800 bg-yellow-100 rounded-full">Draft</span></td><td class="p-4 hidden md:table-cell">Hiring top priority</td><td class="p-4 text-right"><a href="#" class="text-purple-700 hover:underline view-report-link" data-report-id="w34">View</a></td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -214,19 +222,8 @@
                         <div class="hover-invert border border-gray-300 aspect-square flex flex-col items-center justify-center cursor-pointer p-2 rounded-md"><span class="text-2xl mb-1">▣</span><span class="text-xs font-bold">SALES</span><span class="mono text-xs">203</span></div>
                         <div class="hover-invert border border-gray-300 aspect-square flex flex-col items-center justify-center cursor-pointer p-2 rounded-md"><span class="text-2xl mb-1">◊</span><span class="text-xs font-bold">LEGAL</span><span class="mono text-xs">140</span></div>
                     </div>
-                     <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                        <div>
-                            <h3 class="font-bold mb-4 pb-2 border-b border-gray-200">Series A Playbooks</h3>
-                            <ul class="space-y-3 text-sm"><li class="group cursor-pointer"><div class="flex justify-between hover:bg-gray-50 px-2 py-1 -mx-2 rounded"><span>Scaling Engineering Teams</span><span class="mono text-xs">REVOLUT</span></div><p class="text-xs text-gray-500 px-2 hidden group-hover:block notion-block">From 10 to 100 engineers in 18 months</p></li><li class="group cursor-pointer"><div class="flex justify-between hover:bg-gray-50 px-2 py-1 -mx-2 rounded"><span>Board Meeting Excellence</span><span class="mono text-xs">SPOTIFY</span></div><p class="text-xs text-gray-500 px-2 hidden group-hover:block notion-block">Data-driven board decks that drive decisions</p></li><li class="group cursor-pointer"><div class="flex justify-between hover:bg-gray-50 px-2 py-1 -mx-2 rounded"><span>Revenue Operations</span><span class="mono text-xs">KLARNA</span></div><p class="text-xs text-gray-500 px-2 hidden group-hover:block notion-block">Building predictable growth engines</p></li></ul>
-                        </div>
-                        <div>
-                            <h3 class="font-bold mb-4 pb-2 border-b border-gray-200">Crisis Management</h3>
-                            <ul class="space-y-3 text-sm"><li class="group cursor-pointer"><div class="flex justify-between hover:bg-gray-50 px-2 py-1 -mx-2 rounded"><span>Runway Extension</span><span class="mono text-xs">BOOKING</span></div><p class="text-xs text-gray-500 px-2 hidden group-hover:block notion-block">How we survived 2020 and emerged stronger</p></li><li class="group cursor-pointer"><div class="flex justify-between hover:bg-gray-50 px-2 py-1 -mx-2 rounded"><span>Pivot Playbook</span><span class="mono text-xs">TRANSFERWISE</span></div><p class="text-xs text-gray-500 px-2 hidden group-hover:block notion-block">From P2P to B2B banking infrastructure</p></li><li class="group cursor-pointer"><div class="flex justify-between hover:bg-gray-50 px-2 py-1 -mx-2 rounded"><span>Remote Transformation</span><span class="mono text-xs">GITLAB</span></div><p class="text-xs text-gray-500 px-2 hidden group-hover:block notion-block">1000+ employees, 60+ countries, 0 offices</p></li></ul>
-                        </div>
-                        <div>
-                            <h3 class="font-bold mb-4 pb-2 border-b border-gray-200">VC Collaboration</h3>
-                            <ul class="space-y-3 text-sm"><li class="group cursor-pointer"><div class="flex justify-between hover:bg-gray-50 px-2 py-1 -mx-2 rounded"><span>Weekly Partner Sync</span><span class="mono text-xs">INDEX</span></div><p class="text-xs text-gray-500 px-2 hidden group-hover:block notion-block">5-minute voice updates that matter</p></li><li class="group cursor-pointer"><div class="flex justify-between hover:bg-gray-50 px-2 py-1 -mx-2 rounded"><span>Portfolio Intelligence</span><span class="mono text-xs">ATOMICO</span></div><p class="text-xs text-gray-500 px-2 hidden group-hover:block notion-block">Learning from 50 portfolio companies</p></li><li class="group cursor-pointer"><div class="flex justify-between hover:bg-gray-50 px-2 py-1 -mx-2 rounded"><span>Expert Network Access</span><span class="mono text-xs">BALDERTON</span></div><p class="text-xs text-gray-500 px-2 hidden group-hover:block notion-block">Connecting CEOs with domain experts</p></li></ul>
-                        </div>
+                     <div id="ceo-playbook-list" class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        <!-- Playbook content will be injected here by JS -->
                     </div>
                 </div>
 
@@ -261,12 +258,38 @@
                  <div id="page-vc-dashboard" class="p-4 sm:p-8 md:p-12">
                     <header class="mb-8">
                         <h1 class="text-2xl sm:text-3xl font-bold tracking-tight">Portfolio Dashboard</h1>
-                        <p class="text-gray-500 mt-1 mono text-sm">High-level overview of your investments.</p>
+                        <p class="text-gray-500 mt-1 mono text-sm">High-level intelligence on your investments.</p>
                     </header>
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        <div class="bg-white border border-gray-200 p-6 rounded-lg"><div class="flex justify-between items-start mb-4"><h3 class="font-bold">Innovate Inc.</h3><span class="px-2 py-1 text-xs font-semibold text-green-800 bg-green-100 rounded-full">On Track</span></div><div class="grid grid-cols-3 gap-4 text-center"><div class="border-r border-gray-200"><p class="text-lg font-bold">€2.1M</p><p class="text-xs text-gray-500">ARR</p></div><div class="border-r border-gray-200"><p class="text-lg font-bold text-green-600">+18%</p><p class="text-xs text-gray-500">MoM</p></div><div><p class="text-lg font-bold">24mo</p><p class="text-xs text-gray-500">Runway</p></div></div></div>
-                        <div class="bg-white border border-gray-200 p-6 rounded-lg"><div class="flex justify-between items-start mb-4"><h3 class="font-bold">QuantumLeap</h3><span class="px-2 py-1 text-xs font-semibold text-yellow-800 bg-yellow-100 rounded-full">Needs Attention</span></div><div class="grid grid-cols-3 gap-4 text-center"><div class="border-r border-gray-200"><p class="text-lg font-bold">€800K</p><p class="text-xs text-gray-500">ARR</p></div><div class="border-r border-gray-200"><p class="text-lg font-bold text-red-600">-5%</p><p class="text-xs text-gray-500">MoM</p></div><div><p class="text-lg font-bold">9mo</p><p class="text-xs text-gray-500">Runway</p></div></div></div>
-                        <div class="bg-white border border-gray-200 p-6 rounded-lg"><div class="flex justify-between items-start mb-4"><h3 class="font-bold">Synergy AI</h3><span class="px-2 py-1 text-xs font-semibold text-green-800 bg-green-100 rounded-full">On Track</span></div><div class="grid grid-cols-3 gap-4 text-center"><div class="border-r border-gray-200"><p class="text-lg font-bold">€4.5M</p><p class="text-xs text-gray-500">ARR</p></div><div class="border-r border-gray-200"><p class="text-lg font-bold text-green-600">+25%</p><p class="text-xs text-gray-500">MoM</p></div><div><p class="text-lg font-bold">16mo</p><p class="text-xs text-gray-500">Runway</p></div></div></div>
+
+                    <div class="mb-8 bg-white border border-gray-200 rounded-lg p-6">
+                        <h2 class="font-bold mb-4">Portfolio Health Overview</h2>
+                        <div class="flex items-center space-x-4 text-sm mb-4">
+                            <div class="font-semibold">75% On Track</div>
+                            <div class="flex-1 bg-gray-200 rounded-full h-2.5">
+                                <div class="bg-green-500 h-2.5 rounded-l-full" style="width: 75%"></div>
+                                <div class="bg-yellow-400 h-2.5" style="width: 15%"></div>
+                                <div class="bg-red-500 h-2.5 rounded-r-full" style="width: 10%"></div>
+                            </div>
+                        </div>
+                         <div class="flex space-x-4 text-xs mono">
+                            <div class="flex items-center"><span class="w-3 h-3 bg-green-500 rounded-full mr-2"></span>On Track (3)</div>
+                            <div class="flex items-center"><span class="w-3 h-3 bg-yellow-400 rounded-full mr-2"></span>Needs Attention (1)</div>
+                            <div class="flex items-center"><span class="w-3 h-3 bg-red-500 rounded-full mr-2"></span>At Risk (0)</div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-8 bg-white border border-gray-200 rounded-lg p-6">
+                        <h2 class="font-bold mb-4">AI-Generated Cross-Portfolio Insights</h2>
+                        <ul class="space-y-3 text-sm">
+                            <li class="flex items-start gap-3"><span class="text-purple-600 mt-1">◈</span><span><strong>Positive Trend:</strong> 3 companies mentioned successful enterprise pilots this week, suggesting strong Q4 pipeline.</span></li>
+                            <li class="flex items-start gap-3"><span class="text-yellow-600 mt-1">!</span><span><strong>Potential Risk:</strong> 2 companies in the B2C space noted rising customer acquisition costs (CAC). <a href="#" class="text-purple-700 underline">Suggest "Growth Hacking" playbook</a>.</span></li>
+                        </ul>
+                    </div>
+
+                    <div id="vc-portfolio-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <div class="bg-white border border-gray-200 p-6 rounded-lg cursor-pointer hover:shadow-lg transition-shadow" data-company-id="innovate"><div class="flex justify-between items-start mb-4"><h3 class="font-bold">Innovate Inc.</h3><span class="px-2 py-1 text-xs font-semibold text-green-800 bg-green-100 rounded-full">On Track</span></div><div class="grid grid-cols-3 gap-4 text-center"><div class="border-r border-gray-200"><p class="text-lg font-bold">€2.1M</p><p class="text-xs text-gray-500">ARR</p></div><div class="border-r border-gray-200"><p class="text-lg font-bold text-green-600">+18%</p><p class="text-xs text-gray-500">MoM</p></div><div><p class="text-lg font-bold">24mo</p><p class="text-xs text-gray-500">Runway</p></div></div></div>
+                        <div class="bg-white border border-gray-200 p-6 rounded-lg cursor-pointer hover:shadow-lg transition-shadow" data-company-id="quantum"><div class="flex justify-between items-start mb-4"><h3 class="font-bold">QuantumLeap</h3><span class="px-2 py-1 text-xs font-semibold text-yellow-800 bg-yellow-100 rounded-full">Needs Attention</span></div><div class="grid grid-cols-3 gap-4 text-center"><div class="border-r border-gray-200"><p class="text-lg font-bold">€800K</p><p class="text-xs text-gray-500">ARR</p></div><div class="border-r border-gray-200"><p class="text-lg font-bold text-red-600">-5%</p><p class="text-xs text-gray-500">MoM</p></div><div><p class="text-lg font-bold">9mo</p><p class="text-xs text-gray-500">Runway</p></div></div></div>
+                        <div class="bg-white border border-gray-200 p-6 rounded-lg cursor-pointer hover:shadow-lg transition-shadow" data-company-id="synergy"><div class="flex justify-between items-start mb-4"><h3 class="font-bold">Synergy AI</h3><span class="px-2 py-1 text-xs font-semibold text-green-800 bg-green-100 rounded-full">On Track</span></div><div class="grid grid-cols-3 gap-4 text-center"><div class="border-r border-gray-200"><p class="text-lg font-bold">€4.5M</p><p class="text-xs text-gray-500">ARR</p></div><div class="border-r border-gray-200"><p class="text-lg font-bold text-green-600">+25%</p><p class="text-xs text-gray-500">MoM</p></div><div><p class="text-lg font-bold">16mo</p><p class="text-xs text-gray-500">Runway</p></div></div></div>
                     </div>
                 </div>
                  <div id="page-vc-playbooks" class="hidden p-4 sm:p-8 md:p-12">
@@ -275,11 +298,21 @@
                             <h1 class="text-2xl sm:text-3xl font-bold tracking-tight">Firm Playbooks</h1>
                             <p class="text-gray-500 mt-1 mono text-sm">Proprietary strategies for your portfolio companies.</p>
                         </div>
-                        <button class="bg-purple-700 text-white px-4 py-2 text-sm font-bold hover:bg-purple-800 transition-colors rounded-md">Create Playbook</button>
+                        <button id="author-playbook-btn" class="bg-purple-700 text-white px-4 py-2 text-sm font-bold hover:bg-purple-800 transition-colors rounded-md">Author New Playbook</button>
                     </header>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div class="bg-white border border-gray-200 p-6 rounded-lg"><h3 class="font-bold mb-2">Alpha Ventures Go-To-Market</h3><p class="text-sm text-gray-600">Our proven framework for finding product-market fit and scaling to the first 100 customers.</p></div>
-                        <div class="bg-white border border-gray-200 p-6 rounded-lg"><h3 class="font-bold mb-2">Alpha Ventures Hiring Matrix</h3><p class="text-sm text-gray-600">Standardized interview process and scorecards for hiring A-players in Engineering and Sales.</p></div>
+                    <div class="mb-8">
+                        <h2 class="font-bold mb-4">Atomic Ventures' Custom Playbooks</h2>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="bg-white border border-gray-200 p-6 rounded-lg playbook-link cursor-pointer hover:shadow-md" data-playbook-id="board-meetings"><h3 class="font-bold mb-2">Our Guide to Board Meetings</h3><p class="text-sm text-gray-600">The essential template and best practices for running an effective board meeting.</p></div>
+                            <div class="bg-white border border-gray-200 p-6 rounded-lg playbook-link cursor-pointer hover:shadow-md" data-playbook-id="term-sheet"><h3 class="font-bold mb-2">Term Sheet Negotiation 101</h3><p class="text-sm text-gray-600">Key terms and strategies for a successful fundraise.</p></div>
+                        </div>
+                    </div>
+                     <div>
+                        <h2 class="font-bold mb-4">Playbooks Popular in Your Portfolio</h2>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="bg-white border border-gray-200 p-6 rounded-lg playbook-link cursor-pointer hover:shadow-md" data-playbook-id="eng-hiring"><h3 class="font-bold mb-2">Scaling Engineering Teams</h3><p class="text-sm text-gray-600">From 10 to 100 engineers. The definitive guide by Revolut.</p></div>
+                            <div class="bg-white border border-gray-200 p-6 rounded-lg playbook-link cursor-pointer hover:shadow-md" data-playbook-id="seed-deck"><h3 class="font-bold mb-2">The Perfect Seed Deck</h3><p class="text-sm text-gray-600">As recommended by Y Combinator for all their early-stage founders.</p></div>
+                        </div>
                     </div>
                  </div>
                  <div id="page-vc-settings" class="hidden p-4 sm:p-8 md:p-12">
@@ -296,6 +329,22 @@
             <div id="recording-status-text" class="status-text text-gray-500 mb-4">Ready to record</div>
             <div class="recording-controls">
                 <button id="recordButton" class="record-button" title="Start Recording"><div class="record-button-inner"><i class="fas fa-microphone"></i></div><svg class="record-waves" viewBox="0 0 200 200"><circle class="wave wave1" cx="100" cy="100" r="40" /><circle class="wave wave2" cx="100" cy="100" r="70" /></svg></button>
+            </div>
+        </div>
+
+        <!-- Generic Modal -->
+        <div id="modal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-50 z-50 flex items-center justify-center p-4">
+            <div id="modal-overlay" class="absolute inset-0"></div>
+            <div id="modal-content" class="modal-content bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto relative transform scale-95 opacity-0">
+                <div class="p-6">
+                    <div class="flex justify-between items-center pb-4 border-b border-gray-200">
+                        <h2 id="modal-title" class="text-xl font-bold">Modal Title</h2>
+                        <button id="modal-close-btn" class="text-gray-400 hover:text-gray-600 text-3xl leading-none">&times;</button>
+                    </div>
+                    <div id="modal-body" class="py-6">
+                        <!-- Modal content goes here -->
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -530,6 +579,7 @@
         document.addEventListener('DOMContentLoaded', function() {
             let dictationService = null;
             let currentView = 'ceo';
+            let latestGeneratedReport = {};
 
             const ui = {
                 sidebar: document.getElementById('sidebar'),
@@ -538,65 +588,62 @@
                 vcView: document.getElementById('vc-view'),
                 ceoNav: document.getElementById('ceo-nav'),
                 vcNav: document.getElementById('vc-nav'),
+                ceoPlaybookList: document.getElementById('ceo-playbook-list'),
 
                 pages: {
-                     dashboard: document.getElementById('page-dashboard'),
-                     recording: document.getElementById('page-recording'),
-                     reports: document.getElementById('page-reports'),
-                     playbooks: document.getElementById('page-playbooks'),
-                     integrations: document.getElementById('page-integrations'),
-                     settings: document.getElementById('page-settings'),
-                     vcDashboard: document.getElementById('page-vc-dashboard'),
-                     vcPlaybooks: document.getElementById('page-vc-playbooks'),
-                     vcSettings: document.getElementById('page-vc-settings'),
+                     dashboard: document.getElementById('page-dashboard'), recording: document.getElementById('page-recording'), reports: document.getElementById('page-reports'), playbooks: document.getElementById('page-playbooks'), integrations: document.getElementById('page-integrations'), settings: document.getElementById('page-settings'),
+                     vcDashboard: document.getElementById('page-vc-dashboard'), vcPlaybooks: document.getElementById('page-vc-playbooks'), vcSettings: document.getElementById('page-vc-settings'),
                 },
                 navLinks: { 
-                    ceo: {
-                        dashboard: document.getElementById('nav-dashboard'), 
-                        reports: document.getElementById('nav-reports'),
-                        playbooks: document.getElementById('nav-playbooks'),
-                        integrations: document.getElementById('nav-integrations'),
-                        settings: document.getElementById('nav-settings') 
-                    },
-                    vc: {
-                        dashboard: document.getElementById('nav-vc-dashboard'),
-                        playbooks: document.getElementById('nav-vc-playbooks'),
-                        settings: document.getElementById('nav-vc-settings'),
-                    }
+                    ceo: { dashboard: document.getElementById('nav-dashboard'), reports: document.getElementById('nav-reports'), playbooks: document.getElementById('nav-playbooks'), integrations: document.getElementById('nav-integrations'), settings: document.getElementById('nav-settings') },
+                    vc: { dashboard: document.getElementById('nav-vc-dashboard'), playbooks: document.getElementById('nav-vc-playbooks'), settings: document.getElementById('nav-vc-settings'), }
                 },
-                startRecordingBtn: document.getElementById('start-recording-btn'),
-                recordButton: document.getElementById('recordButton'),
-                recordingInterface: document.getElementById('recording-interface'),
-                processingState: document.getElementById('processing-state'),
-                processingStatus: document.getElementById('processing-status'),
-                completedState: document.getElementById('completed-state'),
-                rawTranscriptionOutput: document.getElementById('raw-transcription-output'),
-                polishedNoteOutput: document.getElementById('polished-note-output'),
-                summaryOutput: document.getElementById('summary-output'),
-                apiKeyBanner: document.getElementById('api-key-banner'),
-                bannerSettingsLink: document.getElementById('banner-settings-link'),
-                apiKeyInput: document.getElementById('api-key-input'),
-                saveApiKeyBtn: document.getElementById('save-api-key-btn'),
-                apiKeyStatus: document.getElementById('api-key-status'),
-                viewToggle: document.getElementById('view-toggle'),
-                userName: document.getElementById('user-name'),
-                userCompany: document.getElementById('user-company'),
-                userAvatar: document.getElementById('user-avatar'),
-                ceoLabel: document.getElementById('ceo-label'),
-                vcLabel: document.getElementById('vc-label'),
+                startRecordingBtn: document.getElementById('start-recording-btn'), newReportBtn: document.getElementById('new-report-btn'), recordButton: document.getElementById('recordButton'),
+                recordingInterface: document.getElementById('recording-interface'), processingState: document.getElementById('processing-state'), processingStatus: document.getElementById('processing-status'), completedState: document.getElementById('completed-state'),
+                rawTranscriptionOutput: document.getElementById('raw-transcription-output'), polishedNoteOutput: document.getElementById('polished-note-output'), summaryOutput: document.getElementById('summary-output'),
+                finalizeReportBtn: document.getElementById('finalize-report-btn'), authorPlaybookBtn: document.getElementById('author-playbook-btn'),
+
+                apiKeyBanner: document.getElementById('api-key-banner'), bannerSettingsLink: document.getElementById('banner-settings-link'), apiKeyInput: document.getElementById('api-key-input'),
+                saveApiKeyBtn: document.getElementById('save-api-key-btn'), apiKeyStatus: document.getElementById('api-key-status'),
+                viewToggle: document.getElementById('view-toggle'), userName: document.getElementById('user-name'), userCompany: document.getElementById('user-company'), userAvatar: document.getElementById('user-avatar'),
+                ceoLabel: document.getElementById('ceo-label'), vcLabel: document.getElementById('vc-label'),
+
+                modal: document.getElementById('modal'), modalOverlay: document.getElementById('modal-overlay'), modalContent: document.getElementById('modal-content'),
+                modalTitle: document.getElementById('modal-title'), modalBody: document.getElementById('modal-body'), modalCloseBtn: document.getElementById('modal-close-btn'),
+            };
+
+            const db = {
+                reports: {
+                    w36: { title: 'Weekly Update - W36', date: 'Sep 5, 2025', content: '<h3>Wins</h3><ul><li>Strong month with 23% MoM growth.</li><li>Closed 3 enterprise deals totaling €240k in new ARR.</li></ul><h3>Challenges</h3><ul><li>Engineering hiring remains top priority.</li></ul>' },
+                    w35: { title: 'Weekly Update - W35', date: 'Aug 29, 2025', content: '<h3>Wins</h3><ul><li>Onboarded 2 major enterprise clients: Globex Corp and Innovate LLC.</li><li>Successful launch of the new analytics dashboard.</li></ul><h3>Next Steps</h3><ul><li>Begin planning for Series A raise in Q1 2026.</li></ul>' },
+                    w34: { title: 'Weekly Update - W34', date: 'Aug 22, 2025', content: '<h3>Challenges</h3><ul><li>Unexpected churn from a mid-market customer.</li><li>Technical debt is slowing down feature development.</li></ul>' },
+                    innovate: { title: 'Weekly Update - Innovate Inc.', date: 'Sep 5, 2025', content: '<h3>Wins</h3><ul><li>Product-market fit scores are at an all-time high after the v2.1 launch.</li><li>Closed a strategic partnership with a major distributor.</li></ul>' },
+                    quantum: { title: 'Weekly Update - QuantumLeap', date: 'Sep 5, 2025', content: '<h3>Challenges</h3><ul><li>Marketing experiment with paid social showed higher than expected CAC.</li><li>Key engineering hire resigned.</li></ul><h3>Next Steps</h3><ul><li>Focusing on organic channels for Q4.</li><li>Opening up search for a new lead engineer.</li></ul>' },
+                    synergy: { title: 'Weekly Update - Synergy AI', date: 'Sep 5, 2025', content: '<h3>Wins</h3><ul><li>Landed our first F500 customer.</li><li>Team morale is very high after the offsite.</li></ul>' },
+                },
+                playbooks: {
+                    // Growth
+                    'plg': { category: 'Growth', title: 'Product-Led Growth Engine', company: 'SLACK', content: '<h3>Key Idea</h3><p>Focus on making the product itself the primary driver of user acquisition, conversion, and expansion.</p><ul><li>Freemium model to reduce friction.</li><li>Seamless user onboarding.</li><li>Built-in virality (e.g., inviting colleagues).</li></ul>' },
+                    'outbound': { category: 'Growth', title: 'Outbound Sales Cadence', company: 'HUBSPOT', content: '<h3>Key Idea</h3><p>A structured sequence of touchpoints (email, call, social) to engage prospects.</p><ol><li>Day 1: Personalized Email</li><li>Day 3: LinkedIn Connection Request</li><li>Day 5: Follow-up Email + Call</li></ol>' },
+                    'content-marketing': { category: 'Growth', title: 'Content Marketing Flywheel', company: 'Ahrefs', content: '<h3>Key Idea</h3><p>Create high-quality, SEO-optimized content that solves user problems to attract organic traffic, which in turn builds brand authority and drives leads.</p>' },
+                     // Hiring
+                    'eng-hiring': { category: 'Hiring', title: 'Scaling Engineering Teams', company: 'REVOLUT', content: `<h3>Key Principles</h3><ul><li><strong>Hire for Slope, Not Just Experience:</strong> Look for candidates with a steep learning curve and high potential, not just years on a resume.</li><li><strong>Bar Raiser Interviews:</strong> Involve a senior engineer from a different team in the final interview loop to maintain a consistently high bar for talent.</li><li><strong>Practical Problem Solving:</strong> Use a take-home project or a pair-programming session that mirrors real-world work.</li></ul>` },
+                    'remote': { category: 'Hiring', title: 'Remote Transformation', company: 'GITLAB', content: '<h3>Key Idea</h3><p>Build a thriving, productive company with no physical offices.</p><ul><li>Document everything in a central handbook.</li><li>Promote asynchronous communication.</li><li>Invest in tools for remote collaboration.</li></ul>' },
+                    'culture-deck': { category: 'Hiring', title: 'The Netflix Culture Deck', company: 'NETFLIX', content: '<h3>Key Idea</h3><p>Clearly articulate your company culture and values to attract the right talent and repel the wrong talent. Focus on "Freedom and Responsibility".</p>' },
+                    // Fundraising
+                    'seed-deck': { category: 'Fundraising', title: 'The Perfect Seed Deck', company: 'Y COMBINATOR', content: `<h3>The 10-Slide Structure</h3><ol><li>Title</li><li>Problem</li><li>Solution</li><li>Market Size</li><li>Product</li><li>Traction</li><li>Team</li><li>Competition</li><li>Business Model</li><li>The Ask</li></ol>` },
+                    'board-meeting': { category: 'Fundraising', title: 'Board Meeting Excellence', company: 'SPOTIFY', content: '<h3>Key Idea</h3><p>Structure board meetings around strategic decisions, not just updates.</p><ul><li>Send materials 48 hours in advance.</li><li>Focus 80% of time on forward-looking strategy.</li><li>Use a data-driven appendix for metrics.</li></ul>' },
+                    'data-room': { category: 'Fundraising', title: 'Building a Due Diligence Data Room', company: 'SEQUOIA', content: '<h3>Key Idea</h3><p>Proactively organize all essential company documents (financials, legal, team, product) in a secure online folder to streamline the fundraising due diligence process.</p>' },
+                     // VC Playbooks
+                    'board-meetings': { title: "Our Guide to Board Meetings", content: "<h3>The Atomic Ventures Board Meeting Framework</h3><p>The essential template and best practices for running an effective board meeting that drives decisions, not just reporting.</p><ol><li><strong>Pre-Meeting:</strong> Send a concise pre-read 72 hours in advance, highlighting key decisions needed.</li><li><strong>Meeting Structure:</strong> 10% review of past performance, 60% strategic discussion on 2-3 key topics, 30% open discussion and administrative.</li><li><strong>Post-Meeting:</strong> Send minutes and action items within 24 hours.</li></ol>" },
+                    'term-sheet': { title: "Term Sheet Negotiation 101", content: "<h3>Key Terms for Founders</h3><p>Key terms and strategies for a successful fundraise, focusing on founder-friendly outcomes.</p><ul><li><strong>Valuation:</strong> Understand pre-money vs. post-money.</li><li><strong>Liquidation Preference:</strong> Aim for 1x, non-participating.</li><li><strong>Board Composition:</strong> Ensure founder control or a balanced board.</li><li><strong>Vesting:</strong> Standard is 4-year vest with a 1-year cliff.</li></ul>" }
+                }
             };
 
             function showPage(pageName) {
                 const pageMap = {
-                    'dashboard': ui.pages.dashboard,
-                    'recording': ui.pages.recording,
-                    'reports': ui.pages.reports,
-                    'playbooks': ui.pages.playbooks,
-                    'integrations': ui.pages.integrations,
-                    'settings': ui.pages.settings,
-                    'vc-dashboard': ui.pages.vcDashboard,
-                    'vc-playbooks': ui.pages.vcPlaybooks,
-                    'vc-settings': ui.pages.vcSettings,
+                    'dashboard': ui.pages.dashboard, 'recording': ui.pages.recording, 'reports': ui.pages.reports, 'playbooks': ui.pages.playbooks, 'integrations': ui.pages.integrations, 'settings': ui.pages.settings,
+                    'vc-dashboard': ui.pages.vcDashboard, 'vc-playbooks': ui.pages.vcPlaybooks, 'vc-settings': ui.pages.vcSettings,
                 };
                 Object.values(pageMap).forEach(page => page?.classList.add('hidden'));
                 pageMap[pageName]?.classList.remove('hidden');
@@ -614,18 +661,13 @@
             
             function initializeDictationService(apiKey) {
                 dictationService = new DictationService({
-                    apiKey: apiKey,
-                    recordButton: ui.recordButton,
-                    statusTextElement: document.getElementById('recording-status-text'),
+                    apiKey: apiKey, recordButton: ui.recordButton, statusTextElement: document.getElementById('recording-status-text'),
                     onRecordingStart: () => ui.recordingInterface.classList.remove('hidden'),
                     onRecordingStop: () => {
-                        showPage('recording');
-                        ui.recordingInterface.classList.add('hidden');
-                        ui.processingState.classList.remove('hidden');
-                        ui.completedState.classList.add('hidden');
-                        ui.processingStatus.textContent = 'Transcribing audio...';
+                        showPage('recording'); ui.recordingInterface.classList.add('hidden'); ui.processingState.classList.remove('hidden'); ui.completedState.classList.add('hidden'); ui.processingStatus.textContent = 'Transcribing audio...';
                     },
                     onProcessingComplete: (polishedHtml, rawText) => {
+                        latestGeneratedReport = { title: `Weekly Update - ${new Date().toLocaleDateString()}`, content: polishedHtml };
                         ui.rawTranscriptionOutput.textContent = rawText;
                         ui.polishedNoteOutput.innerHTML = polishedHtml;
                         ui.summaryOutput.innerHTML = polishedHtml;
@@ -638,13 +680,10 @@
             
             function updateRecordButtonState() {
                 const isReady = dictationService && dictationService.isReady();
-                const buttons = [ui.startRecordingBtn, ui.recordButton];
+                const buttons = [ui.startRecordingBtn, ui.recordButton, ui.newReportBtn];
                 buttons.forEach(btn => {
                     if (btn) {
-                        btn.disabled = !isReady;
-                        btn.style.cursor = isReady ? 'pointer' : 'not-allowed';
-                        btn.style.opacity = isReady ? '1' : '0.5';
-                        btn.title = isReady ? 'Start Recording' : 'API Key not configured';
+                        btn.disabled = !isReady; btn.style.cursor = isReady ? 'pointer' : 'not-allowed'; btn.style.opacity = isReady ? '1' : '0.5'; btn.title = isReady ? 'Start Recording' : 'API Key not configured';
                     }
                 });
                 ui.apiKeyBanner.classList.toggle('hidden', isReady);
@@ -654,13 +693,11 @@
                 const apiKey = ui.apiKeyInput.value.trim();
                 if(apiKey) {
                     localStorage.setItem('geminiApiKey', apiKey);
-                    initializeDictationService(apiKey); // Re-initialize the service with the new key
+                    initializeDictationService(apiKey);
                     ui.apiKeyStatus.textContent = 'API Key saved!';
                      setTimeout(() => {
                         ui.apiKeyStatus.textContent = '';
-                        if (dictationService.isReady()) {
-                            showPage('dashboard');
-                        }
+                        if (dictationService.isReady()) showPage('dashboard');
                     }, 2000);
                 }
             }
@@ -668,56 +705,122 @@
             function switchView() {
                 const isVcView = ui.viewToggle.checked;
                 currentView = isVcView ? 'vc' : 'ceo';
-                
-                ui.ceoView.classList.toggle('hidden', isVcView);
-                ui.vcView.classList.toggle('hidden', !isVcView);
-                ui.ceoNav.classList.toggle('hidden', isVcView);
-                ui.vcNav.classList.toggle('hidden', !isVcView);
-                
+                ui.ceoView.classList.toggle('hidden', isVcView); ui.vcView.classList.toggle('hidden', !isVcView); ui.ceoNav.classList.toggle('hidden', isVcView); ui.vcNav.classList.toggle('hidden', !isVcView);
                 if (isVcView) {
-                    ui.userName.textContent = 'Sarah (Partner)';
-                    ui.userCompany.textContent = 'Alpha Ventures';
-                    ui.userAvatar.src = 'https://placehold.co/100x100/8B5CF6/FFFFFF?text=S';
-                    ui.vcLabel.classList.add('font-semibold', 'text-purple-700');
-                    ui.vcLabel.classList.remove('text-gray-500');
-                    ui.ceoLabel.classList.remove('font-semibold', 'text-purple-700');
-                    ui.ceoLabel.classList.add('text-gray-500');
+                    ui.userName.textContent = 'Sarah (Partner)'; ui.userCompany.textContent = 'Alpha Ventures'; ui.userAvatar.src = 'https://placehold.co/100x100/8B5CF6/FFFFFF?text=S';
+                    ui.vcLabel.classList.add('font-semibold', 'text-purple-700'); ui.vcLabel.classList.remove('text-gray-500'); ui.ceoLabel.classList.remove('font-semibold', 'text-purple-700'); ui.ceoLabel.classList.add('text-gray-500');
                     showPage('vc-dashboard');
                 } else {
-                    ui.userName.textContent = 'Alex (CEO)';
-                    ui.userCompany.textContent = 'Acme Inc.';
-                    ui.userAvatar.src = 'https://placehold.co/100x100/5B21B6/FFFFFF?text=A';
-                    ui.ceoLabel.classList.add('font-semibold', 'text-purple-700');
-                    ui.ceoLabel.classList.remove('text-gray-500');
-                    ui.vcLabel.classList.remove('font-semibold', 'text-purple-700');
-                    ui.vcLabel.classList.add('text-gray-500');
+                    ui.userName.textContent = 'Alex (CEO)'; ui.userCompany.textContent = 'Acme Inc.'; ui.userAvatar.src = 'https://placehold.co/100x100/5B21B6/FFFFFF?text=A';
+                    ui.ceoLabel.classList.add('font-semibold', 'text-purple-700'); ui.ceoLabel.classList.remove('text-gray-500'); ui.vcLabel.classList.remove('font-semibold', 'text-purple-700'); ui.vcLabel.classList.add('text-gray-500');
                     showPage('dashboard');
                 }
             }
+            
+            // Modal Logic
+            function showModal(title, body) {
+                ui.modalTitle.textContent = title;
+                ui.modalBody.innerHTML = '';
+                ui.modalBody.appendChild(body);
+                ui.modal.classList.remove('hidden');
+                setTimeout(() => { ui.modalOverlay.classList.remove('opacity-0'); ui.modalContent.classList.remove('scale-95', 'opacity-0'); }, 10);
+            }
 
+            function hideModal() {
+                ui.modalOverlay.classList.add('opacity-0');
+                ui.modalContent.classList.add('scale-95', 'opacity-0');
+                setTimeout(() => ui.modal.classList.add('hidden'), 300);
+            }
+            
+            function showShareModal() {
+                const content = document.createElement('div');
+                content.innerHTML = `
+                    <p class="text-sm text-gray-600 mb-4">Share this report with your stakeholders.</p>
+                    <div class="mb-6"> <label class="text-sm font-bold text-gray-700">Shareable Link</label> <div class="flex mt-1"> <input id="share-link-input" type="text" readonly value="https://operal.ta/r/8ab3f-cde21" class="mono text-sm flex-1 p-2 border border-gray-300 rounded-l-md bg-gray-50"> <button id="copy-link-btn" class="bg-gray-200 px-4 py-2 text-sm font-semibold rounded-r-md hover:bg-gray-300">Copy</button> </div> </div>
+                    <div> <label class="text-sm font-bold text-gray-700">Send to Stakeholders</label> <div class="mt-2 border border-gray-200 rounded-md"> <div class="p-3 flex items-center justify-between"><span class="font-semibold">Alpha Ventures</span><span class="text-xs text-gray-500">sarah@alphavc.com</span></div> <div class="p-3 border-t border-gray-200 flex items-center justify-between"><span class="font-semibold">Seed Fund Inc.</span><span class="text-xs text-gray-500">updates@seed.inc</span></div> </div> </div>
+                    <button id="send-update-btn" class="w-full bg-purple-700 text-white py-2 text-sm font-bold hover:bg-purple-800 transition-colors rounded-md mt-6">Send Update</button>`;
+                showModal('Share Report', content);
+                content.querySelector('#copy-link-btn').addEventListener('click', (e) => { const btn = e.currentTarget; navigator.clipboard.writeText(content.querySelector('#share-link-input').value); btn.textContent = 'Copied!'; setTimeout(() => btn.textContent = 'Copy', 2000); });
+                content.querySelector('#send-update-btn').addEventListener('click', (e) => { const btn = e.currentTarget; btn.textContent = 'Sent!'; btn.classList.replace('bg-purple-700', 'bg-green-500'); setTimeout(() => hideModal(), 1500); });
+            }
 
-            // CEO Nav Listeners
-            Object.entries(ui.navLinks.ceo).forEach(([name, link]) => {
-                link?.addEventListener('click', (e) => { e.preventDefault(); showPage(name); });
-            });
-            // VC Nav Listeners
-            Object.entries(ui.navLinks.vc).forEach(([name, link]) => {
-                const pageName = `vc-${name}`;
-                link?.addEventListener('click', (e) => { e.preventDefault(); showPage(pageName); });
-            });
+            function showViewReportModal(reportId) {
+                const report = db.reports[reportId]; if (!report) return;
+                const content = document.createElement('div'); content.innerHTML = `<div class="prose prose-sm max-w-none">${report.content}</div>`;
+                showModal(report.title, content);
+            }
+
+            function showPlaybookModal(playbookId) {
+                const playbook = db.playbooks[playbookId]; if (!playbook) return;
+                const content = document.createElement('div'); content.innerHTML = `<div class="prose prose-sm max-w-none">${playbook.content}</div>`;
+                showModal(playbook.title, content);
+            }
+            
+            function showAuthorPlaybookModal() {
+                 const content = document.createElement('div');
+                content.innerHTML = `
+                    <div class="space-y-4">
+                        <div><label class="text-sm font-bold text-gray-700">Playbook Title</label><input type="text" placeholder="e.g., Our Guide to Board Meetings" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"></div>
+                        <div><label class="text-sm font-bold text-gray-700">Content (Markdown supported)</label><textarea rows="8" placeholder="### Key Principles..." class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"></textarea></div>
+                    </div>
+                    <div class="flex justify-between items-center mt-6">
+                        <button id="share-playbook-btn" class="bg-gray-200 text-gray-800 px-4 py-2 text-sm font-bold hover:bg-gray-300 rounded-md">Share with Portfolio</button>
+                        <button id="save-playbook-btn" class="bg-purple-700 text-white px-4 py-2 text-sm font-bold hover:bg-purple-800 rounded-md">Save Playbook</button>
+                    </div>`;
+                showModal('Author New Playbook', content);
+                 content.querySelector('#save-playbook-btn').addEventListener('click', (e) => { const btn = e.currentTarget; btn.textContent = 'Saved!'; btn.classList.replace('bg-purple-700', 'bg-green-500'); setTimeout(hideModal, 1500); });
+                 content.querySelector('#share-playbook-btn').addEventListener('click', () => alert('Playbook shared with portfolio!'));
+            }
+            
+            function populateCeoPlaybooks() {
+                const categories = {
+                    'Growth': [], 'Hiring': [], 'Fundraising': [], 'Product': [], 'Sales': [], 'Legal': []
+                };
+                 Object.entries(db.playbooks).forEach(([id, playbook]) => {
+                    if(playbook.category) {
+                        const html = `<li class="group cursor-pointer playbook-link" data-playbook-id="${id}"><div class="flex justify-between hover:bg-gray-50 px-2 py-1 -mx-2 rounded"><span>${playbook.title}</span><span class="mono text-xs">${playbook.company}</span></div></li>`;
+                        categories[playbook.category].push(html);
+                    }
+                });
+                
+                let fullHtml = '';
+                for (const [category, items] of Object.entries(categories)) {
+                    if (items.length) {
+                        fullHtml += `<div><h3 class="font-bold mb-4 pb-2 border-b border-gray-200">${category}</h3><ul class="space-y-3 text-sm">${items.join('')}</ul></div>`;
+                    }
+                }
+                ui.ceoPlaybookList.innerHTML = fullHtml;
+                // Re-add event listeners 
+                document.querySelectorAll('#ceo-playbook-list .playbook-link').forEach(link => {
+                    link.addEventListener('click', (e) => { e.preventDefault(); showPlaybookModal(e.currentTarget.dataset.playbookId); });
+                });
+            }
+
+            // Event Listeners Setup
+            Object.entries(ui.navLinks.ceo).forEach(([name, link]) => link?.addEventListener('click', (e) => { e.preventDefault(); showPage(name); }));
+            Object.entries(ui.navLinks.vc).forEach(([name, link]) => link?.addEventListener('click', (e) => { e.preventDefault(); showPage(`vc-${name}`); }));
             
             ui.bannerSettingsLink.addEventListener('click', (e) => { e.preventDefault(); showPage('settings'); });
             ui.mobileMenuBtn.addEventListener('click', () => { ui.sidebar.classList.toggle('-translate-x-full'); });
             ui.startRecordingBtn.addEventListener('click', () => dictationService?.toggleRecording());
+            if(ui.newReportBtn) ui.newReportBtn.addEventListener('click', () => showPage('dashboard'));
             ui.saveApiKeyBtn.addEventListener('click', saveApiKey);
             ui.viewToggle.addEventListener('change', switchView);
+            ui.finalizeReportBtn.addEventListener('click', showShareModal);
+            if(ui.authorPlaybookBtn) ui.authorPlaybookBtn.addEventListener('click', showAuthorPlaybookModal);
+
+            document.querySelectorAll('.view-report-link').forEach(link => link.addEventListener('click', (e) => { e.preventDefault(); showViewReportModal(e.target.dataset.reportId); }));
+            document.querySelectorAll('#page-vc-playbooks .playbook-link').forEach(link => link.addEventListener('click', (e) => { e.preventDefault(); showPlaybookModal(e.currentTarget.dataset.playbookId); }));
+            document.querySelectorAll('#vc-portfolio-list > div').forEach(card => card.addEventListener('click', (e) => { e.preventDefault(); showViewReportModal(e.currentTarget.dataset.companyId); }));
+
+            ui.modalCloseBtn.addEventListener('click', hideModal);
+            ui.modalOverlay.addEventListener('click', hideModal);
             
             // Initial Load
             const savedApiKey = localStorage.getItem('geminiApiKey');
-            if (savedApiKey) {
-                ui.apiKeyInput.value = savedApiKey;
-            }
+            if (savedApiKey) ui.apiKeyInput.value = savedApiKey;
             initializeDictationService(savedApiKey);
+            populateCeoPlaybooks();
         });
     </script>
 </body>
