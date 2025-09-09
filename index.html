@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Operalta — Platform Prototype</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
+        
+        :root {
+            --grid-color: #f0f0f0;
+            --accent: #5B21B6;
+            --color-recording: #ff3b30;
+            --glass-bg: rgba(255, 255, 255, 0.65);
+            --glass-border: rgba(0, 0, 0, 0.07);
+            --glass-shadow: rgba(0, 0, 0, 0.05);
+            --glass-recording-bg: rgba(248, 248, 248, 0.75);
+            --glass-recording-border: rgba(0, 0, 0, 0.1);
+        }
+        
+        body {
+            font-family: 'Space Grotesk', -apple-system, sans-serif;
+            background-color: #f9fafb;
+        }
+        
+        .mono {
+            font-family: 'Space Mono', monospace;
+        }
+
+        .baseline-grid {
+            background-image: linear-gradient(var(--grid-color) 1px, transparent 1px);
+            background-size: 100% 16px;
+        }
+        
+        .sidebar-link { transition: all 0.2s ease; }
+        .sidebar-link:hover, .sidebar-link.active { background-color: #f3f4f6; color: #111827; }
+        .sidebar-link.active { font-weight: 600; }
+        #sidebar { transition: transform 0.3s ease-in-out; }
+
+        /* CEO/VC Toggle Switch */
+        .toggle-dot { transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        input:checked ~ .toggle-bg { background-color: var(--accent); }
+        input:checked ~ .toggle-dot { transform: translateX(100%); }
+
+        /* Dictation App Styles Integration */
+        .recording-interface {
+            transition: all 0.45s ease-in-out;
+            z-index: 10;
+        }
+        .recording-interface.is-live {
+            position: fixed;
+            bottom: 0; left: 0; right: 0;
+            height: 350px;
+            z-index: 1000;
+            background-color: var(--glass-recording-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-top: 1px solid var(--glass-recording-border);
+            box-shadow: 0 -4px 20px var(--glass-shadow);
+            justify-content: flex-start;
+            padding: 20px;
+        }
+        .live-recording-title, #liveWaveformCanvas, .live-recording-timer {
+            opacity: 0;
+            transform: translateY(15px);
+            transition: opacity 0.3s ease-out 0.1s, transform 0.35s ease-out 0.1s;
+        }
+        .recording-interface.is-live .live-recording-title,
+        .recording-interface.is-live #liveWaveformCanvas,
+        .recording-interface.is-live .live-recording-timer {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        #liveWaveformCanvas { width: 100%; max-width: 340px; height: 70px; margin-bottom: 18px; border-radius: 4px; }
+        .live-recording-timer { font-family: var(--font-mono); font-size: 44px; font-weight: 400; margin-bottom: 22px; text-align: center; }
+        
+        .record-button { position: relative; width: 72px; height: 72px; border-radius: 50%; border: none; outline: none; background: none; cursor: pointer; z-index: 1; }
+        .record-button-inner { position: relative; width: 100%; height: 100%; border-radius: 50%; background: var(--glass-bg); border: 1px solid var(--glass-border); display: flex; align-items: center; justify-content: center; color: #111827; font-size: 24px; z-index: 2; box-shadow: 0 2px 8px rgba(0,0,0,0.1); transition: all 0.3s ease; backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); }
+        .record-button:hover .record-button-inner { transform: scale(1.08); }
+        .record-button.recording .record-button-inner { background-color: var(--color-recording); border-color: transparent; color: white; }
+
+        @keyframes wave { 0% { transform: scale(0.4); opacity: 0.8; } 100% { transform: scale(1.8); opacity: 0; } }
+        .record-waves { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 200px; height: 200px; z-index: 1; opacity: 0; transition: opacity 0.3s ease; pointer-events: none; }
+        .record-button.recording .record-waves { opacity: 1; }
+        .wave { fill: none; stroke: var(--color-recording); stroke-width: 1.5px; opacity: 0; transform-origin: center; }
+        .record-button.recording .wave1 { animation: wave 2s infinite ease-out; }
+        .record-button.recording .wave2 { animation: wave 2s infinite ease-out 0.4s; }
+        
+        .notion-block {
+            border-left: 3px solid var(--accent);
+            padding-left: 1rem;
+            margin-top: 0.5rem;
+        }
+        .hover-invert { transition: all 0.2s ease; }
+        .hover-invert:hover { background: #111827; color: #fff; }
+    </style>
+     <script type="importmap">
+      {
+        "imports": {
+          "@google/genai": "https://esm.sh/@google/genai@^0.8.0",
+          "marked": "https://esm.sh/marked@^4.0.0"
+        }
+      }
+    </script>
+</head>
+<body class="text-gray-900 overflow-x-hidden">
+
+    <div class="relative min-h-screen md:flex">
+        <!-- Mobile Header -->
+        <div class="md:hidden flex justify-between items-center bg-white border-b border-gray-200 p-4 sticky top-0 z-40">
+            <a href="#" class="font-bold text-sm tracking-wider">Operalta</a>
+            <button id="mobile-menu-btn">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+            </button>
+        </div>
+
+        <!-- Sidebar Navigation -->
+        <aside id="sidebar" class="w-64 flex-shrink-0 bg-white border-r border-gray-200 flex flex-col fixed inset-y-0 left-0 z-50 transform -translate-x-full md:relative md:translate-x-0">
+            <div class="h-16 flex items-center px-6 border-b border-gray-200">
+                <a href="#" class="font-bold text-sm tracking-wider flex items-center gap-2"><span>Operalta</span></a>
+            </div>
+            
+            <nav id="ceo-nav" class="flex-1 px-4 py-6 space-y-2">
+                <a href="#" id="nav-dashboard" class="sidebar-link active flex items-center px-4 py-2 text-sm text-gray-600 rounded-md"><svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>Dashboard</a>
+                <a href="#" id="nav-reports" class="sidebar-link flex items-center px-4 py-2 text-sm text-gray-600 rounded-md"><svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>Reports</a>
+                <a href="#" id="nav-playbooks" class="sidebar-link flex items-center px-4 py-2 text-sm text-gray-600 rounded-md"><svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v11.494m-9-5.747h18"></path></svg>Playbooks</a>
+                <a href="#" id="nav-integrations" class="sidebar-link flex items-center px-4 py-2 text-sm text-gray-600 rounded-md"><svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>Integrations</a>
+                <a href="#" id="nav-settings" class="sidebar-link flex items-center px-4 py-2 text-sm text-gray-600 rounded-md"><svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>Settings</a>
+            </nav>
+            <nav id="vc-nav" class="hidden flex-1 px-4 py-6 space-y-2">
+                <a href="#" id="nav-vc-dashboard" class="sidebar-link active flex items-center px-4 py-2 text-sm text-gray-600 rounded-md"><svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2a4 4 0 00-4-4H3s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1h-2a4 4 0 00-4 4v2"></path><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"></path><path d="M17.63 17.63A4 4 0 1014 14a4 4 0 003.63 3.63z"></path></svg>Portfolio</a>
+                <a href="#" id="nav-vc-playbooks" class="sidebar-link flex items-center px-4 py-2 text-sm text-gray-600 rounded-md"><svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v11.494m-9-5.747h18"></path></svg>Playbooks</a>
+                 <a href="#" id="nav-vc-settings" class="sidebar-link flex items-center px-4 py-2 text-sm text-gray-600 rounded-md"><svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>Settings</a>
+            </nav>
+            
+             <div class="px-4 py-4 mt-auto border-t border-gray-200">
+                <div class="flex items-center mb-4">
+                    <img id="user-avatar" class="h-8 w-8 rounded-full object-cover" src="https://placehold.co/100x100/5B21B6/FFFFFF?text=A" alt="User Avatar">
+                    <div class="ml-3">
+                        <p id="user-name" class="text-sm font-semibold text-gray-800">Alex (CEO)</p>
+                        <p id="user-company" class="text-xs text-gray-500">Acme Inc.</p>
+                    </div>
+                </div>
+                 <div class="mt-4 text-xs mono">
+                    <label for="view-toggle" class="flex items-center cursor-pointer">
+                        <span id="ceo-label" class="mr-2 font-semibold text-purple-700">CEO</span>
+                        <div class="relative">
+                            <input type="checkbox" id="view-toggle" class="sr-only">
+                            <div class="toggle-bg block bg-gray-200 w-10 h-5 rounded-full"></div>
+                            <div class="toggle-dot absolute left-0 top-0 bg-white w-5 h-5 rounded-full shadow-md"></div>
+                        </div>
+                        <span id="vc-label" class="ml-2 text-gray-500">VC</span>
+                    </label>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="flex-1">
+            <div id="ceo-view">
+                <div id="page-dashboard" class="p-4 sm:p-8 md:p-12 baseline-grid">
+                    <div id="api-key-banner" class="hidden bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-6 rounded-r-lg" role="alert">
+                        <p class="font-bold">Action Required</p>
+                        <p>Please <a href="#" id="banner-settings-link" class="underline font-semibold">add your Gemini API key</a> in the settings to enable recording.</p>
+                    </div>
+                    <header class="mb-8"><h1 class="text-2xl sm:text-3xl font-bold tracking-tight">CEO Dashboard</h1><p class="text-gray-500 mt-1 mono text-sm">Welcome back, Alex. Your augmented co-founder is ready.</p></header><div class="bg-white p-6 sm:p-8 border border-gray-200 rounded-lg shadow-sm mb-8"><div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4"><h2 class="text-lg font-bold">Create Weekly Update</h2><span class="text-xs mono text-gray-500 mt-1 sm:mt-0">Voice Memo → AI Synthesis → Investor Report</span></div><div class="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6"><button id="start-recording-btn" class="w-16 h-16 bg-purple-700 text-white rounded-full flex items-center justify-center hover:bg-purple-800 transition-all transform hover:scale-105 shadow-lg flex-shrink-0"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path></svg></button><div class="flex-1"><p class="font-semibold">Record a 5-minute voice memo</p><p class="text-sm text-gray-600">Summarize your week: wins, challenges, and key metrics. Our AI will do the rest.</p></div></div></div>
+                     <div class="bg-white p-6 sm:p-8 border border-gray-200 rounded-lg shadow-sm">
+                        <h2 class="text-lg font-bold mb-4">Recent Activity</h2>
+                        <div class="text-sm text-gray-500">No recent reports. Record an update to get started.</div>
+                    </div>
+                </div>
+                
+                <div id="page-recording" class="hidden p-4 sm:p-8 md:p-12">
+                    <header class="mb-8"><h1 class="text-2xl sm:text-3xl font-bold tracking-tight">New Weekly Update</h1></header>
+                    <div id="processing-state" class="hidden text-center py-16"><div class="inline-block w-8 h-8 border-2 border-purple-700 border-t-transparent rounded-full animate-spin mb-4"></div><h3 id="processing-status" class="font-bold">Processing audio...</h3><p class="text-sm text-gray-600 mt-2">This usually takes less than a minute.</p></div>
+                     <div id="completed-state" class="hidden grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12"><div><h4 class="font-bold text-sm mb-2">AI Transcription & Analysis</h4><div id="raw-transcription-output" class="bg-gray-50 p-4 rounded-md max-h-96 overflow-y-auto text-sm text-gray-700 leading-relaxed italic"></div><h4 class="font-bold text-sm mb-2 mt-6">Key Insights Extracted</h4><div id="polished-note-output" class="text-sm text-gray-700 leading-relaxed prose prose-sm max-w-none"></div></div><div class="mt-8 lg:mt-0"><div class="flex items-center justify-between mb-2"><h4 class="font-bold text-sm">Draft: Weekly Investor Update</h4><span class="text-xs bg-purple-100 text-purple-800 px-2 py-0.5 rounded-full">AI-Generated</span></div><div class="bg-white border border-gray-200 p-6 rounded-md shadow-inner"><div class="mb-4"><h4 class="font-bold mb-2">Executive Summary</h4><div id="summary-output" class="text-sm text-gray-700 leading-relaxed prose prose-sm max-w-none"><p>Your AI-generated summary will appear here.</p></div></div><div class="grid grid-cols-3 gap-2 sm:gap-4 mb-4"><div class="text-center p-3 bg-gray-50 rounded"><p class="font-bold text-lg">€1.2M</p><p class="text-xs text-gray-600">ARR</p></div><div class="text-center p-3 bg-gray-50 rounded"><p class="font-bold text-lg text-green-600">+23%</p><p class="text-xs text-gray-600">Growth</p></div><div class="text-center p-3 bg-gray-50 rounded"><p class="font-bold text-lg">18mo</p><p class="text-xs text-gray-600">Runway</p></div></div><p class="text-xs text-gray-500 mono mb-4">Metrics synced from Stripe & Notion.</p><button class="w-full bg-purple-700 text-white py-2 text-sm font-bold hover:bg-purple-800 transition-colors rounded-md">Finalize & Share Report →</button></div></div></div>
+                </div>
+
+                <div id="page-reports" class="hidden p-4 sm:p-8 md:p-12">
+                    <header class="mb-8 flex justify-between items-center">
+                        <div>
+                            <h1 class="text-2xl sm:text-3xl font-bold tracking-tight">Reports</h1>
+                            <p class="text-gray-500 mt-1 mono text-sm">History of all generated investor updates.</p>
+                        </div>
+                        <button class="bg-purple-700 text-white px-4 py-2 text-sm font-bold hover:bg-purple-800 transition-colors rounded-md">New Report</button>
+                    </header>
+                    <div class="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
+                        <table class="w-full text-sm">
+                            <thead class="bg-gray-50"><tr class="text-left text-xs text-gray-500 uppercase tracking-wider"><th class="p-4 font-semibold">Date</th><th class="p-4 font-semibold">Title</th><th class="p-4 font-semibold">Status</th><th class="p-4 font-semibold hidden md:table-cell">Key Metric</th><th class="p-4"></th></tr></thead>
+                            <tbody class="divide-y divide-gray-200">
+                                <tr><td class="p-4">Sep 5, 2025</td><td class="p-4 font-semibold">Weekly Update - W36</td><td class="p-4"><span class="px-2 py-1 text-xs font-semibold text-green-800 bg-green-100 rounded-full">Sent</span></td><td class="p-4 hidden md:table-cell">23% MoM Growth</td><td class="p-4 text-right"><a href="#" class="text-purple-700 hover:underline">View</a></td></tr>
+                                <tr><td class="p-4">Aug 29, 2025</td><td class="p-4 font-semibold">Weekly Update - W35</td><td class="p-4"><span class="px-2 py-1 text-xs font-semibold text-green-800 bg-green-100 rounded-full">Sent</span></td><td class="p-4 hidden md:table-cell">Onboarded 2 Enterprise clients</td><td class="p-4 text-right"><a href="#" class="text-purple-700 hover:underline">View</a></td></tr>
+                                 <tr><td class="p-4">Aug 22, 2025</td><td class="p-4 font-semibold">Weekly Update - W34</td><td class="p-4"><span class="px-2 py-1 text-xs font-semibold text-yellow-800 bg-yellow-100 rounded-full">Draft</span></td><td class="p-4 hidden md:table-cell">Hiring top priority</td><td class="p-4 text-right"><a href="#" class="text-purple-700 hover:underline">View</a></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div id="page-playbooks" class="hidden p-4 sm:p-8 md:p-12">
+                    <header class="mb-8 flex justify-between items-baseline">
+                         <div>
+                            <h1 class="text-2xl sm:text-3xl font-bold tracking-tight">Playbook Library</h1>
+                            <p class="text-gray-500 mt-1 mono text-sm">1,247+ proven strategies from top-tier companies.</p>
+                        </div>
+                        <span class="text-sm mono hidden sm:block">Filter by category ↓</span>
+                    </header>
+                    <div class="grid grid-cols-3 md:grid-cols-6 gap-2 text-center mb-12">
+                        <div class="hover-invert border border-gray-300 aspect-square flex flex-col items-center justify-center cursor-pointer p-2 rounded-md"><span class="text-2xl mb-1">⬆</span><span class="text-xs font-bold">GROWTH</span><span class="mono text-xs">247</span></div>
+                        <div class="hover-invert border border-gray-300 aspect-square flex flex-col items-center justify-center cursor-pointer p-2 rounded-md"><span class="text-2xl mb-1">◐</span><span class="text-xs font-bold">HIRING</span><span class="mono text-xs">189</span></div>
+                        <div class="hover-invert border border-gray-300 aspect-square flex flex-col items-center justify-center cursor-pointer p-2 rounded-md"><span class="text-2xl mb-1">◈</span><span class="text-xs font-bold">FUNDRAISING</span><span class="mono text-xs">312</span></div>
+                        <div class="hover-invert border border-gray-300 aspect-square flex flex-col items-center justify-center cursor-pointer p-2 rounded-md"><span class="text-2xl mb-1">◉</span><span class="text-xs font-bold">PRODUCT</span><span class="mono text-xs">156</span></div>
+                        <div class="hover-invert border border-gray-300 aspect-square flex flex-col items-center justify-center cursor-pointer p-2 rounded-md"><span class="text-2xl mb-1">▣</span><span class="text-xs font-bold">SALES</span><span class="mono text-xs">203</span></div>
+                        <div class="hover-invert border border-gray-300 aspect-square flex flex-col items-center justify-center cursor-pointer p-2 rounded-md"><span class="text-2xl mb-1">◊</span><span class="text-xs font-bold">LEGAL</span><span class="mono text-xs">140</span></div>
+                    </div>
+                     <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        <div>
+                            <h3 class="font-bold mb-4 pb-2 border-b border-gray-200">Series A Playbooks</h3>
+                            <ul class="space-y-3 text-sm"><li class="group cursor-pointer"><div class="flex justify-between hover:bg-gray-50 px-2 py-1 -mx-2 rounded"><span>Scaling Engineering Teams</span><span class="mono text-xs">REVOLUT</span></div><p class="text-xs text-gray-500 px-2 hidden group-hover:block notion-block">From 10 to 100 engineers in 18 months</p></li><li class="group cursor-pointer"><div class="flex justify-between hover:bg-gray-50 px-2 py-1 -mx-2 rounded"><span>Board Meeting Excellence</span><span class="mono text-xs">SPOTIFY</span></div><p class="text-xs text-gray-500 px-2 hidden group-hover:block notion-block">Data-driven board decks that drive decisions</p></li><li class="group cursor-pointer"><div class="flex justify-between hover:bg-gray-50 px-2 py-1 -mx-2 rounded"><span>Revenue Operations</span><span class="mono text-xs">KLARNA</span></div><p class="text-xs text-gray-500 px-2 hidden group-hover:block notion-block">Building predictable growth engines</p></li></ul>
+                        </div>
+                        <div>
+                            <h3 class="font-bold mb-4 pb-2 border-b border-gray-200">Crisis Management</h3>
+                            <ul class="space-y-3 text-sm"><li class="group cursor-pointer"><div class="flex justify-between hover:bg-gray-50 px-2 py-1 -mx-2 rounded"><span>Runway Extension</span><span class="mono text-xs">BOOKING</span></div><p class="text-xs text-gray-500 px-2 hidden group-hover:block notion-block">How we survived 2020 and emerged stronger</p></li><li class="group cursor-pointer"><div class="flex justify-between hover:bg-gray-50 px-2 py-1 -mx-2 rounded"><span>Pivot Playbook</span><span class="mono text-xs">TRANSFERWISE</span></div><p class="text-xs text-gray-500 px-2 hidden group-hover:block notion-block">From P2P to B2B banking infrastructure</p></li><li class="group cursor-pointer"><div class="flex justify-between hover:bg-gray-50 px-2 py-1 -mx-2 rounded"><span>Remote Transformation</span><span class="mono text-xs">GITLAB</span></div><p class="text-xs text-gray-500 px-2 hidden group-hover:block notion-block">1000+ employees, 60+ countries, 0 offices</p></li></ul>
+                        </div>
+                        <div>
+                            <h3 class="font-bold mb-4 pb-2 border-b border-gray-200">VC Collaboration</h3>
+                            <ul class="space-y-3 text-sm"><li class="group cursor-pointer"><div class="flex justify-between hover:bg-gray-50 px-2 py-1 -mx-2 rounded"><span>Weekly Partner Sync</span><span class="mono text-xs">INDEX</span></div><p class="text-xs text-gray-500 px-2 hidden group-hover:block notion-block">5-minute voice updates that matter</p></li><li class="group cursor-pointer"><div class="flex justify-between hover:bg-gray-50 px-2 py-1 -mx-2 rounded"><span>Portfolio Intelligence</span><span class="mono text-xs">ATOMICO</span></div><p class="text-xs text-gray-500 px-2 hidden group-hover:block notion-block">Learning from 50 portfolio companies</p></li><li class="group cursor-pointer"><div class="flex justify-between hover:bg-gray-50 px-2 py-1 -mx-2 rounded"><span>Expert Network Access</span><span class="mono text-xs">BALDERTON</span></div><p class="text-xs text-gray-500 px-2 hidden group-hover:block notion-block">Connecting CEOs with domain experts</p></li></ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="page-integrations" class="hidden p-4 sm:p-8 md:p-12">
+                     <header class="mb-8"><h1 class="text-2xl sm:text-3xl font-bold tracking-tight">Integrations</h1><p class="text-gray-500 mt-1 mono text-sm">Connect Operalta to your existing workflow.</p></header>
+                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <div class="bg-white border border-gray-200 rounded-lg p-6 flex flex-col"><div class="flex items-center mb-4"><img src="https://placehold.co/40x40/000000/FFFFFF?text=N" class="w-10 h-10 mr-4"><h3 class="text-lg font-bold">Notion</h3></div><p class="text-sm text-gray-600 flex-1 mb-4">Sync your company wiki, roadmaps, and KPIs to provide context for AI analysis.</p><button class="w-full bg-green-500 text-white py-2 text-sm font-bold rounded-md">Connected</button></div>
+                        <div class="bg-white border border-gray-200 rounded-lg p-6 flex flex-col"><div class="flex items-center mb-4"><img src="https://placehold.co/40x40/4A154B/FFFFFF?text=S" class="w-10 h-10 mr-4"><h3 class="text-lg font-bold">Slack</h3></div><p class="text-sm text-gray-600 flex-1 mb-4">Send report summaries and get notifications directly in your team's channels.</p><button class="w-full bg-gray-200 text-gray-800 py-2 text-sm font-bold hover:bg-gray-300 rounded-md">Connect</button></div>
+                        <div class="bg-white border border-gray-200 rounded-lg p-6 flex flex-col"><div class="flex items-center mb-4"><img src="https://placehold.co/40x40/635BFF/FFFFFF?text=S" class="w-10 h-10 mr-4"><h3 class="text-lg font-bold">Stripe</h3></div><p class="text-sm text-gray-600 flex-1 mb-4">Automatically pull in key financial metrics like ARR, MRR, and growth rates.</p><button class="w-full bg-gray-200 text-gray-800 py-2 text-sm font-bold hover:bg-gray-300 rounded-md">Connect</button></div>
+                     </div>
+                </div>
+                
+                <div id="page-settings" class="hidden p-4 sm:p-8 md:p-12">
+                    <header class="mb-8"><h1 class="text-2xl sm:text-3xl font-bold tracking-tight">Settings</h1></header>
+                    <div class="bg-white p-6 sm:p-8 border border-gray-200 rounded-lg shadow-sm max-w-2xl">
+                        <h2 class="text-lg font-bold mb-1">API Configuration</h2>
+                        <p class="text-sm text-gray-600 mb-4">A valid Google Gemini API key is required for audio transcription and analysis.</p>
+                        <div class="space-y-2">
+                            <label for="api-key-input" class="text-sm font-semibold text-gray-700">Gemini API Key</label>
+                            <input type="password" id="api-key-input" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm" placeholder="Enter your API key">
+                        </div>
+                        <div class="mt-4 flex items-center justify-between">
+                            <button id="save-api-key-btn" class="bg-purple-700 text-white px-4 py-2 text-sm font-bold hover:bg-purple-800 transition-colors rounded-md">Save Key</button>
+                            <span id="api-key-status" class="text-sm text-green-600"></span>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-4">You can get a key from <a href="https://aistudio.google.com/app/apikey" target="_blank" class="text-purple-700 underline">Google AI Studio</a>. Your key is stored securely in your browser's local storage.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="vc-view" class="hidden">
+                 <div id="page-vc-dashboard" class="p-4 sm:p-8 md:p-12">
+                    <header class="mb-8">
+                        <h1 class="text-2xl sm:text-3xl font-bold tracking-tight">Portfolio Dashboard</h1>
+                        <p class="text-gray-500 mt-1 mono text-sm">High-level overview of your investments.</p>
+                    </header>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <div class="bg-white border border-gray-200 p-6 rounded-lg"><div class="flex justify-between items-start mb-4"><h3 class="font-bold">Innovate Inc.</h3><span class="px-2 py-1 text-xs font-semibold text-green-800 bg-green-100 rounded-full">On Track</span></div><div class="grid grid-cols-3 gap-4 text-center"><div class="border-r border-gray-200"><p class="text-lg font-bold">€2.1M</p><p class="text-xs text-gray-500">ARR</p></div><div class="border-r border-gray-200"><p class="text-lg font-bold text-green-600">+18%</p><p class="text-xs text-gray-500">MoM</p></div><div><p class="text-lg font-bold">24mo</p><p class="text-xs text-gray-500">Runway</p></div></div></div>
+                        <div class="bg-white border border-gray-200 p-6 rounded-lg"><div class="flex justify-between items-start mb-4"><h3 class="font-bold">QuantumLeap</h3><span class="px-2 py-1 text-xs font-semibold text-yellow-800 bg-yellow-100 rounded-full">Needs Attention</span></div><div class="grid grid-cols-3 gap-4 text-center"><div class="border-r border-gray-200"><p class="text-lg font-bold">€800K</p><p class="text-xs text-gray-500">ARR</p></div><div class="border-r border-gray-200"><p class="text-lg font-bold text-red-600">-5%</p><p class="text-xs text-gray-500">MoM</p></div><div><p class="text-lg font-bold">9mo</p><p class="text-xs text-gray-500">Runway</p></div></div></div>
+                        <div class="bg-white border border-gray-200 p-6 rounded-lg"><div class="flex justify-between items-start mb-4"><h3 class="font-bold">Synergy AI</h3><span class="px-2 py-1 text-xs font-semibold text-green-800 bg-green-100 rounded-full">On Track</span></div><div class="grid grid-cols-3 gap-4 text-center"><div class="border-r border-gray-200"><p class="text-lg font-bold">€4.5M</p><p class="text-xs text-gray-500">ARR</p></div><div class="border-r border-gray-200"><p class="text-lg font-bold text-green-600">+25%</p><p class="text-xs text-gray-500">MoM</p></div><div><p class="text-lg font-bold">16mo</p><p class="text-xs text-gray-500">Runway</p></div></div></div>
+                    </div>
+                </div>
+                 <div id="page-vc-playbooks" class="hidden p-4 sm:p-8 md:p-12">
+                     <header class="mb-8 flex justify-between items-baseline">
+                         <div>
+                            <h1 class="text-2xl sm:text-3xl font-bold tracking-tight">Firm Playbooks</h1>
+                            <p class="text-gray-500 mt-1 mono text-sm">Proprietary strategies for your portfolio companies.</p>
+                        </div>
+                        <button class="bg-purple-700 text-white px-4 py-2 text-sm font-bold hover:bg-purple-800 transition-colors rounded-md">Create Playbook</button>
+                    </header>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="bg-white border border-gray-200 p-6 rounded-lg"><h3 class="font-bold mb-2">Alpha Ventures Go-To-Market</h3><p class="text-sm text-gray-600">Our proven framework for finding product-market fit and scaling to the first 100 customers.</p></div>
+                        <div class="bg-white border border-gray-200 p-6 rounded-lg"><h3 class="font-bold mb-2">Alpha Ventures Hiring Matrix</h3><p class="text-sm text-gray-600">Standardized interview process and scorecards for hiring A-players in Engineering and Sales.</p></div>
+                    </div>
+                 </div>
+                 <div id="page-vc-settings" class="hidden p-4 sm:p-8 md:p-12">
+                      <header class="mb-8"><h1 class="text-2xl sm:text-3xl font-bold tracking-tight">Settings</h1></header>
+                      <p>VC settings page placeholder.</p>
+                 </div>
+            </div>
+        </main>
+        
+        <div id="recording-interface" class="recording-interface hidden flex-col items-center">
+            <div id="liveRecordingTitle" class="live-recording-title hidden text-lg font-semibold">New Recording</div>
+            <canvas id="liveWaveformCanvas" class="hidden"></canvas>
+            <div id="liveRecordingTimerDisplay" class="live-recording-timer hidden">00:00.00</div>
+            <div id="recording-status-text" class="status-text text-gray-500 mb-4">Ready to record</div>
+            <div class="recording-controls">
+                <button id="recordButton" class="record-button" title="Start Recording"><div class="record-button-inner"><i class="fas fa-microphone"></i></div><svg class="record-waves" viewBox="0 0 200 200"><circle class="wave wave1" cx="100" cy="100" r="40" /><circle class="wave wave2" cx="100" cy="100" r="70" /></svg></button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { GoogleGenAI } from "@google/genai";
+        import { marked } from "marked";
+
+        const MODEL_NAME = 'gemini-1.5-flash';
+
+        class DictationService {
+            constructor(options) {
+                this.genAI = null;
+                this.apiKey = options.apiKey;
+                
+                if (this.apiKey) {
+                    try {
+                        this.genAI = new GoogleGenAI({ apiKey: this.apiKey });
+                    } catch (e) {
+                        console.error("Failed to initialize GoogleGenAI:", e);
+                    }
+                }
+                
+                this.recordButton = options.recordButton;
+                this.statusTextElement = options.statusTextElement;
+                this.onProcessingComplete = options.onProcessingComplete;
+                this.onRecordingStart = options.onRecordingStart;
+                this.onRecordingStop = options.onRecordingStop;
+                
+                this.liveWaveformCanvas = document.getElementById('liveWaveformCanvas');
+                this.liveRecordingTimerDisplay = document.getElementById('liveRecordingTimerDisplay');
+                this.recordingInterface = document.getElementById('recording-interface');
+                this.liveRecordingTitle = document.getElementById('liveRecordingTitle');
+
+                if (this.liveWaveformCanvas) {
+                    this.liveWaveformCtx = this.liveWaveformCanvas.getContext('2d');
+                }
+                
+                this.audioChunks = [];
+                this.isRecording = false;
+                this.mediaRecorder = null;
+                this.stream = null;
+                this.audioContext = null;
+
+                this.bindEventListeners();
+            }
+            
+            isReady() {
+                return this.genAI !== null;
+            }
+
+            bindEventListeners() {
+                this.recordButton.addEventListener('click', () => this.toggleRecording());
+                window.addEventListener('resize', () => this.handleResize());
+            }
+            
+            handleResize() { if (this.isRecording) requestAnimationFrame(() => this.setupCanvasDimensions()); }
+
+            setupCanvasDimensions() {
+                if (!this.liveWaveformCanvas || !this.liveWaveformCtx) return;
+                const canvas = this.liveWaveformCanvas;
+                const dpr = window.devicePixelRatio || 1;
+                const rect = canvas.getBoundingClientRect();
+                canvas.width = rect.width * dpr;
+                canvas.height = rect.height * dpr;
+                this.liveWaveformCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+            }
+
+            async toggleRecording() {
+                if (!this.isReady()) {
+                    console.error("Dictation service not ready. API Key might be missing or invalid.");
+                    this.statusTextElement.textContent = 'API Key invalid.';
+                    this.statusTextElement.style.color = 'red';
+                    return;
+                }
+                this.isRecording ? await this.stopRecording() : await this.startRecording();
+            }
+            
+            async startRecording() {
+                try {
+                    this.audioChunks = [];
+                    this.statusTextElement.textContent = 'Requesting microphone...';
+                    this.stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                    
+                    this.mediaRecorder = new MediaRecorder(this.stream);
+                    this.mediaRecorder.ondataavailable = e => { if (e.data.size > 0) this.audioChunks.push(e.data) };
+                    this.mediaRecorder.onstop = () => {
+                        if (this.onRecordingStop) this.onRecordingStop();
+                        this.stopLiveDisplay();
+                        if (this.audioChunks.length > 0) {
+                            const audioBlob = new Blob(this.audioChunks, { type: this.mediaRecorder?.mimeType || 'audio/webm' });
+                            this.processAudio(audioBlob);
+                        }
+                        if (this.stream) this.stream.getTracks().forEach(track => track.stop());
+                    };
+
+                    this.mediaRecorder.start();
+                    this.isRecording = true;
+                    this.recordButton.classList.add('recording');
+                    this.recordButton.title = 'Stop Recording';
+                    this.startLiveDisplay();
+                    if(this.onRecordingStart) this.onRecordingStart();
+
+                } catch (error) {
+                    console.error("Error starting recording:", error);
+                    this.statusTextElement.textContent = 'Microphone access denied.';
+                }
+            }
+            
+            async stopRecording() {
+                if (this.mediaRecorder && this.isRecording) {
+                    this.mediaRecorder.stop();
+                    this.isRecording = false;
+                    this.recordButton.classList.remove('recording');
+                    this.recordButton.title = 'Start Recording';
+                    this.statusTextElement.textContent = 'Processing...';
+                }
+            }
+            
+            startLiveDisplay() {
+                this.recordingInterface.classList.add('is-live');
+                ['liveRecordingTitle', 'liveWaveformCanvas', 'liveRecordingTimerDisplay'].forEach(id => document.getElementById(id)?.classList.remove('hidden'));
+                this.setupCanvasDimensions();
+                const icon = this.recordButton.querySelector('i');
+                if(icon) { icon.classList.remove('fa-microphone'); icon.classList.add('fa-stop'); }
+                this.setupAudioVisualizer();
+                this.drawLiveWaveform();
+                this.recordingStartTime = Date.now();
+                if (this.timerIntervalId) clearInterval(this.timerIntervalId);
+                this.timerIntervalId = setInterval(() => this.updateLiveTimer(), 50);
+            }
+
+            stopLiveDisplay() {
+                 this.recordingInterface.classList.remove('is-live');
+                 setTimeout(() => this.recordingInterface.classList.add('hidden'), 500);
+                ['liveRecordingTitle', 'liveWaveformCanvas', 'liveRecordingTimerDisplay'].forEach(id => document.getElementById(id)?.classList.add('hidden'));
+                const icon = this.recordButton.querySelector('i');
+                if(icon) { icon.classList.remove('fa-stop'); icon.classList.add('fa-microphone'); }
+                if (this.waveformDrawingId) cancelAnimationFrame(this.waveformDrawingId);
+                if (this.timerIntervalId) clearInterval(this.timerIntervalId);
+                if (this.audioContext && this.audioContext.state !== 'closed') this.audioContext.close();
+                this.audioContext = null;
+            }
+
+            setupAudioVisualizer() {
+                if (!this.stream) return;
+                this.audioContext = new AudioContext();
+                const source = this.audioContext.createMediaStreamSource(this.stream);
+                this.analyserNode = this.audioContext.createAnalyser();
+                this.analyserNode.fftSize = 256;
+                this.waveformDataArray = new Uint8Array(this.analyserNode.frequencyBinCount);
+                source.connect(this.analyserNode);
+            }
+
+            drawLiveWaveform() {
+                if (!this.isRecording) return;
+                requestAnimationFrame(() => this.drawLiveWaveform());
+                if (!this.analyserNode) return;
+                this.analyserNode.getByteFrequencyData(this.waveformDataArray);
+                const ctx = this.liveWaveformCtx, canvas = this.liveWaveformCanvas;
+                if(!ctx || !canvas) return;
+                ctx.clearRect(0, 0, canvas.clientWidth, canvas.clientHeight);
+                const numBars = this.waveformDataArray.length * 0.5;
+                const barWidth = canvas.clientWidth / numBars * 0.7;
+                let x = 0;
+                ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--color-recording').trim();
+                for (let i = 0; i < numBars; i++) {
+                    const barHeight = (this.waveformDataArray[i] / 255) * canvas.clientHeight;
+                    ctx.fillRect(x, (canvas.clientHeight - barHeight) / 2, barWidth, barHeight);
+                    x += barWidth * 1.3;
+                }
+            }
+            
+            updateLiveTimer() {
+                const elapsedMs = Date.now() - this.recordingStartTime;
+                const minutes = Math.floor(elapsedMs / 60000);
+                const seconds = Math.floor((elapsedMs % 60000) / 1000);
+                const hundredths = Math.floor((elapsedMs % 1000) / 10);
+                this.liveRecordingTimerDisplay.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}.${String(hundredths).padStart(2, '0')}`;
+            }
+
+            async processAudio(audioBlob) {
+                const base64Audio = await new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onloadend = () => resolve(reader.result.split(',')[1]);
+                    reader.onerror = reject;
+                    reader.readAsDataURL(audioBlob);
+                });
+                const mimeType = this.mediaRecorder?.mimeType || 'audio/webm';
+                await this.getTranscription(base64Audio, mimeType);
+            }
+
+            async getTranscription(base64Audio, mimeType) {
+                try {
+                    const contents = [{ text: 'Please provide a verbatim transcript of this audio recording.' }, { inlineData: { mimeType, data: base64Audio } }];
+                    const response = await this.genAI.models.generateContent({ model: MODEL_NAME, contents });
+                    this.getPolishedNote(response.text);
+                } catch (error) { 
+                    console.error("Error during transcription:", error);
+                    this.onProcessingComplete(`<p><strong>Error during transcription:</strong> ${error.message}</p>`, 'Transcription failed. Please check your API key and network connection.'); 
+                }
+            }
+
+            async getPolishedNote(rawTranscription) {
+                try {
+                    if (!rawTranscription.trim()) { this.onProcessingComplete('<p>No content to polish.</p>', rawTranscription); return; }
+                    const prompt = `You are an expert executive assistant. Take the following raw, verbatim audio transcript from a CEO's weekly update and transform it into a polished, professional, and concise investor update.
+                    
+                    Your tasks are to:
+                    1.  **Correct Grammar and Punctuation:** Fix any grammatical errors and add appropriate punctuation.
+                    2.  **Remove Filler Words:** Eliminate all filler words (e.g., "um," "uh," "like," "you know"), verbal tics, and false starts.
+                    3.  **Synthesize and Structure:** Do not just clean up the text. Synthesize the core ideas and structure the output clearly using Markdown. Use headings like ### Wins, ### Challenges, and ### Next Steps.
+                    4.  **Format for Clarity:** Use bullet points for lists of achievements, tasks, or metrics.
+                    5.  **Maintain Tone and Meaning:** The final output should be professional and clear but must retain the original meaning and intent of the CEO's message.
+
+                    Here is the raw transcript:
+                    ---
+                    ${rawTranscription}
+                    ---
+                    `;
+                    const contents = [{ text: prompt }];
+                    const response = await this.genAI.models.generateContent({ model: MODEL_NAME, contents });
+                    this.onProcessingComplete(marked.parse(response.text), rawTranscription);
+                } catch (error) { 
+                     console.error("Error during polishing:", error);
+                    this.onProcessingComplete(`<p><strong>Error during polishing:</strong> ${error.message}</p>`, rawTranscription); 
+                }
+            }
+        }
+
+
+        document.addEventListener('DOMContentLoaded', function() {
+            let dictationService = null;
+            let currentView = 'ceo';
+
+            const ui = {
+                sidebar: document.getElementById('sidebar'),
+                mobileMenuBtn: document.getElementById('mobile-menu-btn'),
+                ceoView: document.getElementById('ceo-view'),
+                vcView: document.getElementById('vc-view'),
+                ceoNav: document.getElementById('ceo-nav'),
+                vcNav: document.getElementById('vc-nav'),
+
+                pages: {
+                     dashboard: document.getElementById('page-dashboard'),
+                     recording: document.getElementById('page-recording'),
+                     reports: document.getElementById('page-reports'),
+                     playbooks: document.getElementById('page-playbooks'),
+                     integrations: document.getElementById('page-integrations'),
+                     settings: document.getElementById('page-settings'),
+                     vcDashboard: document.getElementById('page-vc-dashboard'),
+                     vcPlaybooks: document.getElementById('page-vc-playbooks'),
+                     vcSettings: document.getElementById('page-vc-settings'),
+                },
+                navLinks: { 
+                    ceo: {
+                        dashboard: document.getElementById('nav-dashboard'), 
+                        reports: document.getElementById('nav-reports'),
+                        playbooks: document.getElementById('nav-playbooks'),
+                        integrations: document.getElementById('nav-integrations'),
+                        settings: document.getElementById('nav-settings') 
+                    },
+                    vc: {
+                        dashboard: document.getElementById('nav-vc-dashboard'),
+                        playbooks: document.getElementById('nav-vc-playbooks'),
+                        settings: document.getElementById('nav-vc-settings'),
+                    }
+                },
+                startRecordingBtn: document.getElementById('start-recording-btn'),
+                recordButton: document.getElementById('recordButton'),
+                recordingInterface: document.getElementById('recording-interface'),
+                processingState: document.getElementById('processing-state'),
+                processingStatus: document.getElementById('processing-status'),
+                completedState: document.getElementById('completed-state'),
+                rawTranscriptionOutput: document.getElementById('raw-transcription-output'),
+                polishedNoteOutput: document.getElementById('polished-note-output'),
+                summaryOutput: document.getElementById('summary-output'),
+                apiKeyBanner: document.getElementById('api-key-banner'),
+                bannerSettingsLink: document.getElementById('banner-settings-link'),
+                apiKeyInput: document.getElementById('api-key-input'),
+                saveApiKeyBtn: document.getElementById('save-api-key-btn'),
+                apiKeyStatus: document.getElementById('api-key-status'),
+                viewToggle: document.getElementById('view-toggle'),
+                userName: document.getElementById('user-name'),
+                userCompany: document.getElementById('user-company'),
+                userAvatar: document.getElementById('user-avatar'),
+                ceoLabel: document.getElementById('ceo-label'),
+                vcLabel: document.getElementById('vc-label'),
+            };
+
+            function showPage(pageName) {
+                const pageMap = {
+                    'dashboard': ui.pages.dashboard,
+                    'recording': ui.pages.recording,
+                    'reports': ui.pages.reports,
+                    'playbooks': ui.pages.playbooks,
+                    'integrations': ui.pages.integrations,
+                    'settings': ui.pages.settings,
+                    'vc-dashboard': ui.pages.vcDashboard,
+                    'vc-playbooks': ui.pages.vcPlaybooks,
+                    'vc-settings': ui.pages.vcSettings,
+                };
+                Object.values(pageMap).forEach(page => page?.classList.add('hidden'));
+                pageMap[pageName]?.classList.remove('hidden');
+
+                const navMap = currentView === 'ceo' ? ui.navLinks.ceo : ui.navLinks.vc;
+                const navKey = pageName.replace('vc-', '');
+                Object.values(navMap).forEach(link => link?.classList.remove('active'));
+                navMap[navKey]?.classList.add('active');
+                
+                if (ui.sidebar.classList.contains('translate-x-0')) {
+                    ui.sidebar.classList.remove('translate-x-0');
+                    ui.sidebar.classList.add('-translate-x-full');
+                }
+            }
+            
+            function initializeDictationService(apiKey) {
+                dictationService = new DictationService({
+                    apiKey: apiKey,
+                    recordButton: ui.recordButton,
+                    statusTextElement: document.getElementById('recording-status-text'),
+                    onRecordingStart: () => ui.recordingInterface.classList.remove('hidden'),
+                    onRecordingStop: () => {
+                        showPage('recording');
+                        ui.recordingInterface.classList.add('hidden');
+                        ui.processingState.classList.remove('hidden');
+                        ui.completedState.classList.add('hidden');
+                        ui.processingStatus.textContent = 'Transcribing audio...';
+                    },
+                    onProcessingComplete: (polishedHtml, rawText) => {
+                        ui.rawTranscriptionOutput.textContent = rawText;
+                        ui.polishedNoteOutput.innerHTML = polishedHtml;
+                        ui.summaryOutput.innerHTML = polishedHtml;
+                        ui.processingState.classList.add('hidden');
+                        ui.completedState.classList.remove('hidden');
+                    }
+                });
+                updateRecordButtonState();
+            }
+            
+            function updateRecordButtonState() {
+                const isReady = dictationService && dictationService.isReady();
+                const buttons = [ui.startRecordingBtn, ui.recordButton];
+                buttons.forEach(btn => {
+                    if (btn) {
+                        btn.disabled = !isReady;
+                        btn.style.cursor = isReady ? 'pointer' : 'not-allowed';
+                        btn.style.opacity = isReady ? '1' : '0.5';
+                        btn.title = isReady ? 'Start Recording' : 'API Key not configured';
+                    }
+                });
+                ui.apiKeyBanner.classList.toggle('hidden', isReady);
+            }
+
+            function saveApiKey() {
+                const apiKey = ui.apiKeyInput.value.trim();
+                if(apiKey) {
+                    localStorage.setItem('geminiApiKey', apiKey);
+                    initializeDictationService(apiKey); // Re-initialize the service with the new key
+                    ui.apiKeyStatus.textContent = 'API Key saved!';
+                     setTimeout(() => {
+                        ui.apiKeyStatus.textContent = '';
+                        if (dictationService.isReady()) {
+                            showPage('dashboard');
+                        }
+                    }, 2000);
+                }
+            }
+            
+            function switchView() {
+                const isVcView = ui.viewToggle.checked;
+                currentView = isVcView ? 'vc' : 'ceo';
+                
+                ui.ceoView.classList.toggle('hidden', isVcView);
+                ui.vcView.classList.toggle('hidden', !isVcView);
+                ui.ceoNav.classList.toggle('hidden', isVcView);
+                ui.vcNav.classList.toggle('hidden', !isVcView);
+                
+                if (isVcView) {
+                    ui.userName.textContent = 'Sarah (Partner)';
+                    ui.userCompany.textContent = 'Alpha Ventures';
+                    ui.userAvatar.src = 'https://placehold.co/100x100/8B5CF6/FFFFFF?text=S';
+                    ui.vcLabel.classList.add('font-semibold', 'text-purple-700');
+                    ui.vcLabel.classList.remove('text-gray-500');
+                    ui.ceoLabel.classList.remove('font-semibold', 'text-purple-700');
+                    ui.ceoLabel.classList.add('text-gray-500');
+                    showPage('vc-dashboard');
+                } else {
+                    ui.userName.textContent = 'Alex (CEO)';
+                    ui.userCompany.textContent = 'Acme Inc.';
+                    ui.userAvatar.src = 'https://placehold.co/100x100/5B21B6/FFFFFF?text=A';
+                    ui.ceoLabel.classList.add('font-semibold', 'text-purple-700');
+                    ui.ceoLabel.classList.remove('text-gray-500');
+                    ui.vcLabel.classList.remove('font-semibold', 'text-purple-700');
+                    ui.vcLabel.classList.add('text-gray-500');
+                    showPage('dashboard');
+                }
+            }
+
+
+            // CEO Nav Listeners
+            Object.entries(ui.navLinks.ceo).forEach(([name, link]) => {
+                link?.addEventListener('click', (e) => { e.preventDefault(); showPage(name); });
+            });
+            // VC Nav Listeners
+            Object.entries(ui.navLinks.vc).forEach(([name, link]) => {
+                const pageName = `vc-${name}`;
+                link?.addEventListener('click', (e) => { e.preventDefault(); showPage(pageName); });
+            });
+            
+            ui.bannerSettingsLink.addEventListener('click', (e) => { e.preventDefault(); showPage('settings'); });
+            ui.mobileMenuBtn.addEventListener('click', () => { ui.sidebar.classList.toggle('-translate-x-full'); });
+            ui.startRecordingBtn.addEventListener('click', () => dictationService?.toggleRecording());
+            ui.saveApiKeyBtn.addEventListener('click', saveApiKey);
+            ui.viewToggle.addEventListener('change', switchView);
+            
+            // Initial Load
+            const savedApiKey = localStorage.getItem('geminiApiKey');
+            if (savedApiKey) {
+                ui.apiKeyInput.value = savedApiKey;
+            }
+            initializeDictationService(savedApiKey);
+        });
+    </script>
+</body>
+</html>
+
