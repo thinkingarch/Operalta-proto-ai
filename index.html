@@ -103,11 +103,11 @@
         }
         
         /* Playbook Category Filter */
-        .playbook-category-btn { transition: all 0.2s ease; }
-        .playbook-category-btn.active {
+        .playbook-category-btn { transition: all 0.2s ease; border: 1px solid #e5e7eb; }
+        .playbook-category-btn.active, .playbook-category-btn:hover {
             background-color: var(--accent);
             color: white;
-            font-weight: 600;
+            border-color: var(--accent);
         }
     </style>
      <script type="importmap">
@@ -219,16 +219,15 @@
                             <p class="text-gray-500 mt-1 mono text-sm">1,247+ proven strategies from top-tier companies.</p>
                         </div>
                     </header>
-                     <div id="playbook-category-filters" class="flex flex-wrap gap-2 mb-8">
-                        <button class="playbook-category-btn active px-3 py-1 text-sm border border-gray-300 rounded-full" data-category="ALL">ALL</button>
-                        <button class="playbook-category-btn px-3 py-1 text-sm border border-gray-300 rounded-full" data-category="Growth">GROWTH</button>
-                        <button class="playbook-category-btn px-3 py-1 text-sm border border-gray-300 rounded-full" data-category="Hiring">HIRING</button>
-                        <button class="playbook-category-btn px-3 py-1 text-sm border border-gray-300 rounded-full" data-category="Fundraising">FUNDRAISING</button>
-                        <button class="playbook-category-btn px-3 py-1 text-sm border border-gray-300 rounded-full" data-category="Product">PRODUCT</button>
-                        <button class="playbook-category-btn px-3 py-1 text-sm border border-gray-300 rounded-full" data-category="Sales">SALES</button>
-                        <button class="playbook-category-btn px-3 py-1 text-sm border border-gray-300 rounded-full" data-category="Legal">LEGAL</button>
+                    <div id="playbook-category-filters" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 text-center mb-12">
+                         <div class="playbook-category-btn aspect-square flex flex-col items-center justify-center cursor-pointer p-2 rounded-md" data-category="Growth"><span class="text-2xl mb-1">⬆</span><span class="text-xs font-bold">GROWTH</span></div>
+                         <div class="playbook-category-btn aspect-square flex flex-col items-center justify-center cursor-pointer p-2 rounded-md" data-category="Hiring"><span class="text-2xl mb-1">◐</span><span class="text-xs font-bold">HIRING</span></div>
+                         <div class="playbook-category-btn aspect-square flex flex-col items-center justify-center cursor-pointer p-2 rounded-md" data-category="Fundraising"><span class="text-2xl mb-1">◈</span><span class="text-xs font-bold">FUNDRAISING</span></div>
+                         <div class="playbook-category-btn aspect-square flex flex-col items-center justify-center cursor-pointer p-2 rounded-md" data-category="Product"><span class="text-2xl mb-1">◉</span><span class="text-xs font-bold">PRODUCT</span></div>
+                         <div class="playbook-category-btn aspect-square flex flex-col items-center justify-center cursor-pointer p-2 rounded-md" data-category="Sales"><span class="text-2xl mb-1">▣</span><span class="text-xs font-bold">SALES</span></div>
+                         <div class="playbook-category-btn aspect-square flex flex-col items-center justify-center cursor-pointer p-2 rounded-md" data-category="Legal"><span class="text-2xl mb-1">◊</span><span class="text-xs font-bold">LEGAL</span></div>
                     </div>
-                     <div id="ceo-playbook-list" class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                     <div id="ceo-playbook-list" class="space-y-8">
                         <!-- Playbook content will be injected here by JS -->
                     </div>
                 </div>
@@ -270,8 +269,8 @@
                     <div class="mb-8 bg-white border border-gray-200 rounded-lg p-6">
                         <h2 class="font-bold mb-4">Portfolio Health Overview</h2>
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
-                            <div><p class="text-3xl font-bold text-green-600">3</p><p class="text-sm text-gray-500">On Track</p></div>
-                            <div><p class="text-3xl font-bold text-yellow-500">1</p><p class="text-sm text-gray-500">Needs Attention</p></div>
+                            <div><p class="text-3xl font-bold text-green-600">8</p><p class="text-sm text-gray-500">On Track</p></div>
+                            <div><p class="text-3xl font-bold text-yellow-500">2</p><p class="text-sm text-gray-500">Needs Attention</p></div>
                             <div><p class="text-3xl font-bold text-red-600">0</p><p class="text-sm text-gray-500">At Risk</p></div>
                         </div>
                     </div>
@@ -279,16 +278,14 @@
                     <div class="mb-8 bg-white border border-gray-200 rounded-lg p-6">
                         <h2 class="font-bold mb-4">AI-Generated Cross-Portfolio Insights</h2>
                         <ul class="space-y-3 text-sm">
-                            <li class="flex items-start gap-3"><span class="text-purple-600 mt-1">◈</span><span><strong>Positive Trend:</strong> 3 companies mentioned successful enterprise pilots this week, suggesting strong Q4 pipeline.</span></li>
-                            <li class="flex items-start gap-3"><span class="text-yellow-600 mt-1">!</span><span><strong>Potential Risk:</strong> 2 companies in the B2C space noted rising customer acquisition costs (CAC). <a href="#" class="text-purple-700 underline">Suggest "Growth Hacking" playbook</a>.</span></li>
+                            <li class="flex items-start gap-3"><span class="text-purple-600 mt-1">◈</span><span><strong>Positive Trend:</strong> 5 companies mentioned successful enterprise pilots this week, suggesting strong Q4 pipeline.</span></li>
+                            <li class="flex items-start gap-3"><span class="text-yellow-600 mt-1">!</span><span><strong>Potential Risk:</strong> 3 companies in the B2C space noted rising customer acquisition costs (CAC). <a href="#" class="text-purple-700 underline">Suggest "Growth Hacking" playbook</a>.</span></li>
                             <li class="flex items-start gap-3"><span class="text-blue-600 mt-1">→</span><span><strong>Opportunity:</strong> Innovate Inc. and Synergy AI are both hiring for senior product roles. Consider an introduction between their VPs of Product to share best practices.</span></li>
                         </ul>
                     </div>
 
                     <div id="vc-portfolio-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        <div class="bg-white border border-gray-200 p-6 rounded-lg cursor-pointer hover:shadow-lg transition-shadow" data-company-id="innovate"><div class="flex justify-between items-start mb-4"><h3 class="font-bold">Innovate Inc.</h3><span class="px-2 py-1 text-xs font-semibold text-green-800 bg-green-100 rounded-full">On Track</span></div><div class="grid grid-cols-3 gap-4 text-center"><div class="border-r border-gray-200"><p class="text-lg font-bold">€2.1M</p><p class="text-xs text-gray-500">ARR</p></div><div class="border-r border-gray-200"><p class="text-lg font-bold text-green-600">+18%</p><p class="text-xs text-gray-500">MoM</p></div><div><p class="text-lg font-bold">24mo</p><p class="text-xs text-gray-500">Runway</p></div></div></div>
-                        <div class="bg-white border border-gray-200 p-6 rounded-lg cursor-pointer hover:shadow-lg transition-shadow" data-company-id="quantum"><div class="flex justify-between items-start mb-4"><h3 class="font-bold">QuantumLeap</h3><span class="px-2 py-1 text-xs font-semibold text-yellow-800 bg-yellow-100 rounded-full">Needs Attention</span></div><div class="grid grid-cols-3 gap-4 text-center"><div class="border-r border-gray-200"><p class="text-lg font-bold">€800K</p><p class="text-xs text-gray-500">ARR</p></div><div class="border-r border-gray-200"><p class="text-lg font-bold text-red-600">-5%</p><p class="text-xs text-gray-500">MoM</p></div><div><p class="text-lg font-bold">9mo</p><p class="text-xs text-gray-500">Runway</p></div></div></div>
-                        <div class="bg-white border border-gray-200 p-6 rounded-lg cursor-pointer hover:shadow-lg transition-shadow" data-company-id="synergy"><div class="flex justify-between items-start mb-4"><h3 class="font-bold">Synergy AI</h3><span class="px-2 py-1 text-xs font-semibold text-green-800 bg-green-100 rounded-full">On Track</span></div><div class="grid grid-cols-3 gap-4 text-center"><div class="border-r border-gray-200"><p class="text-lg font-bold">€4.5M</p><p class="text-xs text-gray-500">ARR</p></div><div class="border-r border-gray-200"><p class="text-lg font-bold text-green-600">+25%</p><p class="text-xs text-gray-500">MoM</p></div><div><p class="text-lg font-bold">16mo</p><p class="text-xs text-gray-500">Runway</p></div></div></div>
+                        <!-- Portfolio companies injected by JS -->
                     </div>
                 </div>
                  <div id="page-vc-playbooks" class="hidden p-4 sm:p-8 md:p-12">
@@ -579,6 +576,7 @@
             let dictationService = null;
             let currentView = 'ceo';
             let latestGeneratedReport = {};
+            let activePlaybookCategories = [];
 
             const ui = {
                 sidebar: document.getElementById('sidebar'),
@@ -589,6 +587,7 @@
                 vcNav: document.getElementById('vc-nav'),
                 ceoPlaybookList: document.getElementById('ceo-playbook-list'),
                 playbookCategoryFilters: document.getElementById('playbook-category-filters'),
+                vcPortfolioList: document.getElementById('vc-portfolio-list'),
 
                 pages: {
                      dashboard: document.getElementById('page-dashboard'), recording: document.getElementById('page-recording'), reports: document.getElementById('page-reports'), playbooks: document.getElementById('page-playbooks'), integrations: document.getElementById('page-integrations'), settings: document.getElementById('page-settings'),
@@ -613,6 +612,18 @@
             };
 
             const db = {
+                companies: {
+                    innovate: { name: 'Innovate Inc.', status: 'On Track', metrics: { arr: '€2.1M', growth: '+18%', runway: '24mo' } },
+                    quantum: { name: 'QuantumLeap', status: 'Needs Attention', metrics: { arr: '€800K', growth: '-5%', runway: '9mo' } },
+                    synergy: { name: 'Synergy AI', status: 'On Track', metrics: { arr: '€4.5M', growth: '+25%', runway: '16mo' } },
+                    dataforge: { name: 'DataForge', status: 'On Track', metrics: { arr: '€1.5M', growth: '+12%', runway: '20mo' } },
+                    nextech: { name: 'NexTech', status: 'On Track', metrics: { arr: '€3.2M', growth: '+15%', runway: '18mo' } },
+                    cloudscape: { name: 'Cloudscape', status: 'Needs Attention', metrics: { arr: '€950K', growth: '+2%', runway: '11mo' } },
+                    biogen: { name: 'BioGen', status: 'On Track', metrics: { arr: '€1.8M', growth: '+20%', runway: '22mo' } },
+                    finwise: { name: 'FinWise', status: 'On Track', metrics: { arr: '€5.1M', growth: '+19%', runway: '15mo' } },
+                    logix: { name: 'Logix', status: 'On Track', metrics: { arr: '€2.8M', growth: '+14%', runway: '19mo' } },
+                    zenith: { name: 'Zenith VR', status: 'On Track', metrics: { arr: '€1.1M', growth: '+30%', runway: '14mo' } },
+                },
                 reports: {
                     w36: { title: 'Weekly Update - W36', date: 'Sep 5, 2025', metrics: { arr: '€1.2M', growth: '+23%', runway: '18mo' }, content: '<h3>Wins</h3><ul><li>Strong month with 23% MoM growth.</li><li>Closed 3 enterprise deals totaling €240k in new ARR.</li></ul><h3>Challenges</h3><ul><li>Engineering hiring remains top priority.</li></ul>' },
                     w35: { title: 'Weekly Update - W35', date: 'Aug 29, 2025', metrics: { arr: '€1.1M', growth: '+15%', runway: '19mo' }, content: '<h3>Wins</h3><ul><li>Onboarded 2 major enterprise clients: Globex Corp and Innovate LLC.</li><li>Successful launch of the new analytics dashboard.</li></ul><h3>Next Steps</h3><ul><li>Begin planning for Series A raise in Q1 2026.</li></ul>' },
@@ -624,13 +635,10 @@
                 playbooks: {
                     'plg': { category: 'Growth', title: 'Product-Led Growth Engine', company: 'SLACK', content: '<h3>Key Idea</h3><p>Focus on making the product itself the primary driver of user acquisition, conversion, and expansion.</p><ul><li>Freemium model to reduce friction.</li><li>Seamless user onboarding.</li><li>Built-in virality (e.g., inviting colleagues).</li></ul>' },
                     'outbound': { category: 'Growth', title: 'Outbound Sales Cadence', company: 'HUBSPOT', content: '<h3>Key Idea</h3><p>A structured sequence of touchpoints (email, call, social) to engage prospects.</p><ol><li>Day 1: Personalized Email</li><li>Day 3: LinkedIn Connection Request</li><li>Day 5: Follow-up Email + Call</li></ol>' },
-                    'content-marketing': { category: 'Growth', title: 'Content Marketing Flywheel', company: 'Ahrefs', content: '<h3>Key Idea</h3><p>Create high-quality, SEO-optimized content that solves user problems to attract organic traffic, which in turn builds brand authority and drives leads.</p>' },
                     'eng-hiring': { category: 'Hiring', title: 'Scaling Engineering Teams', company: 'REVOLUT', content: `<h3>Key Principles</h3><ul><li><strong>Hire for Slope, Not Just Experience:</strong> Look for candidates with a steep learning curve and high potential, not just years on a resume.</li><li><strong>Bar Raiser Interviews:</strong> Involve a senior engineer from a different team in the final interview loop to maintain a consistently high bar for talent.</li><li><strong>Practical Problem Solving:</strong> Use a take-home project or a pair-programming session that mirrors real-world work.</li></ul>` },
                     'remote': { category: 'Hiring', title: 'Remote Transformation', company: 'GITLAB', content: '<h3>Key Idea</h3><p>Build a thriving, productive company with no physical offices.</p><ul><li>Document everything in a central handbook.</li><li>Promote asynchronous communication.</li><li>Invest in tools for remote collaboration.</li></ul>' },
-                    'culture-deck': { category: 'Hiring', title: 'The Netflix Culture Deck', company: 'NETFLIX', content: '<h3>Key Idea</h3><p>Clearly articulate your company culture and values to attract the right talent and repel the wrong talent. Focus on "Freedom and Responsibility".</p>' },
                     'seed-deck': { category: 'Fundraising', title: 'The Perfect Seed Deck', company: 'Y COMBINATOR', content: `<h3>The 10-Slide Structure</h3><ol><li>Title</li><li>Problem</li><li>Solution</li><li>Market Size</li><li>Product</li><li>Traction</li><li>Team</li><li>Competition</li><li>Business Model</li><li>The Ask</li></ol>` },
                     'board-meeting': { category: 'Fundraising', title: 'Board Meeting Excellence', company: 'SPOTIFY', content: '<h3>Key Idea</h3><p>Structure board meetings around strategic decisions, not just updates.</p><ul><li>Send materials 48 hours in advance.</li><li>Focus 80% of time on forward-looking strategy.</li><li>Use a data-driven appendix for metrics.</li></ul>' },
-                    'data-room': { category: 'Fundraising', title: 'Building a Due Diligence Data Room', company: 'SEQUOIA', content: '<h3>Key Idea</h3><p>Proactively organize all essential company documents (financials, legal, team, product) in a secure online folder to streamline the fundraising due diligence process.</p>' },
                     'product-docs': { category: 'Product', title: 'Writing Great Product Docs', company: 'INTERCOM', content: '<h3>Key Idea</h3><p>Structure product docs around the "Why, What, and How" to ensure clarity for the entire team.</p><ul><li><strong>Why:</strong> The problem you are solving and for whom.</li><li><strong>What:</strong> The scope of the feature, including user stories and success metrics.</li><li><strong>How:</strong> High-level technical approach and design mocks.</li></ul>' },
                     'user-interviews': { category: 'Product', title: 'Effective User Interviews', company: 'STRIPE', content: '<h3>Key Idea</h3><p>Ask open-ended questions about past behavior, not future intentions. Focus on understanding their problems deeply rather than pitching your solution.</p>' },
                     'enterprise-sales': { category: 'Sales', title: 'Enterprise Sales Playbook', company: 'SALESFORCE', content: '<h3>Key Idea</h3><p>Navigate complex sales cycles by mapping the organization, identifying the champion, economic buyer, and technical buyer, and building consensus across the buying committee.</p>' },
@@ -760,10 +768,54 @@
                 showModal(report.title, content);
             }
 
+            function showCompanyDetailModal(companyId) {
+                const company = db.companies[companyId];
+                if (!company) return;
+                 const statusClass = company.status === 'On Track' ? 'text-green-600 bg-green-100' : 'text-yellow-600 bg-yellow-100';
+
+                const content = document.createElement('div');
+                content.innerHTML = `
+                    <div class="mb-6">
+                        <div class="flex justify-between items-start">
+                             <h3 class="text-lg font-bold">Status Overview</h3>
+                             <span class="px-2 py-1 text-xs font-semibold ${statusClass} rounded-full">${company.status}</span>
+                        </div>
+                        <div class="mt-4 grid grid-cols-3 gap-4 text-center">
+                           <div><p class="font-bold text-2xl">${company.metrics.arr}</p><p class="text-xs text-gray-600">ARR</p></div>
+                            <div><p class="font-bold text-2xl ${company.metrics.growth.startsWith('+') ? 'text-green-600' : 'text-red-600'}">${company.metrics.growth}</p><p class="text-xs text-gray-600">MoM Growth</p></div>
+                            <div><p class="font-bold text-2xl">${company.metrics.runway}</p><p class="text-xs text-gray-600">Runway</p></div>
+                        </div>
+                    </div>
+                    <div class="mb-6">
+                        <h3 class="text-lg font-bold mb-3">Last 4 Weeks Updates</h3>
+                        <div class="space-y-2 text-sm">
+                            <a href="#" class="flex justify-between p-2 rounded-md hover:bg-gray-50 view-report-link" data-report-id="${companyId}"><span class="font-semibold">W36 Update</span><span class="text-gray-500">Sep 5, 2025</span></a>
+                            <a href="#" class="flex justify-between p-2 rounded-md hover:bg-gray-50 view-report-link" data-report-id="${companyId}"><span class="font-semibold">W35 Update</span><span class="text-gray-500">Aug 29, 2025</span></a>
+                        </div>
+                    </div>
+                     <div>
+                        <h3 class="text-lg font-bold mb-3">Recommended Playbooks</h3>
+                        <div class="space-y-2 text-sm">
+                           <a href="#" class="flex justify-between p-2 rounded-md hover:bg-gray-50 playbook-link" data-playbook-id="enterprise-sales"><span class="font-semibold">Enterprise Sales Playbook</span><span class="text-gray-500 mono text-xs">SALESFORCE</span></a>
+                           <a href="#" class="flex justify-between p-2 rounded-md hover:bg-gray-50 playbook-link" data-playbook-id="eng-hiring"><span class="font-semibold">Scaling Engineering Teams</span><span class="text-gray-500 mono text-xs">REVOLUT</span></a>
+                        </div>
+                    </div>
+                `;
+                 showModal(company.name, content);
+                 content.querySelectorAll('.view-report-link').forEach(link => link.addEventListener('click', (e) => { e.preventDefault(); showViewReportModal(e.currentTarget.dataset.reportId); }));
+                 content.querySelectorAll('.playbook-link').forEach(link => link.addEventListener('click', (e) => { e.preventDefault(); showPlaybookModal(e.currentTarget.dataset.playbookId); }));
+            }
+
             function showPlaybookModal(playbookId) {
                 const playbook = db.playbooks[playbookId]; if (!playbook) return;
                 const content = document.createElement('div');
-                content.innerHTML = `<div class="prose prose-sm max-w-none">${playbook.content}</div>`;
+                content.innerHTML = `
+                    <div class="prose prose-sm max-w-none">${playbook.content}</div>
+                    <div class="mt-6 pt-4 border-t border-gray-200 flex space-x-4">
+                         <button class="flex-1 bg-purple-100 text-purple-700 px-4 py-2 text-sm font-bold hover:bg-purple-200 transition-colors rounded-md">Add to AI-Coach</button>
+                         <button class="flex-1 bg-gray-200 text-gray-800 px-4 py-2 text-sm font-bold hover:bg-gray-300 transition-colors rounded-md">Read</button>
+                    </div>
+                `;
                 showModal(playbook.title, content);
             }
             
@@ -783,28 +835,64 @@
                  content.querySelector('#share-playbook-btn').addEventListener('click', () => alert('Playbook shared with portfolio!'));
             }
             
-            function populateCeoPlaybooks(filter = 'ALL') {
-                const categories = {};
-                Object.values(db.playbooks).forEach(p => { if(p.category) { categories[p.category] = [] } });
+            function populateCeoPlaybooks() {
+                const activeCategories = Array.from(ui.playbookCategoryFilters.querySelectorAll('.playbook-category-btn.active')).map(btn => btn.dataset.category);
                 
-                Object.entries(db.playbooks).forEach(([id, playbook]) => {
-                    if (playbook.category && (filter === 'ALL' || filter === playbook.category)) {
-                        const html = `<li class="group cursor-pointer playbook-link" data-playbook-id="${id}"><div class="flex justify-between hover:bg-gray-50 px-2 py-1 -mx-2 rounded"><span>${playbook.title}</span><span class="mono text-xs">${playbook.company}</span></div></li>`;
-                        categories[playbook.category].push(html);
-                    }
+                const categories = { 'Growth': [], 'Hiring': [], 'Fundraising': [], 'Product': [], 'Sales': [], 'Legal': [] };
+                let visiblePlaybooks = Object.entries(db.playbooks).filter(([id, playbook]) => playbook.category && (activeCategories.length === 0 || activeCategories.includes(playbook.category)));
+
+                if (visiblePlaybooks.length === 0) {
+                    ui.ceoPlaybookList.innerHTML = `<div class="text-center text-gray-500 col-span-full">No playbooks found for the selected categories.</div>`;
+                    return;
+                }
+
+                visiblePlaybooks.forEach(([id, p]) => {
+                    const html = `
+                        <div class="bg-white border border-gray-200 p-4 rounded-lg flex justify-between items-center group">
+                            <div>
+                                <p class="font-semibold">${p.title}</p>
+                                <p class="text-sm text-gray-500">from ${p.company}</p>
+                            </div>
+                            <button class="playbook-view-btn text-xs bg-gray-200 text-gray-700 px-3 py-1 rounded-full font-semibold hover:bg-gray-300" data-playbook-id="${id}">View</button>
+                        </div>`;
+                    if(categories[p.category]) categories[p.category].push(html);
                 });
                 
                 let fullHtml = '';
-                for (const [category, items] of Object.entries(categories)) {
+                for (const [categoryName, items] of Object.entries(categories)) {
                     if (items.length) {
-                        fullHtml += `<div><h3 class="font-bold mb-4 pb-2 border-b border-gray-200">${category}</h3><ul class="space-y-3 text-sm">${items.join('')}</ul></div>`;
+                        fullHtml += `<div><h3 class="font-bold mb-4 pb-2 border-b border-gray-200">${categoryName}</h3><div class="space-y-4 text-sm">${items.join('')}</div></div>`;
                     }
                 }
+                
                 ui.ceoPlaybookList.innerHTML = fullHtml;
+
                 // Re-add event listeners 
-                document.querySelectorAll('#ceo-playbook-list .playbook-link').forEach(link => {
-                    link.addEventListener('click', (e) => { e.preventDefault(); showPlaybookModal(e.currentTarget.dataset.playbookId); });
+                document.querySelectorAll('#ceo-playbook-list .playbook-view-btn').forEach(link => {
+                    link.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); showPlaybookModal(e.currentTarget.dataset.playbookId); });
                 });
+            }
+
+            function populateVcPortfolio() {
+                let html = '';
+                for (const [id, company] of Object.entries(db.companies)) {
+                     const statusClass = company.status === 'On Track' ? 'text-green-800 bg-green-100' : 'text-yellow-800 bg-yellow-100';
+                     const growthClass = company.metrics.growth.startsWith('+') ? 'text-green-600' : 'text-red-600';
+                    html += `
+                        <div class="bg-white border border-gray-200 p-6 rounded-lg cursor-pointer hover:shadow-lg transition-shadow" data-company-id="${id}">
+                            <div class="flex justify-between items-start mb-4">
+                                <h3 class="font-bold">${company.name}</h3>
+                                <span class="px-2 py-1 text-xs font-semibold ${statusClass} rounded-full">${company.status}</span>
+                            </div>
+                            <div class="grid grid-cols-3 gap-4 text-center">
+                                <div class="border-r border-gray-200"><p class="text-lg font-bold">${company.metrics.arr}</p><p class="text-xs text-gray-500">ARR</p></div>
+                                <div class="border-r border-gray-200"><p class="text-lg font-bold ${growthClass}">${company.metrics.growth}</p><p class="text-xs text-gray-500">MoM</p></div>
+                                <div><p class="text-lg font-bold">${company.metrics.runway}</p><p class="text-xs text-gray-500">Runway</p></div>
+                            </div>
+                        </div>`;
+                }
+                ui.vcPortfolioList.innerHTML = html;
+                document.querySelectorAll('#vc-portfolio-list > div').forEach(card => card.addEventListener('click', (e) => { e.preventDefault(); showCompanyDetailModal(e.currentTarget.dataset.companyId); }));
             }
 
             // Event Listeners Setup
@@ -822,16 +910,15 @@
 
             document.querySelectorAll('.view-report-link').forEach(link => link.addEventListener('click', (e) => { e.preventDefault(); showViewReportModal(e.target.dataset.reportId); }));
             document.querySelectorAll('#page-vc-playbooks .playbook-link').forEach(link => link.addEventListener('click', (e) => { e.preventDefault(); showPlaybookModal(e.currentTarget.dataset.playbookId); }));
-            document.querySelectorAll('#vc-portfolio-list > div').forEach(card => card.addEventListener('click', (e) => { e.preventDefault(); showViewReportModal(e.currentTarget.dataset.companyId); }));
-
+            
             ui.modalCloseBtn.addEventListener('click', hideModal);
             ui.modalOverlay.addEventListener('click', hideModal);
             
             ui.playbookCategoryFilters.addEventListener('click', (e) => {
-                if (e.target.tagName === 'BUTTON') {
-                    ui.playbookCategoryFilters.querySelectorAll('button').forEach(btn => btn.classList.remove('active'));
-                    e.target.classList.add('active');
-                    populateCeoPlaybooks(e.target.dataset.category);
+                const targetButton = e.target.closest('.playbook-category-btn');
+                if (targetButton) {
+                    targetButton.classList.toggle('active');
+                    populateCeoPlaybooks();
                 }
             });
 
@@ -840,6 +927,7 @@
             if (savedApiKey) ui.apiKeyInput.value = savedApiKey;
             initializeDictationService(savedApiKey);
             populateCeoPlaybooks();
+            populateVcPortfolio();
         });
     </script>
 </body>
