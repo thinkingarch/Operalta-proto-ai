@@ -189,7 +189,22 @@
                 <div id="page-recording" class="hidden p-4 sm:p-8 md:p-12">
                     <header class="mb-8"><h1 class="text-2xl sm:text-3xl font-bold tracking-tight">New Weekly Update</h1></header>
                     <div id="processing-state" class="hidden text-center py-16"><div class="inline-block w-8 h-8 border-2 border-purple-700 border-t-transparent rounded-full animate-spin mb-4"></div><h3 id="processing-status" class="font-bold">Processing audio...</h3><p class="text-sm text-gray-600 mt-2">This usually takes less than a minute.</p></div>
-                     <div id="completed-state" class="hidden grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12"><div><h4 class="font-bold text-sm mb-2">AI Transcription & Analysis</h4><div id="raw-transcription-output" class="bg-gray-50 p-4 rounded-md max-h-96 overflow-y-auto text-sm text-gray-700 leading-relaxed italic"></div><h4 class="font-bold text-sm mb-2 mt-6">Key Insights Extracted</h4><div id="polished-note-output" class="text-sm text-gray-700 leading-relaxed prose prose-sm max-w-none"></div></div><div class="mt-8 lg:mt-0"><div class="flex items-center justify-between mb-2"><h4 class="font-bold text-sm">Draft: Weekly Investor Update</h4><span class="text-xs bg-purple-100 text-purple-800 px-2 py-0.5 rounded-full">AI-Generated</span></div><div class="bg-white border border-gray-200 p-6 rounded-md shadow-inner"><div class="mb-4"><h4 class="font-bold mb-2">Executive Summary</h4><div id="summary-output" class="text-sm text-gray-700 leading-relaxed prose prose-sm max-w-none"><p>Your AI-generated summary will appear here.</p></div></div><div class="grid grid-cols-3 gap-2 sm:gap-4 mb-4"><div class="text-center p-3 bg-gray-50 rounded"><p class="font-bold text-lg">€1.2M</p><p class="text-xs text-gray-600">ARR</p></div><div class="text-center p-3 bg-gray-50 rounded"><p class="font-bold text-lg text-green-600">+23%</p><p class="text-xs text-gray-600">Growth</p></div><div class="text-center p-3 bg-gray-50 rounded"><p class="font-bold text-lg">18mo</p><p class="text-xs text-gray-600">Runway</p></div></div><p class="text-xs text-gray-500 mono mb-4">Metrics synced from Stripe & Notion.</p><button id="finalize-report-btn" class="w-full bg-purple-700 text-white py-2 text-sm font-bold hover:bg-purple-800 transition-colors rounded-md">Finalize & Share Report →</button></div></div></div>
+                    <div id="completed-state" class="hidden grid grid-cols-1 lg:grid-cols-2 gap-12">
+                        <!-- AI Analysis -->
+                        <div id="extracted-intelligence">
+                             <h4 class="font-bold text-sm mb-4">Extracted Intelligence</h4>
+                             <div class="bg-white p-6 border border-gray-200 rounded-lg space-y-4">
+                                <!-- Content injected here -->
+                             </div>
+                        </div>
+                        <!-- Strategic Update -->
+                        <div id="strategic-update">
+                            <h4 class="font-bold text-sm mb-4">Strategic Update</h4>
+                            <div class="bg-white border-2 border-gray-200 p-6 rounded-lg shadow-lg">
+                                <!-- Content injected here -->
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <div id="page-reports" class="hidden p-4 sm:p-8 md:p-12">
@@ -540,33 +555,49 @@
                     this.getPolishedNote(response.text);
                 } catch (error) { 
                     console.error("Error during transcription:", error);
-                    this.onProcessingComplete(`<p><strong>Error during transcription:</strong> ${error.message}</p>`, 'Transcription failed. Please check your API key and network connection.'); 
+                    this.onProcessingComplete(null, null, { error: `Transcription failed: ${error.message}` }); 
                 }
             }
 
             async getPolishedNote(rawTranscription) {
-                try {
-                    if (!rawTranscription.trim()) { this.onProcessingComplete('<p>No content to polish.</p>', rawTranscription); return; }
-                    const prompt = `You are an expert executive assistant. Take the following raw, verbatim audio transcript from a CEO's weekly update and transform it into a polished, professional, and concise investor update.
-                    
-                    Your tasks are to:
-                    1.  **Correct Grammar and Punctuation:** Fix any grammatical errors and add appropriate punctuation.
-                    2.  **Remove Filler Words:** Eliminate all filler words (e.g., "um," "uh," "like," "you know"), verbal tics, and false starts.
-                    3.  **Synthesize and Structure:** Do not just clean up the text. Synthesize the core ideas and structure the output clearly using Markdown. Use headings like ### Wins, ### Challenges, and ### Next Steps.
-                    4.  **Format for Clarity:** Use bullet points for lists of achievements, tasks, or metrics.
-                    5.  **Maintain Tone and Meaning:** The final output should be professional and clear but must retain the original meaning and intent of the CEO's message.
+                 try {
+                    if (!rawTranscription.trim()) { 
+                        this.onProcessingComplete(null, rawTranscription, { arr: 'N/A', growth: 'N/A', runway: 'N/A' });
+                        return;
+                    }
+                    const prompt = `
+                        Analyze the following raw transcript of a CEO's weekly update. Your task is to extract key information and create a polished summary.
+                        
+                        Respond with ONLY a JSON object in the following format, with no other text or markdown formatting:
+                        {
+                          "arr": "Extract the current ARR. Format as a string, e.g., '€1.2M'. If not mentioned, return 'N/A'.",
+                          "growth": "Extract the month-over-month growth. Format as a string, e.g., '+23%'. If not mentioned, return 'N/A'.",
+                          "runway": "Extract the current runway. Format as a string, e.g., '18mo'. If not mentioned, return 'N/A'.",
+                          "wins": [
+                            "List key wins as an array of strings."
+                          ],
+                          "challenges": [
+                             "List key challenges as an array of strings."
+                          ],
+                          "insights": [
+                            "List key strategic insights or learnings as an array of strings."
+                          ],
+                          "fullSummary": "Create a polished, professional, and concise investor update in Markdown format based on the transcript. Synthesize the core ideas and structure the output clearly using headings like ### Wins, ### Challenges, and ### Next Steps. Use bullet points for lists of achievements, tasks, or metrics. Remove all filler words and correct grammar."
+                        }
 
-                    Here is the raw transcript:
-                    ---
-                    ${rawTranscription}
-                    ---
+                        Here is the raw transcript:
+                        ---
+                        ${rawTranscription}
+                        ---
                     `;
                     const contents = [{ text: prompt }];
-                    const response = await this.genAI.models.generateContent({ model: MODEL_NAME, contents });
-                    this.onProcessingComplete(marked.parse(response.text), rawTranscription);
+                    const result = await this.genAI.models.generateContent({ model: MODEL_NAME, contents });
+                    const jsonText = result.text.match(/```json\n([\s\S]*?)\n```/)[1];
+                    const data = JSON.parse(jsonText);
+                    this.onProcessingComplete(data, rawTranscription, null);
                 } catch (error) { 
-                     console.error("Error during polishing:", error);
-                    this.onProcessingComplete(`<p><strong>Error during polishing:</strong> ${error.message}</p>`, rawTranscription); 
+                    console.error("Error during polishing:", error);
+                    this.onProcessingComplete(null, rawTranscription, { error: `AI analysis failed: ${error.message}` });
                 }
             }
         }
@@ -599,8 +630,11 @@
                 },
                 startRecordingBtn: document.getElementById('start-recording-btn'), newReportBtn: document.getElementById('new-report-btn'), recordButton: document.getElementById('recordButton'),
                 recordingInterface: document.getElementById('recording-interface'), processingState: document.getElementById('processing-state'), processingStatus: document.getElementById('processing-status'), completedState: document.getElementById('completed-state'),
-                rawTranscriptionOutput: document.getElementById('raw-transcription-output'), polishedNoteOutput: document.getElementById('polished-note-output'), summaryOutput: document.getElementById('summary-output'),
-                finalizeReportBtn: document.getElementById('finalize-report-btn'), authorPlaybookBtn: document.getElementById('author-playbook-btn'),
+                
+                extractedIntelligenceContainer: document.getElementById('extracted-intelligence'),
+                strategicUpdateContainer: document.getElementById('strategic-update'),
+
+                authorPlaybookBtn: document.getElementById('author-playbook-btn'),
 
                 apiKeyBanner: document.getElementById('api-key-banner'), bannerSettingsLink: document.getElementById('banner-settings-link'), apiKeyInput: document.getElementById('api-key-input'),
                 saveApiKeyBtn: document.getElementById('save-api-key-btn'), apiKeyStatus: document.getElementById('api-key-status'),
@@ -676,17 +710,51 @@
                     onRecordingStop: () => {
                         showPage('recording'); ui.recordingInterface.classList.add('hidden'); ui.processingState.classList.remove('hidden'); ui.completedState.classList.add('hidden'); ui.processingStatus.textContent = 'Transcribing audio...';
                     },
-                    onProcessingComplete: (polishedHtml, rawText) => {
-                        latestGeneratedReport = { title: `Weekly Update - ${new Date().toLocaleDateString()}`, content: polishedHtml, metrics: { arr: '€1.2M', growth: '+23%', runway: '18mo' } };
-                        ui.rawTranscriptionOutput.textContent = rawText;
-                        ui.polishedNoteOutput.innerHTML = polishedHtml;
-                        ui.summaryOutput.innerHTML = polishedHtml;
-                        ui.processingState.classList.add('hidden');
-                        ui.completedState.classList.remove('hidden');
+                    onProcessingComplete: (data, rawText, error) => {
+                         latestGeneratedReport = { ...data, raw: rawText };
+                         renderCompletedState(latestGeneratedReport);
+                         ui.processingState.classList.add('hidden');
+                         ui.completedState.classList.remove('hidden');
                     }
                 });
                 updateRecordButtonState();
             }
+
+             function renderCompletedState(data) {
+                if (data.error) {
+                    ui.extractedIntelligenceContainer.innerHTML = `<h4 class="font-bold text-sm mb-4">Error</h4><div class="bg-white p-6 border border-red-200 rounded-lg"><p class="text-red-600">${data.error}</p></div>`;
+                    ui.strategicUpdateContainer.innerHTML = `<h4 class="font-bold text-sm mb-4">Strategic Update</h4><div class="bg-white border-2 border-gray-200 p-6 rounded-lg shadow-lg"><p class="text-gray-500">Could not be generated due to an error.</p></div>`;
+                    return;
+                }
+
+                const renderList = (items) => items && items.length > 0 ? `<ul>${items.map(item => `<li class="flex items-start gap-2"><span class="text-purple-600">→</span><span>${item}</span></li>`).join('')}</ul>` : '<p class="text-gray-500">None mentioned.</p>';
+                 const fullSummaryHtml = data.fullSummary ? marked.parse(data.fullSummary) : '<p class="text-gray-500">Summary not available.</p>';
+
+
+                const intelligenceHtml = `
+                    <div class="space-y-4">
+                        <div><h4 class="font-bold text-sm mb-2 text-green-600">Key Wins</h4>${renderList(data.wins)}</div>
+                        <div><h4 class="font-bold text-sm mb-2 text-amber-600">Key Challenges</h4>${renderList(data.challenges)}</div>
+                        <div><h4 class="font-bold text-sm mb-2 text-blue-600">Strategic Insights</h4>${renderList(data.insights)}</div>
+                        <div class="pt-4 border-t"><h4 class="font-bold text-sm mb-2">Full Transcript</h4><p class="text-xs italic text-gray-500 max-h-32 overflow-y-auto">${data.raw || 'Not available.'}</p></div>
+                    </div>`;
+                ui.extractedIntelligenceContainer.querySelector('.bg-white').innerHTML = intelligenceHtml;
+                
+                const strategicHtml = `
+                    <div class="flex items-center justify-between mb-6"><div><h3 class="font-bold text-xl">Strategic Update</h3><p class="text-sm text-gray-600 mono">Week ${new Date().getWeek()} • ${new Date().getFullYear()}</p></div><span class="text-sm bg-green-100 text-green-800 px-3 py-1 rounded-full">Momentum Building</span></div>
+                     <div class="grid grid-cols-3 gap-4 mb-6">
+                        <div class="text-center p-3 bg-gray-50 rounded"><p class="font-bold text-xl">${data.arr || 'N/A'}</p><p class="text-xs text-gray-600">ARR</p></div>
+                        <div class="text-center p-3 bg-gray-50 rounded"><p class="font-bold text-xl ${data.growth && data.growth.startsWith('+') ? 'text-green-600' : 'text-red-600'}">${data.growth || 'N/A'}</p><p class="text-xs text-gray-600">Growth</p></div>
+                        <div class="text-center p-3 bg-gray-50 rounded"><p class="font-bold text-xl">${data.runway || 'N/A'}</p><p class="text-xs text-gray-600">Runway</p></div>
+                    </div>
+                    <div class="prose prose-sm max-w-none">${fullSummaryHtml}</div>
+                    <button id="finalize-report-btn-2" class="mt-6 w-full bg-purple-700 text-white py-2 text-sm font-bold hover:bg-purple-800 transition-colors rounded-md">Finalize & Share →</button>
+                `;
+                ui.strategicUpdateContainer.querySelector('.bg-white').innerHTML = strategicHtml;
+                 document.getElementById('finalize-report-btn-2').addEventListener('click', showShareModal);
+            }
+            
+            Date.prototype.getWeek = function() { var d = new Date(Date.UTC(this.getFullYear(), this.getMonth(), this.getDate())); var dayNum = d.getUTCDay() || 7; d.setUTCDate(d.getUTCDate() + 4 - dayNum); var yearStart = new Date(Date.UTC(d.getUTCFullYear(),0,1)); return Math.ceil((((d - yearStart) / 86400000) + 1)/7) };
             
             function updateRecordButtonState() {
                 const isReady = dictationService && dictationService.isReady();
@@ -905,7 +973,14 @@
             if(ui.newReportBtn) ui.newReportBtn.addEventListener('click', () => showPage('dashboard'));
             ui.saveApiKeyBtn.addEventListener('click', saveApiKey);
             ui.viewToggle.addEventListener('change', switchView);
-            ui.finalizeReportBtn.addEventListener('click', showShareModal);
+            
+            // Event delegation for dynamically created button
+            document.addEventListener('click', function(e) {
+                if (e.target && e.target.id == 'finalize-report-btn-2') {
+                    showShareModal();
+                }
+            });
+
             if(ui.authorPlaybookBtn) ui.authorPlaybookBtn.addEventListener('click', showAuthorPlaybookModal);
 
             document.querySelectorAll('.view-report-link').forEach(link => link.addEventListener('click', (e) => { e.preventDefault(); showViewReportModal(e.target.dataset.reportId); }));
