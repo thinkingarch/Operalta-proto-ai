@@ -269,7 +269,10 @@
                             <button id="save-api-key-btn" class="bg-purple-700 text-white px-4 py-2 text-sm font-bold hover:bg-purple-800 transition-colors rounded-md">Save Key</button>
                             <span id="api-key-status" class="text-sm text-green-600"></span>
                         </div>
-                        <p class="text-xs text-gray-500 mt-4">You can get a key from <a href="https://aistudio.google.com/app/apikey" target="_blank" class="text-purple-700 underline">Google AI Studio</a>. Your key is stored securely in your browser's local storage.</p>
+                        <p class="text-xs text-gray-500 mt-4">You can get a key from <a href="https://aistudio.google.com/app/apikey" target="_blank" class="text-purple-700 underline">Google AI Studio</a>. Your key is stored in your browser's local storage.</p>
+                        <div class="mt-4 bg-orange-100 border-l-4 border-orange-500 text-orange-700 p-3 text-xs" role="alert">
+                            <p><strong class="font-bold">Security Notice:</strong> For this prototype, your API key is stored in local storage. For production applications, always use a secure vault or environment variables to protect your credentials.</p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -370,7 +373,7 @@
             constructor(options) {
                 this.genAI = null;
                 this.apiKey = options.apiKey;
-                
+
                 if (this.apiKey) {
                     try {
                         this.genAI = new GoogleGenAI({ apiKey: this.apiKey });
@@ -378,17 +381,18 @@
                         console.error("Failed to initialize GoogleGenAI:", e);
                     }
                 }
-                
+
+                // Cache all UI elements from options
                 this.recordButton = options.recordButton;
                 this.statusTextElement = options.statusTextElement;
+                this.liveWaveformCanvas = options.liveWaveformCanvas;
+                this.liveRecordingTimerDisplay = options.liveRecordingTimerDisplay;
+                this.recordingInterface = options.recordingInterface;
+                this.liveRecordingTitle = options.liveRecordingTitle;
+
                 this.onProcessingComplete = options.onProcessingComplete;
                 this.onRecordingStart = options.onRecordingStart;
                 this.onRecordingStop = options.onRecordingStop;
-                
-                this.liveWaveformCanvas = document.getElementById('liveWaveformCanvas');
-                this.liveRecordingTimerDisplay = document.getElementById('liveRecordingTimerDisplay');
-                this.recordingInterface = document.getElementById('recording-interface');
-                this.liveRecordingTitle = document.getElementById('liveRecordingTitle');
 
                 if (this.liveWaveformCanvas) {
                     this.liveWaveformCtx = this.liveWaveformCanvas.getContext('2d');
@@ -477,7 +481,7 @@
             
             startLiveDisplay() {
                 this.recordingInterface.classList.add('is-live');
-                ['liveRecordingTitle', 'liveWaveformCanvas', 'liveRecordingTimerDisplay'].forEach(id => document.getElementById(id)?.classList.remove('hidden'));
+                [this.liveRecordingTitle, this.liveWaveformCanvas, this.liveRecordingTimerDisplay].forEach(el => el?.classList.remove('hidden'));
                 this.setupCanvasDimensions();
                 const icon = this.recordButton.querySelector('i');
                 if(icon) { icon.classList.remove('fa-microphone'); icon.classList.add('fa-stop'); }
@@ -491,7 +495,7 @@
             stopLiveDisplay() {
                  this.recordingInterface.classList.remove('is-live');
                  setTimeout(() => this.recordingInterface.classList.add('hidden'), 500);
-                ['liveRecordingTitle', 'liveWaveformCanvas', 'liveRecordingTimerDisplay'].forEach(id => document.getElementById(id)?.classList.add('hidden'));
+                [this.liveRecordingTitle, this.liveWaveformCanvas, this.liveRecordingTimerDisplay].forEach(el => el?.classList.add('hidden'));
                 const icon = this.recordButton.querySelector('i');
                 if(icon) { icon.classList.remove('fa-stop'); icon.classList.add('fa-microphone'); }
                 if (this.waveformDrawingId) cancelAnimationFrame(this.waveformDrawingId);
@@ -512,7 +516,7 @@
 
             drawLiveWaveform() {
                 if (!this.isRecording) return;
-                requestAnimationFrame(() => this.drawLiveWaveform());
+                this.waveformDrawingId = requestAnimationFrame(() => this.drawLiveWaveform());
                 if (!this.analyserNode) return;
                 this.analyserNode.getByteFrequencyData(this.waveformDataArray);
                 const ctx = this.liveWaveformCtx, canvas = this.liveWaveformCanvas;
@@ -551,8 +555,8 @@
             async getTranscription(base64Audio, mimeType) {
                 try {
                     const contents = [{ text: 'Please provide a verbatim transcript of this audio recording.' }, { inlineData: { mimeType, data: base64Audio } }];
-                    const response = await this.genAI.models.generateContent({ model: MODEL_NAME, contents });
-                    this.getPolishedNote(response.text);
+                    const response = await this.genAI.getGenerativeModel({ model: MODEL_NAME }).generateContent({ contents });
+                    this.getPolishedNote(response.response.text());
                 } catch (error) { 
                     console.error("Error during transcription:", error);
                     this.onProcessingComplete(null, null, { error: `Transcription failed: ${error.message}` }); 
@@ -573,15 +577,9 @@
                           "arr": "Extract the current ARR. Format as a string, e.g., '€1.2M'. If not mentioned, return 'N/A'.",
                           "growth": "Extract the month-over-month growth. Format as a string, e.g., '+23%'. If not mentioned, return 'N/A'.",
                           "runway": "Extract the current runway. Format as a string, e.g., '18mo'. If not mentioned, return 'N/A'.",
-                          "wins": [
-                            "List key wins as an array of strings."
-                          ],
-                          "challenges": [
-                             "List key challenges as an array of strings."
-                          ],
-                          "insights": [
-                            "List key strategic insights or learnings as an array of strings."
-                          ],
+                          "wins": [ "List key wins as an array of strings." ],
+                          "challenges": [ "List key challenges as an array of strings." ],
+                          "insights": [ "List key strategic insights or learnings as an array of strings." ],
                           "fullSummary": "Create a polished, professional, and concise investor update in Markdown format based on the transcript. Synthesize the core ideas and structure the output clearly using headings like ### Wins, ### Challenges, and ### Next Steps. Use bullet points for lists of achievements, tasks, or metrics. Remove all filler words and correct grammar."
                         }
 
@@ -590,9 +588,12 @@
                         ${rawTranscription}
                         ---
                     `;
-                    const contents = [{ text: prompt }];
-                    const result = await this.genAI.models.generateContent({ model: MODEL_NAME, contents });
-                    const jsonText = result.text.match(/```json\n([\s\S]*?)\n```/)[1];
+                    const result = await this.genAI.getGenerativeModel({ model: MODEL_NAME }).generateContent(prompt);
+                    const jsonMatch = result.response.text().match(/```json\n([\s\S]*?)\n```/);
+                    if (!jsonMatch || !jsonMatch[1]) {
+                        throw new Error("AI response did not contain valid JSON.");
+                    }
+                    const jsonText = jsonMatch[1];
                     const data = JSON.parse(jsonText);
                     this.onProcessingComplete(data, rawTranscription, null);
                 } catch (error) { 
@@ -602,134 +603,310 @@
             }
         }
 
+        var app = {
+            dictationService: null,
+            currentView: 'ceo',
+            latestGeneratedReport: {},
 
-        document.addEventListener('DOMContentLoaded', function() {
-            let dictationService = null;
-            let currentView = 'ceo';
-            let latestGeneratedReport = {};
-            let activePlaybookCategories = [];
-
-            const ui = {
-                sidebar: document.getElementById('sidebar'),
-                mobileMenuBtn: document.getElementById('mobile-menu-btn'),
-                ceoView: document.getElementById('ceo-view'),
-                vcView: document.getElementById('vc-view'),
-                ceoNav: document.getElementById('ceo-nav'),
-                vcNav: document.getElementById('vc-nav'),
-                ceoPlaybookList: document.getElementById('ceo-playbook-list'),
-                playbookCategoryFilters: document.getElementById('playbook-category-filters'),
-                vcPortfolioList: document.getElementById('vc-portfolio-list'),
-
-                pages: {
-                     dashboard: document.getElementById('page-dashboard'), recording: document.getElementById('page-recording'), reports: document.getElementById('page-reports'), playbooks: document.getElementById('page-playbooks'), integrations: document.getElementById('page-integrations'), settings: document.getElementById('page-settings'),
-                     vcDashboard: document.getElementById('page-vc-dashboard'), vcPlaybooks: document.getElementById('page-vc-playbooks'), vcSettings: document.getElementById('page-vc-settings'),
-                },
-                navLinks: { 
-                    ceo: { dashboard: document.getElementById('nav-dashboard'), reports: document.getElementById('nav-reports'), playbooks: document.getElementById('nav-playbooks'), integrations: document.getElementById('nav-integrations'), settings: document.getElementById('nav-settings') },
-                    vc: { dashboard: document.getElementById('nav-vc-dashboard'), playbooks: document.getElementById('nav-vc-playbooks'), settings: document.getElementById('nav-vc-settings'), }
-                },
-                startRecordingBtn: document.getElementById('start-recording-btn'), newReportBtn: document.getElementById('new-report-btn'), recordButton: document.getElementById('recordButton'),
-                recordingInterface: document.getElementById('recording-interface'), processingState: document.getElementById('processing-state'), processingStatus: document.getElementById('processing-status'), completedState: document.getElementById('completed-state'),
-                
-                extractedIntelligenceContainer: document.getElementById('extracted-intelligence'),
-                strategicUpdateContainer: document.getElementById('strategic-update'),
-
-                authorPlaybookBtn: document.getElementById('author-playbook-btn'),
-
-                apiKeyBanner: document.getElementById('api-key-banner'), bannerSettingsLink: document.getElementById('banner-settings-link'), apiKeyInput: document.getElementById('api-key-input'),
-                saveApiKeyBtn: document.getElementById('save-api-key-btn'), apiKeyStatus: document.getElementById('api-key-status'),
-                viewToggle: document.getElementById('view-toggle'), userName: document.getElementById('user-name'), userCompany: document.getElementById('user-company'), userAvatar: document.getElementById('user-avatar'),
-                ceoLabel: document.getElementById('ceo-label'), vcLabel: document.getElementById('vc-label'),
-
-                modal: document.getElementById('modal'), modalOverlay: document.getElementById('modal-overlay'), modalContent: document.getElementById('modal-content'),
-                modalTitle: document.getElementById('modal-title'), modalBody: document.getElementById('modal-body'), modalCloseBtn: document.getElementById('modal-close-btn'),
-            };
-
-            const db = {
-                companies: {
-                    innovate: { name: 'Innovate Inc.', status: 'On Track', metrics: { arr: '€2.1M', growth: '+18%', runway: '24mo' } },
-                    quantum: { name: 'QuantumLeap', status: 'Needs Attention', metrics: { arr: '€800K', growth: '-5%', runway: '9mo' } },
-                    synergy: { name: 'Synergy AI', status: 'On Track', metrics: { arr: '€4.5M', growth: '+25%', runway: '16mo' } },
-                    dataforge: { name: 'DataForge', status: 'On Track', metrics: { arr: '€1.5M', growth: '+12%', runway: '20mo' } },
-                    nextech: { name: 'NexTech', status: 'On Track', metrics: { arr: '€3.2M', growth: '+15%', runway: '18mo' } },
-                    cloudscape: { name: 'Cloudscape', status: 'Needs Attention', metrics: { arr: '€950K', growth: '+2%', runway: '11mo' } },
-                    biogen: { name: 'BioGen', status: 'On Track', metrics: { arr: '€1.8M', growth: '+20%', runway: '22mo' } },
-                    finwise: { name: 'FinWise', status: 'On Track', metrics: { arr: '€5.1M', growth: '+19%', runway: '15mo' } },
-                    logix: { name: 'Logix', status: 'On Track', metrics: { arr: '€2.8M', growth: '+14%', runway: '19mo' } },
-                    zenith: { name: 'Zenith VR', status: 'On Track', metrics: { arr: '€1.1M', growth: '+30%', runway: '14mo' } },
-                },
-                reports: {
-                    w36: { title: 'Weekly Update - W36', date: 'Sep 5, 2025', metrics: { arr: '€1.2M', growth: '+23%', runway: '18mo' }, content: '<h3>Wins</h3><ul><li>Strong month with 23% MoM growth.</li><li>Closed 3 enterprise deals totaling €240k in new ARR.</li></ul><h3>Challenges</h3><ul><li>Engineering hiring remains top priority.</li></ul>' },
-                    w35: { title: 'Weekly Update - W35', date: 'Aug 29, 2025', metrics: { arr: '€1.1M', growth: '+15%', runway: '19mo' }, content: '<h3>Wins</h3><ul><li>Onboarded 2 major enterprise clients: Globex Corp and Innovate LLC.</li><li>Successful launch of the new analytics dashboard.</li></ul><h3>Next Steps</h3><ul><li>Begin planning for Series A raise in Q1 2026.</li></ul>' },
-                    w34: { title: 'Weekly Update - W34', date: 'Aug 22, 2025', metrics: { arr: '€1.05M', growth: '+5%', runway: '20mo' }, content: '<h3>Challenges</h3><ul><li>Unexpected churn from a mid-market customer.</li><li>Technical debt is slowing down feature development.</li></ul>' },
-                    innovate: { title: 'Weekly Update - Innovate Inc.', date: 'Sep 5, 2025', metrics: { arr: '€2.1M', growth: '+18%', runway: '24mo' }, content: '<h3>Wins</h3><ul><li>Product-market fit scores are at an all-time high after the v2.1 launch.</li><li>Closed a strategic partnership with a major distributor.</li></ul>' },
-                    quantum: { title: 'Weekly Update - QuantumLeap', date: 'Sep 5, 2025', metrics: { arr: '€800K', growth: '-5%', runway: '9mo' }, content: '<h3>Challenges</h3><ul><li>Marketing experiment with paid social showed higher than expected CAC.</li><li>Key engineering hire resigned.</li></ul><h3>Next Steps</h3><ul><li>Focusing on organic channels for Q4.</li><li>Opening up search for a new lead engineer.</li></ul>' },
-                    synergy: { title: 'Weekly Update - Synergy AI', date: 'Sep 5, 2025', metrics: { arr: '€4.5M', growth: '+25%', runway: '16mo' }, content: '<h3>Wins</h3><ul><li>Landed our first F500 customer.</li><li>Team morale is very high after the offsite.</li></ul>' },
-                },
-                playbooks: {
-                    'plg': { category: 'Growth', title: 'Product-Led Growth Engine', company: 'SLACK', content: '<h3>Key Idea</h3><p>Focus on making the product itself the primary driver of user acquisition, conversion, and expansion.</p><ul><li>Freemium model to reduce friction.</li><li>Seamless user onboarding.</li><li>Built-in virality (e.g., inviting colleagues).</li></ul>' },
-                    'outbound': { category: 'Growth', title: 'Outbound Sales Cadence', company: 'HUBSPOT', content: '<h3>Key Idea</h3><p>A structured sequence of touchpoints (email, call, social) to engage prospects.</p><ol><li>Day 1: Personalized Email</li><li>Day 3: LinkedIn Connection Request</li><li>Day 5: Follow-up Email + Call</li></ol>' },
-                    'eng-hiring': { category: 'Hiring', title: 'Scaling Engineering Teams', company: 'REVOLUT', content: `<h3>Key Principles</h3><ul><li><strong>Hire for Slope, Not Just Experience:</strong> Look for candidates with a steep learning curve and high potential, not just years on a resume.</li><li><strong>Bar Raiser Interviews:</strong> Involve a senior engineer from a different team in the final interview loop to maintain a consistently high bar for talent.</li><li><strong>Practical Problem Solving:</strong> Use a take-home project or a pair-programming session that mirrors real-world work.</li></ul>` },
-                    'remote': { category: 'Hiring', title: 'Remote Transformation', company: 'GITLAB', content: '<h3>Key Idea</h3><p>Build a thriving, productive company with no physical offices.</p><ul><li>Document everything in a central handbook.</li><li>Promote asynchronous communication.</li><li>Invest in tools for remote collaboration.</li></ul>' },
-                    'seed-deck': { category: 'Fundraising', title: 'The Perfect Seed Deck', company: 'Y COMBINATOR', content: `<h3>The 10-Slide Structure</h3><ol><li>Title</li><li>Problem</li><li>Solution</li><li>Market Size</li><li>Product</li><li>Traction</li><li>Team</li><li>Competition</li><li>Business Model</li><li>The Ask</li></ol>` },
-                    'board-meeting': { category: 'Fundraising', title: 'Board Meeting Excellence', company: 'SPOTIFY', content: '<h3>Key Idea</h3><p>Structure board meetings around strategic decisions, not just updates.</p><ul><li>Send materials 48 hours in advance.</li><li>Focus 80% of time on forward-looking strategy.</li><li>Use a data-driven appendix for metrics.</li></ul>' },
-                    'product-docs': { category: 'Product', title: 'Writing Great Product Docs', company: 'INTERCOM', content: '<h3>Key Idea</h3><p>Structure product docs around the "Why, What, and How" to ensure clarity for the entire team.</p><ul><li><strong>Why:</strong> The problem you are solving and for whom.</li><li><strong>What:</strong> The scope of the feature, including user stories and success metrics.</li><li><strong>How:</strong> High-level technical approach and design mocks.</li></ul>' },
-                    'user-interviews': { category: 'Product', title: 'Effective User Interviews', company: 'STRIPE', content: '<h3>Key Idea</h3><p>Ask open-ended questions about past behavior, not future intentions. Focus on understanding their problems deeply rather than pitching your solution.</p>' },
-                    'enterprise-sales': { category: 'Sales', title: 'Enterprise Sales Playbook', company: 'SALESFORCE', content: '<h3>Key Idea</h3><p>Navigate complex sales cycles by mapping the organization, identifying the champion, economic buyer, and technical buyer, and building consensus across the buying committee.</p>' },
-                    'saas-pricing': { category: 'Sales', title: 'Value-Based SaaS Pricing', company: 'TWILIO', content: '<h3>Key Idea</h3><p>Price your product based on the value it delivers to the customer segment, not on your costs or competitor prices. Common models include per-user, usage-based, and tiered pricing.</p>' },
-                    'cap-table': { category: 'Legal', title: 'Cap Table Management', company: 'CARTA', content: '<h3>Key Idea</h3><p>Maintain a clean and accurate capitalization table from day one. It is the single source of truth for company ownership and is critical for fundraising and employee equity.</p>' },
-                    'nda': { category: 'Legal', title: 'When to Use an NDA', company: 'WILSON SONSINI', content: '<h3>Key Idea</h3><p>Use Non-Disclosure Agreements sparingly. They are standard for M&A or deep strategic partnerships, but create unnecessary friction when talking to most VCs or potential hires.</p>' },
-                    'board-meetings': { title: "Our Guide to Board Meetings", content: "<h3>The Atomic Ventures Board Meeting Framework</h3><p>The essential template and best practices for running an effective board meeting that drives decisions, not just reporting.</p><ol><li><strong>Pre-Meeting:</strong> Send a concise pre-read 72 hours in advance, highlighting key decisions needed.</li><li><strong>Meeting Structure:</strong> 10% review of past performance, 60% strategic discussion on 2-3 key topics, 30% open discussion and administrative.</li><li><strong>Post-Meeting:</strong> Send minutes and action items within 24 hours.</li></ol>" },
-                    'term-sheet': { title: "Term Sheet Negotiation 101", content: "<h3>Key Terms for Founders</h3><p>Key terms and strategies for a successful fundraise, focusing on founder-friendly outcomes.</p><ul><li><strong>Valuation:</strong> Understand pre-money vs. post-money.</li><li><strong>Liquidation Preference:</strong> Aim for 1x, non-participating.</li><li><strong>Board Composition:</strong> Ensure founder control or a balanced board.</li><li><strong>Vesting:</strong> Standard is 4-year vest with a 1-year cliff.</li></ul>" }
-                }
-            };
-
-            function showPage(pageName) {
-                const pageMap = {
-                    'dashboard': ui.pages.dashboard, 'recording': ui.pages.recording, 'reports': ui.pages.reports, 'playbooks': ui.pages.playbooks, 'integrations': ui.pages.integrations, 'settings': ui.pages.settings,
-                    'vc-dashboard': ui.pages.vcDashboard, 'vc-playbooks': ui.pages.vcPlaybooks, 'vc-settings': ui.pages.vcSettings,
+            init() {
+                const start = () => {
+                    ui.init();
+                    this.loadInitialData();
+                    this.setupEventListeners();
                 };
-                Object.values(pageMap).forEach(page => page?.classList.add('hidden'));
-                pageMap[pageName]?.classList.remove('hidden');
 
-                const navMap = currentView === 'ceo' ? ui.navLinks.ceo : ui.navLinks.vc;
+                if (document.readyState === 'loading') {
+                    document.addEventListener('DOMContentLoaded', start);
+                } else {
+                    start();
+                }
+            },
+
+            loadInitialData() {
+                const savedApiKey = localStorage.getItem('geminiApiKey');
+                if (savedApiKey) {
+                    ui.elements.apiKeyInput.value = savedApiKey;
+                }
+                api.initializeDictationService(savedApiKey);
+                ui.populateCeoPlaybooks();
+                ui.populateVcPortfolio();
+            },
+
+            setupEventListeners() {
+                ui.elements.viewToggle.addEventListener('change', () => this.switchView());
+                Object.entries(ui.elements.navLinks.ceo).forEach(([name, link]) => link?.addEventListener('click', (e) => { e.preventDefault(); ui.showPage(name); }));
+                Object.entries(ui.elements.navLinks.vc).forEach(([name, link]) => link?.addEventListener('click', (e) => { e.preventDefault(); ui.showPage(`vc-${name}`); }));
+                ui.elements.bannerSettingsLink.addEventListener('click', (e) => { e.preventDefault(); ui.showPage('settings'); });
+                ui.elements.mobileMenuBtn.addEventListener('click', () => { ui.elements.sidebar.classList.toggle('-translate-x-full'); });
+                ui.elements.startRecordingBtn.addEventListener('click', () => this.dictationService?.toggleRecording());
+                if (ui.elements.newReportBtn) ui.elements.newReportBtn.addEventListener('click', () => ui.showPage('dashboard'));
+                ui.elements.saveApiKeyBtn.addEventListener('click', () => api.saveApiKey());
+                if (ui.elements.authorPlaybookBtn) ui.elements.authorPlaybookBtn.addEventListener('click', ui.showAuthorPlaybookModal);
+                ui.elements.modalCloseBtn.addEventListener('click', ui.hideModal);
+                ui.elements.modalOverlay.addEventListener('click', ui.hideModal);
+
+                ui.elements.playbookCategoryFilters.addEventListener('click', (e) => {
+                    const targetButton = e.target.closest('.playbook-category-btn');
+                    if (targetButton) {
+                        targetButton.classList.toggle('active');
+                        ui.populateCeoPlaybooks();
+                    }
+                });
+
+                document.addEventListener('click', (e) => this.handleDelegatedClicks(e));
+            },
+
+            handleDelegatedClicks(e) {
+                const target = e.target;
+                const delegatedActions = {
+                    '#finalize-report-btn-2': () => ui.showShareModal(),
+                    '.view-report-link': (el) => ui.showViewReportModal(el.dataset.reportId),
+                    '.playbook-link': (el) => ui.showPlaybookModal(el.dataset.playbookId),
+                    '.playbook-view-btn': (el) => ui.showPlaybookModal(el.dataset.playbookId),
+                    '#vc-portfolio-list > div[data-company-id]': (el) => ui.showCompanyDetailModal(el.dataset.companyId),
+                    '#copy-link-btn': () => {
+                        navigator.clipboard.writeText(document.getElementById('share-link-input').value);
+                        target.textContent = 'Copied!';
+                        setTimeout(() => target.textContent = 'Copy', 2000);
+                    },
+                    '#send-update-btn': () => {
+                        target.textContent = 'Sent!';
+                        target.classList.replace('bg-purple-700', 'bg-green-500');
+                        setTimeout(ui.hideModal, 1500);
+                    },
+                    '#save-playbook-btn': () => {
+                        target.textContent = 'Saved!';
+                        target.classList.replace('bg-purple-700', 'bg-green-500');
+                        setTimeout(ui.hideModal, 1500);
+                    },
+                    '#share-playbook-btn': () => alert('Playbook shared with portfolio!'),
+                };
+
+                for (const selector in delegatedActions) {
+                    const element = target.closest(selector);
+                    if (element) {
+                        e.preventDefault();
+                        delegatedActions[selector](element);
+                        return;
+                    }
+                }
+            },
+
+            switchView() {
+                ui.hideModal();
+                const isVcView = ui.elements.viewToggle.checked;
+                this.currentView = isVcView ? 'vc' : 'ceo';
+                
+                ui.elements.ceoView.classList.toggle('hidden', isVcView);
+                ui.elements.vcView.classList.toggle('hidden', !isVcView);
+                ui.elements.ceoNav.classList.toggle('hidden', isVcView);
+                ui.elements.vcNav.classList.toggle('hidden', !isVcView);
+
+                if (isVcView) {
+                    ui.updateUser('Sarah (Partner)', 'Alpha Ventures', 'https://placehold.co/100x100/8B5CF6/FFFFFF?text=S');
+                    ui.toggleLabels(true);
+                    ui.showPage('vc-dashboard');
+                } else {
+                    ui.updateUser('Alex (CEO)', 'Acme Inc.', 'https://placehold.co/100x100/5B21B6/FFFFFF?text=A');
+                    ui.toggleLabels(false);
+                    ui.showPage('dashboard');
+                }
+            }
+        };
+
+        var api = {
+            genAI: null,
+            DictationService: DictationService,
+
+            initializeDictationService(apiKey) {
+                if (apiKey) {
+                    try {
+                        this.genAI = new GoogleGenAI({ apiKey });
+                        app.dictationService = new this.DictationService({
+                            apiKey,
+                            genAI: this.genAI,
+                            recordButton: ui.elements.recordButton,
+                            statusTextElement: ui.elements.statusTextElement,
+                            liveWaveformCanvas: ui.elements.liveWaveformCanvas,
+                            liveRecordingTimerDisplay: ui.elements.liveRecordingTimerDisplay,
+                            recordingInterface: ui.elements.recordingInterface,
+                            liveRecordingTitle: ui.elements.liveRecordingTitle,
+                            onRecordingStart: () => ui.elements.recordingInterface.classList.remove('hidden'),
+                            onRecordingStop: () => {
+                                ui.showPage('recording');
+                                ui.elements.processingState.classList.remove('hidden');
+                                ui.elements.completedState.classList.add('hidden');
+                                ui.elements.processingStatus.textContent = 'Transcribing audio...';
+                            },
+                            onProcessingComplete: (data, rawText, error) => {
+                                app.latestGeneratedReport = { ...data, raw: rawText, error: error?.error };
+                                ui.renderCompletedState(app.latestGeneratedReport);
+                                ui.elements.processingState.classList.add('hidden');
+                                ui.elements.completedState.classList.remove('hidden');
+                            }
+                        });
+                    } catch (e) {
+                        console.error("Failed to initialize GoogleGenAI:", e);
+                        app.dictationService = null;
+                    }
+                } else {
+                    app.dictationService = null;
+                }
+                ui.updateRecordButtonState();
+            },
+
+            async saveApiKey() {
+                const apiKey = ui.elements.apiKeyInput.value.trim();
+                if (!apiKey) {
+                    ui.elements.apiKeyStatus.textContent = 'Please enter an API key.';
+                    ui.elements.apiKeyStatus.classList.replace('text-green-600', 'text-red-600');
+                    return;
+                }
+
+                ui.elements.saveApiKeyBtn.disabled = true;
+                ui.elements.saveApiKeyBtn.textContent = 'Validating...';
+                ui.elements.apiKeyStatus.textContent = '';
+
+                try {
+                    const testGenAI = new GoogleGenAI({ apiKey });
+                    await testGenAI.getGenerativeModel({ model: MODEL_NAME }).generateContent("test");
+
+                    localStorage.setItem('geminiApiKey', apiKey);
+                    this.initializeDictationService(apiKey);
+
+                    ui.elements.apiKeyStatus.textContent = 'API Key is valid and saved!';
+                    ui.elements.apiKeyStatus.classList.replace('text-red-600', 'text-green-600');
+
+                    setTimeout(() => {
+                        ui.elements.apiKeyStatus.textContent = '';
+                        if (app.dictationService?.isReady()) ui.showPage('dashboard');
+                    }, 2000);
+
+                } catch (error) {
+                    console.error("API Key validation failed:", error);
+                    localStorage.removeItem('geminiApiKey');
+                    this.initializeDictationService(null);
+
+                    ui.elements.apiKeyStatus.textContent = 'Invalid API Key. Please check and try again.';
+                    ui.elements.apiKeyStatus.classList.replace('text-green-600', 'text-red-600');
+                } finally {
+                    ui.elements.saveApiKeyBtn.disabled = false;
+                    ui.elements.saveApiKeyBtn.textContent = 'Save Key';
+                }
+            }
+        };
+
+        /**
+         * UI module to handle all DOM interactions and updates.
+         */
+        var ui = {
+            elements: {},
+
+            /**
+             * Caches all necessary DOM elements into the `elements` object.
+             */
+            init() {
+                const elementIds = [
+                    'sidebar', 'mobileMenuBtn', 'ceoView', 'vcView', 'ceoNav', 'vcNav', 'ceoPlaybookList',
+                    'playbookCategoryFilters', 'vcPortfolioList', 'page-dashboard', 'page-recording', 'page-reports',
+                    'page-playbooks', 'page-integrations', 'page-settings', 'page-vc-dashboard', 'page-vc-playbooks',
+                    'page-vc-settings', 'startRecordingBtn', 'newReportBtn', 'recordButton', 'recordingInterface',
+                    'processingState', 'processingStatus', 'completedState', 'liveWaveformCanvas',
+                    'liveRecordingTimerDisplay', 'liveRecordingTitle', 'recording-status-text',
+                    'extractedIntelligenceContainer', 'strategicUpdateContainer', 'authorPlaybookBtn',
+                    'apiKeyBanner', 'bannerSettingsLink', 'apiKeyInput', 'saveApiKeyBtn', 'apiKeyStatus',
+                    'viewToggle', 'userName', 'userCompany', 'userAvatar', 'ceoLabel', 'vcLabel',
+                    'modal', 'modalOverlay', 'modalContent', 'modalTitle', 'modalBody', 'modalCloseBtn'
+                ];
+                elementIds.forEach(id => {
+                    this.elements[id.replace(/-(\w)/g, (match, p1) => p1.toUpperCase())] = document.getElementById(id);
+                });
+
+                this.elements.pages = {
+                    dashboard: this.elements.pageDashboard, recording: this.elements.pageRecording, reports: this.elements.pageReports,
+                    playbooks: this.elements.pagePlaybooks, integrations: this.elements.pageIntegrations, settings: this.elements.pageSettings,
+                    vcDashboard: this.elements.pageVcDashboard, vcPlaybooks: this.elements.pageVcPlaybooks, vcSettings: this.elements.pageVcSettings
+                };
+
+                this.elements.navLinks = {
+                    ceo: { dashboard: document.getElementById('nav-dashboard'), reports: document.getElementById('nav-reports'), playbooks: document.getElementById('nav-playbooks'), integrations: document.getElementById('nav-integrations'), settings: document.getElementById('nav-settings') },
+                    vc: { dashboard: document.getElementById('nav-vc-dashboard'), playbooks: document.getElementById('nav-vc-playbooks'), settings: document.getElementById('nav-vc-settings') }
+                };
+            },
+
+            /**
+             * Shows a specific page and hides all others.
+             * @param {string} pageName - The name of the page to show.
+             */
+            showPage(pageName) {
+                Object.values(this.elements.pages).forEach(page => page?.classList.add('hidden'));
+                this.elements.pages[pageName]?.classList.remove('hidden');
+
+                const navMap = app.currentView === 'ceo' ? this.elements.navLinks.ceo : this.elements.navLinks.vc;
                 const navKey = pageName.replace('vc-', '');
                 Object.values(navMap).forEach(link => link?.classList.remove('active'));
                 navMap[navKey]?.classList.add('active');
                 
-                if (ui.sidebar.classList.contains('translate-x-0')) {
-                    ui.sidebar.classList.remove('translate-x-0');
-                    ui.sidebar.classList.add('-translate-x-full');
+                if (this.elements.sidebar.classList.contains('translate-x-0')) {
+                    this.elements.sidebar.classList.add('-translate-x-full');
                 }
-            }
-            
-            function initializeDictationService(apiKey) {
-                dictationService = new DictationService({
-                    apiKey: apiKey, recordButton: ui.recordButton, statusTextElement: document.getElementById('recording-status-text'),
-                    onRecordingStart: () => ui.recordingInterface.classList.remove('hidden'),
-                    onRecordingStop: () => {
-                        showPage('recording'); ui.recordingInterface.classList.add('hidden'); ui.processingState.classList.remove('hidden'); ui.completedState.classList.add('hidden'); ui.processingStatus.textContent = 'Transcribing audio...';
-                    },
-                    onProcessingComplete: (data, rawText, error) => {
-                         latestGeneratedReport = { ...data, raw: rawText };
-                         renderCompletedState(latestGeneratedReport);
-                         ui.processingState.classList.add('hidden');
-                         ui.completedState.classList.remove('hidden');
+            },
+
+            /**
+             * Updates the user information in the sidebar.
+             * @param {string} name - The user's name.
+             * @param {string} company - The user's company.
+             * @param {string} avatarSrc - The URL for the user's avatar.
+             */
+            updateUser(name, company, avatarSrc) {
+                this.elements.userName.textContent = name;
+                this.elements.userCompany.textContent = company;
+                this.elements.userAvatar.src = avatarSrc;
+            },
+
+            /**
+             * Toggles the active state of the CEO/VC labels.
+             * @param {boolean} isVcView - True if the VC view is active.
+             */
+            toggleLabels(isVcView) {
+                this.elements.vcLabel.classList.toggle('font-semibold', isVcView);
+                this.elements.vcLabel.classList.toggle('text-purple-700', isVcView);
+                this.elements.vcLabel.classList.toggle('text-gray-500', !isVcView);
+                this.elements.ceoLabel.classList.toggle('font-semibold', !isVcView);
+                this.elements.ceoLabel.classList.toggle('text-purple-700', !isVcView);
+                this.elements.ceoLabel.classList.toggle('text-gray-500', isVcView);
+            },
+
+            /**
+             * Updates the enabled/disabled state of recording buttons based on API key readiness.
+             */
+            updateRecordButtonState() {
+                const isReady = app.dictationService && app.dictationService.isReady();
+                const buttons = [this.elements.startRecordingBtn, this.elements.recordButton, this.elements.newReportBtn];
+                buttons.forEach(btn => {
+                    if (btn) {
+                        btn.disabled = !isReady;
+                        btn.style.cursor = isReady ? 'pointer' : 'not-allowed';
+                        btn.style.opacity = isReady ? '1' : '0.5';
+                        btn.title = isReady ? 'Start Recording' : 'API Key not configured';
                     }
                 });
-                updateRecordButtonState();
-            }
+                this.elements.apiKeyBanner.classList.toggle('hidden', isReady);
+            },
 
-             function renderCompletedState(data) {
+            /**
+             * Renders the completed state of a recording, including AI analysis and the strategic update.
+             * @param {object} data - The processed data from the recording.
+             */
+            renderCompletedState(data) {
                 if (data.error) {
-                    ui.extractedIntelligenceContainer.innerHTML = `<h4 class="font-bold text-sm mb-4">Error</h4><div class="bg-white p-6 border border-red-200 rounded-lg"><p class="text-red-600">${data.error}</p></div>`;
-                    ui.strategicUpdateContainer.innerHTML = `<h4 class="font-bold text-sm mb-4">Strategic Update</h4><div class="bg-white border-2 border-gray-200 p-6 rounded-lg shadow-lg"><p class="text-gray-500">Could not be generated due to an error.</p></div>`;
+                    this.elements.extractedIntelligenceContainer.innerHTML = `<h4 class="font-bold text-sm mb-4">Error</h4><div class="bg-white p-6 border border-red-200 rounded-lg"><p class="text-red-600">${data.error}</p></div>`;
+                    this.elements.strategicUpdateContainer.innerHTML = `<h4 class="font-bold text-sm mb-4">Strategic Update</h4><div class="bg-white border-2 border-gray-200 p-6 rounded-lg shadow-lg"><p class="text-gray-500">Could not be generated due to an error.</p></div>`;
                     return;
                 }
 
                 const renderList = (items) => items && items.length > 0 ? `<ul>${items.map(item => `<li class="flex items-start gap-2"><span class="text-purple-600">→</span><span>${item}</span></li>`).join('')}</ul>` : '<p class="text-gray-500">None mentioned.</p>';
-                 const fullSummaryHtml = data.fullSummary ? marked.parse(data.fullSummary) : '<p class="text-gray-500">Summary not available.</p>';
-
+                const fullSummaryHtml = data.fullSummary ? marked.parse(data.fullSummary) : '<p class="text-gray-500">Summary not available.</p>';
 
                 const intelligenceHtml = `
                     <div class="space-y-4">
@@ -738,7 +915,7 @@
                         <div><h4 class="font-bold text-sm mb-2 text-blue-600">Strategic Insights</h4>${renderList(data.insights)}</div>
                         <div class="pt-4 border-t"><h4 class="font-bold text-sm mb-2">Full Transcript</h4><p class="text-xs italic text-gray-500 max-h-32 overflow-y-auto">${data.raw || 'Not available.'}</p></div>
                     </div>`;
-                ui.extractedIntelligenceContainer.querySelector('.bg-white').innerHTML = intelligenceHtml;
+                this.elements.extractedIntelligenceContainer.querySelector('.bg-white').innerHTML = intelligenceHtml;
                 
                 const strategicHtml = `
                     <div class="flex items-center justify-between mb-6"><div><h3 class="font-bold text-xl">Strategic Update</h3><p class="text-sm text-gray-600 mono">Week ${new Date().getWeek()} • ${new Date().getFullYear()}</p></div><span class="text-sm bg-green-100 text-green-800 px-3 py-1 rounded-full">Momentum Building</span></div>
@@ -750,80 +927,47 @@
                     <div class="prose prose-sm max-w-none">${fullSummaryHtml}</div>
                     <button id="finalize-report-btn-2" class="mt-6 w-full bg-purple-700 text-white py-2 text-sm font-bold hover:bg-purple-800 transition-colors rounded-md">Finalize & Share →</button>
                 `;
-                ui.strategicUpdateContainer.querySelector('.bg-white').innerHTML = strategicHtml;
-                 document.getElementById('finalize-report-btn-2').addEventListener('click', showShareModal);
-            }
-            
-            Date.prototype.getWeek = function() { var d = new Date(Date.UTC(this.getFullYear(), this.getMonth(), this.getDate())); var dayNum = d.getUTCDay() || 7; d.setUTCDate(d.getUTCDate() + 4 - dayNum); var yearStart = new Date(Date.UTC(d.getUTCFullYear(),0,1)); return Math.ceil((((d - yearStart) / 86400000) + 1)/7) };
-            
-            function updateRecordButtonState() {
-                const isReady = dictationService && dictationService.isReady();
-                const buttons = [ui.startRecordingBtn, ui.recordButton, ui.newReportBtn];
-                buttons.forEach(btn => {
-                    if (btn) {
-                        btn.disabled = !isReady; btn.style.cursor = isReady ? 'pointer' : 'not-allowed'; btn.style.opacity = isReady ? '1' : '0.5'; btn.title = isReady ? 'Start Recording' : 'API Key not configured';
-                    }
-                });
-                ui.apiKeyBanner.classList.toggle('hidden', isReady);
-            }
+                this.elements.strategicUpdateContainer.querySelector('.bg-white').innerHTML = strategicHtml;
+            },
 
-            function saveApiKey() {
-                const apiKey = ui.apiKeyInput.value.trim();
-                if(apiKey) {
-                    localStorage.setItem('geminiApiKey', apiKey);
-                    initializeDictationService(apiKey);
-                    ui.apiKeyStatus.textContent = 'API Key saved!';
-                     setTimeout(() => {
-                        ui.apiKeyStatus.textContent = '';
-                        if (dictationService.isReady()) showPage('dashboard');
-                    }, 2000);
-                }
-            }
-            
-            function switchView() {
-                const isVcView = ui.viewToggle.checked;
-                currentView = isVcView ? 'vc' : 'ceo';
-                ui.ceoView.classList.toggle('hidden', isVcView); ui.vcView.classList.toggle('hidden', !isVcView); ui.ceoNav.classList.toggle('hidden', isVcView); ui.vcNav.classList.toggle('hidden', !isVcView);
-                if (isVcView) {
-                    ui.userName.textContent = 'Sarah (Partner)'; ui.userCompany.textContent = 'Alpha Ventures'; ui.userAvatar.src = 'https://placehold.co/100x100/8B5CF6/FFFFFF?text=S';
-                    ui.vcLabel.classList.add('font-semibold', 'text-purple-700'); ui.vcLabel.classList.remove('text-gray-500'); ui.ceoLabel.classList.remove('font-semibold', 'text-purple-700'); ui.ceoLabel.classList.add('text-gray-500');
-                    showPage('vc-dashboard');
-                } else {
-                    ui.userName.textContent = 'Alex (CEO)'; ui.userCompany.textContent = 'Acme Inc.'; ui.userAvatar.src = 'https://placehold.co/100x100/5B21B6/FFFFFF?text=A';
-                    ui.ceoLabel.classList.add('font-semibold', 'text-purple-700'); ui.ceoLabel.classList.remove('text-gray-500'); ui.vcLabel.classList.remove('font-semibold', 'text-purple-700'); ui.vcLabel.classList.add('text-gray-500');
-                    showPage('dashboard');
-                }
-            }
-            
-            // Modal Logic
-            function showModal(title, body) {
-                ui.modalTitle.textContent = title;
-                ui.modalBody.innerHTML = '';
-                ui.modalBody.appendChild(body);
-                ui.modal.classList.remove('hidden');
-                setTimeout(() => { ui.modalOverlay.classList.remove('opacity-0'); ui.modalContent.classList.remove('scale-95', 'opacity-0'); }, 10);
-            }
+            /**
+             * Shows a modal with the given title and body content.
+             * @param {string} title - The title of the modal.
+             * @param {HTMLElement} body - The HTML element to be placed in the modal body.
+             */
+            showModal(title, body) {
+                this.elements.modalTitle.textContent = title;
+                this.elements.modalBody.innerHTML = '';
+                this.elements.modalBody.appendChild(body);
+                this.elements.modal.classList.remove('hidden');
+                setTimeout(() => {
+                    this.elements.modalOverlay.classList.remove('opacity-0');
+                    this.elements.modalContent.classList.remove('scale-95', 'opacity-0');
+                }, 10);
+            },
 
-            function hideModal() {
-                ui.modalOverlay.classList.add('opacity-0');
-                ui.modalContent.classList.add('scale-95', 'opacity-0');
-                setTimeout(() => ui.modal.classList.add('hidden'), 300);
-            }
-            
-            function showShareModal() {
+            /**
+             * Hides the currently visible modal.
+             */
+            hideModal() {
+                ui.elements.modalOverlay.classList.add('opacity-0');
+                ui.elements.modalContent.classList.add('scale-95', 'opacity-0');
+                setTimeout(() => ui.elements.modal.classList.add('hidden'), 300);
+            },
+
+            showShareModal() {
                 const content = document.createElement('div');
                 content.innerHTML = `
                     <p class="text-sm text-gray-600 mb-4">Share this report with your stakeholders.</p>
                     <div class="mb-6"> <label class="text-sm font-bold text-gray-700">Shareable Link</label> <div class="flex mt-1"> <input id="share-link-input" type="text" readonly value="https://operal.ta/r/8ab3f-cde21" class="mono text-sm flex-1 p-2 border border-gray-300 rounded-l-md bg-gray-50"> <button id="copy-link-btn" class="bg-gray-200 px-4 py-2 text-sm font-semibold rounded-r-md hover:bg-gray-300">Copy</button> </div> </div>
                     <div> <label class="text-sm font-bold text-gray-700">Send to Stakeholders</label> <div class="mt-2 border border-gray-200 rounded-md"> <div class="p-3 flex items-center justify-between"><span class="font-semibold">Alpha Ventures</span><span class="text-xs text-gray-500">sarah@alphavc.com</span></div> <div class="p-3 border-t border-gray-200 flex items-center justify-between"><span class="font-semibold">Seed Fund Inc.</span><span class="text-xs text-gray-500">updates@seed.inc</span></div> </div> </div>
                     <button id="send-update-btn" class="w-full bg-purple-700 text-white py-2 text-sm font-bold hover:bg-purple-800 transition-colors rounded-md mt-6">Send Update</button>`;
-                showModal('Share Report', content);
-                content.querySelector('#copy-link-btn').addEventListener('click', (e) => { const btn = e.currentTarget; navigator.clipboard.writeText(content.querySelector('#share-link-input').value); btn.textContent = 'Copied!'; setTimeout(() => btn.textContent = 'Copy', 2000); });
-                content.querySelector('#send-update-btn').addEventListener('click', (e) => { const btn = e.currentTarget; btn.textContent = 'Sent!'; btn.classList.replace('bg-purple-700', 'bg-green-500'); setTimeout(() => hideModal(), 1500); });
-            }
+                this.showModal('Share Report', content);
+            },
 
-            function showViewReportModal(reportId) {
-                const report = db.reports[reportId]; if (!report) return;
+            showViewReportModal(reportId) {
+                const report = db.reports[reportId];
+                if (!report) return;
                 const content = document.createElement('div');
                 const growthClass = report.metrics.growth.startsWith('+') ? 'text-green-600' : 'text-red-600';
                 content.innerHTML = `
@@ -833,14 +977,13 @@
                         <div><p class="font-bold text-2xl">${report.metrics.runway}</p><p class="text-xs text-gray-600">Runway</p></div>
                     </div>
                     <div class="prose prose-sm max-w-none">${report.content}</div>`;
-                showModal(report.title, content);
-            }
+                this.showModal(report.title, content);
+            },
 
-            function showCompanyDetailModal(companyId) {
+            showCompanyDetailModal(companyId) {
                 const company = db.companies[companyId];
                 if (!company) return;
-                 const statusClass = company.status === 'On Track' ? 'text-green-600 bg-green-100' : 'text-yellow-600 bg-yellow-100';
-
+                const statusClass = company.status === 'On Track' ? 'text-green-600 bg-green-100' : 'text-yellow-600 bg-yellow-100';
                 const content = document.createElement('div');
                 content.innerHTML = `
                     <div class="mb-6">
@@ -867,28 +1010,25 @@
                            <a href="#" class="flex justify-between p-2 rounded-md hover:bg-gray-50 playbook-link" data-playbook-id="enterprise-sales"><span class="font-semibold">Enterprise Sales Playbook</span><span class="text-gray-500 mono text-xs">SALESFORCE</span></a>
                            <a href="#" class="flex justify-between p-2 rounded-md hover:bg-gray-50 playbook-link" data-playbook-id="eng-hiring"><span class="font-semibold">Scaling Engineering Teams</span><span class="text-gray-500 mono text-xs">REVOLUT</span></a>
                         </div>
-                    </div>
-                `;
-                 showModal(company.name, content);
-                 content.querySelectorAll('.view-report-link').forEach(link => link.addEventListener('click', (e) => { e.preventDefault(); showViewReportModal(e.currentTarget.dataset.reportId); }));
-                 content.querySelectorAll('.playbook-link').forEach(link => link.addEventListener('click', (e) => { e.preventDefault(); showPlaybookModal(e.currentTarget.dataset.playbookId); }));
-            }
+                    </div>`;
+                this.showModal(company.name, content);
+            },
 
-            function showPlaybookModal(playbookId) {
-                const playbook = db.playbooks[playbookId]; if (!playbook) return;
+            showPlaybookModal(playbookId) {
+                const playbook = db.playbooks[playbookId];
+                if (!playbook) return;
                 const content = document.createElement('div');
                 content.innerHTML = `
                     <div class="prose prose-sm max-w-none">${playbook.content}</div>
                     <div class="mt-6 pt-4 border-t border-gray-200 flex space-x-4">
                          <button class="flex-1 bg-purple-100 text-purple-700 px-4 py-2 text-sm font-bold hover:bg-purple-200 transition-colors rounded-md">Add to AI-Coach</button>
                          <button class="flex-1 bg-gray-200 text-gray-800 px-4 py-2 text-sm font-bold hover:bg-gray-300 transition-colors rounded-md">Read</button>
-                    </div>
-                `;
-                showModal(playbook.title, content);
-            }
+                    </div>`;
+                this.showModal(playbook.title, content);
+            },
             
-            function showAuthorPlaybookModal() {
-                 const content = document.createElement('div');
+            showAuthorPlaybookModal() {
+                const content = document.createElement('div');
                 content.innerHTML = `
                     <div class="space-y-4">
                         <div><label class="text-sm font-bold text-gray-700">Playbook Title</label><input type="text" placeholder="e.g., Our Guide to Board Meetings" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"></div>
@@ -898,31 +1038,38 @@
                         <button id="share-playbook-btn" class="bg-gray-200 text-gray-800 px-4 py-2 text-sm font-bold hover:bg-gray-300 rounded-md">Share with Portfolio</button>
                         <button id="save-playbook-btn" class="bg-purple-700 text-white px-4 py-2 text-sm font-bold hover:bg-purple-800 rounded-md">Save Playbook</button>
                     </div>`;
-                showModal('Author New Playbook', content);
-                 content.querySelector('#save-playbook-btn').addEventListener('click', (e) => { const btn = e.currentTarget; btn.textContent = 'Saved!'; btn.classList.replace('bg-purple-700', 'bg-green-500'); setTimeout(hideModal, 1500); });
-                 content.querySelector('#share-playbook-btn').addEventListener('click', () => alert('Playbook shared with portfolio!'));
-            }
+                this.showModal('Author New Playbook', content);
+            },
             
-            function populateCeoPlaybooks() {
-                const activeCategories = Array.from(ui.playbookCategoryFilters.querySelectorAll('.playbook-category-btn.active')).map(btn => btn.dataset.category);
-                
+            /**
+             * Creates the HTML for a single playbook card.
+             * @param {object} playbook - The playbook data.
+             * @param {string} id - The playbook ID.
+             * @returns {string} The HTML string for the card.
+             */
+            _createPlaybookCardHtml(playbook, id) {
+                return `
+                    <div class="bg-white border border-gray-200 p-4 rounded-lg flex justify-between items-center group">
+                        <div>
+                            <p class="font-semibold">${playbook.title}</p>
+                            <p class="text-sm text-gray-500">from ${playbook.company}</p>
+                        </div>
+                        <button class="playbook-view-btn text-xs bg-gray-200 text-gray-700 px-3 py-1 rounded-full font-semibold hover:bg-gray-300" data-playbook-id="${id}">View</button>
+                    </div>`;
+            },
+
+            populateCeoPlaybooks() {
+                const activeCategories = Array.from(this.elements.playbookCategoryFilters.querySelectorAll('.playbook-category-btn.active')).map(btn => btn.dataset.category);
                 const categories = { 'Growth': [], 'Hiring': [], 'Fundraising': [], 'Product': [], 'Sales': [], 'Legal': [] };
-                let visiblePlaybooks = Object.entries(db.playbooks).filter(([id, playbook]) => playbook.category && (activeCategories.length === 0 || activeCategories.includes(playbook.category)));
+                const visiblePlaybooks = Object.entries(db.playbooks).filter(([id, playbook]) => playbook.category && (activeCategories.length === 0 || activeCategories.includes(playbook.category)));
 
                 if (visiblePlaybooks.length === 0) {
-                    ui.ceoPlaybookList.innerHTML = `<div class="text-center text-gray-500 col-span-full">No playbooks found for the selected categories.</div>`;
+                    this.elements.ceoPlaybookList.innerHTML = `<div class="text-center text-gray-500 col-span-full">No playbooks found for the selected categories.</div>`;
                     return;
                 }
 
                 visiblePlaybooks.forEach(([id, p]) => {
-                    const html = `
-                        <div class="bg-white border border-gray-200 p-4 rounded-lg flex justify-between items-center group">
-                            <div>
-                                <p class="font-semibold">${p.title}</p>
-                                <p class="text-sm text-gray-500">from ${p.company}</p>
-                            </div>
-                            <button class="playbook-view-btn text-xs bg-gray-200 text-gray-700 px-3 py-1 rounded-full font-semibold hover:bg-gray-300" data-playbook-id="${id}">View</button>
-                        </div>`;
+                    const html = this._createPlaybookCardHtml(p, id);
                     if(categories[p.category]) categories[p.category].push(html);
                 });
                 
@@ -932,78 +1079,82 @@
                         fullHtml += `<div><h3 class="font-bold mb-4 pb-2 border-b border-gray-200">${categoryName}</h3><div class="space-y-4 text-sm">${items.join('')}</div></div>`;
                     }
                 }
-                
-                ui.ceoPlaybookList.innerHTML = fullHtml;
+                this.elements.ceoPlaybookList.innerHTML = fullHtml;
+            },
 
-                // Re-add event listeners 
-                document.querySelectorAll('#ceo-playbook-list .playbook-view-btn').forEach(link => {
-                    link.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); showPlaybookModal(e.currentTarget.dataset.playbookId); });
-                });
+            /**
+             * Creates the HTML for a single company card.
+             * @param {object} company - The company data.
+             * @param {string} id - The company ID.
+             * @returns {string} The HTML string for the card.
+             */
+            _createCompanyCardHtml(company, id) {
+                const statusClass = company.status === 'On Track' ? 'text-green-800 bg-green-100' : 'text-yellow-800 bg-yellow-100';
+                const growthClass = company.metrics.growth.startsWith('+') ? 'text-green-600' : 'text-red-600';
+                return `
+                    <div class="bg-white border border-gray-200 p-6 rounded-lg cursor-pointer hover:shadow-lg transition-shadow" data-company-id="${id}">
+                        <div class="flex justify-between items-start mb-4">
+                            <h3 class="font-bold">${company.name}</h3>
+                            <span class="px-2 py-1 text-xs font-semibold ${statusClass} rounded-full">${company.status}</span>
+                        </div>
+                        <div class="grid grid-cols-3 gap-4 text-center">
+                            <div class="border-r border-gray-200"><p class="text-lg font-bold">${company.metrics.arr}</p><p class="text-xs text-gray-500">ARR</p></div>
+                            <div class="border-r border-gray-200"><p class="text-lg font-bold ${growthClass}">${company.metrics.growth}</p><p class="text-xs text-gray-500">MoM</p></div>
+                            <div><p class="text-lg font-bold">${company.metrics.runway}</p><p class="text-xs text-gray-500">Runway</p></div>
+                        </div>
+                    </div>`;
+            },
+
+            populateVcPortfolio() {
+                const html = Object.entries(db.companies)
+                    .map(([id, company]) => this._createCompanyCardHtml(company, id))
+                    .join('');
+                this.elements.vcPortfolioList.innerHTML = html;
             }
+        };
 
-            function populateVcPortfolio() {
-                let html = '';
-                for (const [id, company] of Object.entries(db.companies)) {
-                     const statusClass = company.status === 'On Track' ? 'text-green-800 bg-green-100' : 'text-yellow-800 bg-yellow-100';
-                     const growthClass = company.metrics.growth.startsWith('+') ? 'text-green-600' : 'text-red-600';
-                    html += `
-                        <div class="bg-white border border-gray-200 p-6 rounded-lg cursor-pointer hover:shadow-lg transition-shadow" data-company-id="${id}">
-                            <div class="flex justify-between items-start mb-4">
-                                <h3 class="font-bold">${company.name}</h3>
-                                <span class="px-2 py-1 text-xs font-semibold ${statusClass} rounded-full">${company.status}</span>
-                            </div>
-                            <div class="grid grid-cols-3 gap-4 text-center">
-                                <div class="border-r border-gray-200"><p class="text-lg font-bold">${company.metrics.arr}</p><p class="text-xs text-gray-500">ARR</p></div>
-                                <div class="border-r border-gray-200"><p class="text-lg font-bold ${growthClass}">${company.metrics.growth}</p><p class="text-xs text-gray-500">MoM</p></div>
-                                <div><p class="text-lg font-bold">${company.metrics.runway}</p><p class="text-xs text-gray-500">Runway</p></div>
-                            </div>
-                        </div>`;
-                }
-                ui.vcPortfolioList.innerHTML = html;
-                document.querySelectorAll('#vc-portfolio-list > div').forEach(card => card.addEventListener('click', (e) => { e.preventDefault(); showCompanyDetailModal(e.currentTarget.dataset.companyId); }));
+        var db = {
+            companies: {
+                innovate: { name: 'Innovate Inc.', status: 'On Track', metrics: { arr: '€2.1M', growth: '+18%', runway: '24mo' } },
+                quantum: { name: 'QuantumLeap', status: 'Needs Attention', metrics: { arr: '€800K', growth: '-5%', runway: '9mo' } },
+                synergy: { name: 'Synergy AI', status: 'On Track', metrics: { arr: '€4.5M', growth: '+25%', runway: '16mo' } },
+                dataforge: { name: 'DataForge', status: 'On Track', metrics: { arr: '€1.5M', growth: '+12%', runway: '20mo' } },
+                nextech: { name: 'NexTech', status: 'On Track', metrics: { arr: '€3.2M', growth: '+15%', runway: '18mo' } },
+                cloudscape: { name: 'Cloudscape', status: 'Needs Attention', metrics: { arr: '€950K', growth: '+2%', runway: '11mo' } },
+                biogen: { name: 'BioGen', status: 'On Track', metrics: { arr: '€1.8M', growth: '+20%', runway: '22mo' } },
+                finwise: { name: 'FinWise', status: 'On Track', metrics: { arr: '€5.1M', growth: '+19%', runway: '15mo' } },
+                logix: { name: 'Logix', status: 'On Track', metrics: { arr: '€2.8M', growth: '+14%', runway: '19mo' } },
+                zenith: { name: 'Zenith VR', status: 'On Track', metrics: { arr: '€1.1M', growth: '+30%', runway: '14mo' } },
+            },
+            reports: {
+                w36: { title: 'Weekly Update - W36', date: 'Sep 5, 2025', metrics: { arr: '€1.2M', growth: '+23%', runway: '18mo' }, content: '<h3>Wins</h3><ul><li>Strong month with 23% MoM growth.</li><li>Closed 3 enterprise deals totaling €240k in new ARR.</li></ul><h3>Challenges</h3><ul><li>Engineering hiring remains top priority.</li></ul>' },
+                w35: { title: 'Weekly Update - W35', date: 'Aug 29, 2025', metrics: { arr: '€1.1M', growth: '+15%', runway: '19mo' }, content: '<h3>Wins</h3><ul><li>Onboarded 2 major enterprise clients: Globex Corp and Innovate LLC.</li><li>Successful launch of the new analytics dashboard.</li></ul><h3>Next Steps</h3><ul><li>Begin planning for Series A raise in Q1 2026.</li></ul>' },
+                w34: { title: 'Weekly Update - W34', date: 'Aug 22, 2025', metrics: { arr: '€1.05M', growth: '+5%', runway: '20mo' }, content: '<h3>Challenges</h3><ul><li>Unexpected churn from a mid-market customer.</li><li>Technical debt is slowing down feature development.</li></ul>' },
+                innovate: { title: 'Weekly Update - Innovate Inc.', date: 'Sep 5, 2025', metrics: { arr: '€2.1M', growth: '+18%', runway: '24mo' }, content: '<h3>Wins</h3><ul><li>Product-market fit scores are at an all-time high after the v2.1 launch.</li><li>Closed a strategic partnership with a major distributor.</li></ul>' },
+                quantum: { title: 'Weekly Update - QuantumLeap', date: 'Sep 5, 2025', metrics: { arr: '€800K', growth: '-5%', runway: '9mo' }, content: '<h3>Challenges</h3><ul><li>Marketing experiment with paid social showed higher than expected CAC.</li><li>Key engineering hire resigned.</li></ul><h3>Next Steps</h3><ul><li>Focusing on organic channels for Q4.</li><li>Opening up search for a new lead engineer.</li></ul>' },
+                synergy: { title: 'Weekly Update - Synergy AI', date: 'Sep 5, 2025', metrics: { arr: '€4.5M', growth: '+25%', runway: '16mo' }, content: '<h3>Wins</h3><ul><li>Landed our first F500 customer.</li><li>Team morale is very high after the offsite.</li></ul>' },
+            },
+            playbooks: {
+                'plg': { category: 'Growth', title: 'Product-Led Growth Engine', company: 'SLACK', content: '<h3>Key Idea</h3><p>Focus on making the product itself the primary driver of user acquisition, conversion, and expansion.</p><ul><li>Freemium model to reduce friction.</li><li>Seamless user onboarding.</li><li>Built-in virality (e.g., inviting colleagues).</li></ul>' },
+                'outbound': { category: 'Growth', title: 'Outbound Sales Cadence', company: 'HUBSPOT', content: '<h3>Key Idea</h3><p>A structured sequence of touchpoints (email, call, social) to engage prospects.</p><ol><li>Day 1: Personalized Email</li><li>Day 3: LinkedIn Connection Request</li><li>Day 5: Follow-up Email + Call</li></ol>' },
+                'eng-hiring': { category: 'Hiring', title: 'Scaling Engineering Teams', company: 'REVOLUT', content: `<h3>Key Principles</h3><ul><li><strong>Hire for Slope, Not Just Experience:</strong> Look for candidates with a steep learning curve and high potential, not just years on a resume.</li><li><strong>Bar Raiser Interviews:</strong> Involve a senior engineer from a different team in the final interview loop to maintain a consistently high bar for talent.</li><li><strong>Practical Problem Solving:</strong> Use a take-home project or a pair-programming session that mirrors real-world work.</li></ul>` },
+                'remote': { category: 'Hiring', title: 'Remote Transformation', company: 'GITLAB', content: '<h3>Key Idea</h3><p>Build a thriving, productive company with no physical offices.</p><ul><li>Document everything in a central handbook.</li><li>Promote asynchronous communication.</li><li>Invest in tools for remote collaboration.</li></ul>' },
+                'seed-deck': { category: 'Fundraising', title: 'The Perfect Seed Deck', company: 'Y COMBINATOR', content: `<h3>The 10-Slide Structure</h3><ol><li>Title</li><li>Problem</li><li>Solution</li><li>Market Size</li><li>Product</li><li>Traction</li><li>Team</li><li>Competition</li><li>Business Model</li><li>The Ask</li></ol>` },
+                'board-meeting': { category: 'Fundraising', title: 'Board Meeting Excellence', company: 'SPOTIFY', content: '<h3>Key Idea</h3><p>Structure board meetings around strategic decisions, not just updates.</p><ul><li>Send materials 48 hours in advance.</li><li>Focus 80% of time on forward-looking strategy.</li><li>Use a data-driven appendix for metrics.</li></ul>' },
+                'product-docs': { category: 'Product', title: 'Writing Great Product Docs', company: 'INTERCOM', content: '<h3>Key Idea</h3><p>Structure product docs around the "Why, What, and How" to ensure clarity for the entire team.</p><ul><li><strong>Why:</strong> The problem you are solving and for whom.</li><li><strong>What:</strong> The scope of the feature, including user stories and success metrics.</li><li><strong>How:</strong> High-level technical approach and design mocks.</li></ul>' },
+                'user-interviews': { category: 'Product', title: 'Effective User Interviews', company: 'STRIPE', content: '<h3>Key Idea</h3><p>Ask open-ended questions about past behavior, not future intentions. Focus on understanding their problems deeply rather than pitching your solution.</p>' },
+                'enterprise-sales': { category: 'Sales', title: 'Enterprise Sales Playbook', company: 'SALESFORCE', content: '<h3>Key Idea</h3><p>Navigate complex sales cycles by mapping the organization, identifying the champion, economic buyer, and technical buyer, and building consensus across the buying committee.</p>' },
+                'saas-pricing': { category: 'Sales', title: 'Value-Based SaaS Pricing', company: 'TWILIO', content: '<h3>Key Idea</h3><p>Price your product based on the value it delivers to the customer segment, not on your costs or competitor prices. Common models include per-user, usage-based, and tiered pricing.</p>' },
+                'cap-table': { category: 'Legal', title: 'Cap Table Management', company: 'CARTA', content: '<h3>Key Idea</h3><p>Maintain a clean and accurate capitalization table from day one. It is the single source of truth for company ownership and is critical for fundraising and employee equity.</p>' },
+                'nda': { category: 'Legal', 'title': 'When to Use an NDA', 'company': 'WILSON SONSINI', content: '<h3>Key Idea</h3><p>Use Non-Disclosure Agreements sparingly. They are standard for M&A or deep strategic partnerships, but create unnecessary friction when talking to most VCs or potential hires.</p>' },
+                'board-meetings': { title: "Our Guide to Board Meetings", content: "<h3>The Atomic Ventures Board Meeting Framework</h3><p>The essential template and best practices for running an effective board meeting that drives decisions, not just reporting.</p><ol><li><strong>Pre-Meeting:</strong> Send a concise pre-read 72 hours in advance, highlighting key decisions needed.</li><li><strong>Meeting Structure:</strong> 10% review of past performance, 60% strategic discussion on 2-3 key topics, 30% open discussion and administrative.</li><li><strong>Post-Meeting:</strong> Send minutes and action items within 24 hours.</li></ol>" },
+                'term-sheet': { title: "Term Sheet Negotiation 101", content: "<h3>Key Terms for Founders</h3><p>Key terms and strategies for a successful fundraise, focusing on founder-friendly outcomes.</p><ul><li><strong>Valuation:</strong> Understand pre-money vs. post-money.</li><li><strong>Liquidation Preference:</strong> Aim for 1x, non-participating.</li><li><strong>Board Composition:</strong> Ensure founder control or a balanced board.</li><li><strong>Vesting:</strong> Standard is 4-year vest with a 1-year cliff.</li></ul>" }
             }
+        };
 
-            // Event Listeners Setup
-            Object.entries(ui.navLinks.ceo).forEach(([name, link]) => link?.addEventListener('click', (e) => { e.preventDefault(); showPage(name); }));
-            Object.entries(ui.navLinks.vc).forEach(([name, link]) => link?.addEventListener('click', (e) => { e.preventDefault(); showPage(`vc-${name}`); }));
-            
-            ui.bannerSettingsLink.addEventListener('click', (e) => { e.preventDefault(); showPage('settings'); });
-            ui.mobileMenuBtn.addEventListener('click', () => { ui.sidebar.classList.toggle('-translate-x-full'); });
-            ui.startRecordingBtn.addEventListener('click', () => dictationService?.toggleRecording());
-            if(ui.newReportBtn) ui.newReportBtn.addEventListener('click', () => showPage('dashboard'));
-            ui.saveApiKeyBtn.addEventListener('click', saveApiKey);
-            ui.viewToggle.addEventListener('change', switchView);
-            
-            // Event delegation for dynamically created button
-            document.addEventListener('click', function(e) {
-                if (e.target && e.target.id == 'finalize-report-btn-2') {
-                    showShareModal();
-                }
-            });
+        Date.prototype.getWeek = function() { var d = new Date(Date.UTC(this.getFullYear(), this.getMonth(), this.getDate())); var dayNum = d.getUTCDay() || 7; d.setUTCDate(d.getUTCDate() + 4 - dayNum); var yearStart = new Date(Date.UTC(d.getUTCFullYear(),0,1)); return Math.ceil((((d - yearStart) / 86400000) + 1)/7) };
 
-            if(ui.authorPlaybookBtn) ui.authorPlaybookBtn.addEventListener('click', showAuthorPlaybookModal);
-
-            document.querySelectorAll('.view-report-link').forEach(link => link.addEventListener('click', (e) => { e.preventDefault(); showViewReportModal(e.target.dataset.reportId); }));
-            document.querySelectorAll('#page-vc-playbooks .playbook-link').forEach(link => link.addEventListener('click', (e) => { e.preventDefault(); showPlaybookModal(e.currentTarget.dataset.playbookId); }));
-            
-            ui.modalCloseBtn.addEventListener('click', hideModal);
-            ui.modalOverlay.addEventListener('click', hideModal);
-            
-            ui.playbookCategoryFilters.addEventListener('click', (e) => {
-                const targetButton = e.target.closest('.playbook-category-btn');
-                if (targetButton) {
-                    targetButton.classList.toggle('active');
-                    populateCeoPlaybooks();
-                }
-            });
-
-            // Initial Load
-            const savedApiKey = localStorage.getItem('geminiApiKey');
-            if (savedApiKey) ui.apiKeyInput.value = savedApiKey;
-            initializeDictationService(savedApiKey);
-            populateCeoPlaybooks();
-            populateVcPortfolio();
-        });
+        app.init();
     </script>
 </body>
 </html>
