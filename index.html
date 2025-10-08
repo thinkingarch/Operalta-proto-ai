@@ -210,21 +210,73 @@
             border-radius: 50%;
             transform: translate(-50%, -50%);
         }
-        .circle-item {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 180px; /* Adjust as needed */
-            margin: -60px 0 0 -90px; /* Half of width and height */
-            height: 120px;
-        }
         .center-item {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
             text-align: center;
+            width: 250px;
+            height: 250px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
         }
+        .center-item::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 100%;
+            height: 100%;
+            border: 2px dashed #c4b5fd; /* violet-300 */
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+        }
+        .circle-item {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 150px; 
+            height: 90px;
+            margin: -45px 0 0 -75px; 
+            cursor: pointer;
+        }
+        .circle-item .item-content {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            border-radius: 0.5rem;
+            border: 1px solid #e5e7eb;
+            background-color: #f9fafb;
+            transition: all 0.2s ease-in-out;
+        }
+        .circle-item .item-details {
+            display: none;
+            position: absolute;
+            top: 105%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 220px;
+            padding: 0.75rem;
+            background-color: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            z-index: 10;
+        }
+        .circle-item:hover .item-content {
+            background-color: #eef2ff;
+            border-color: var(--accent);
+        }
+        .circle-item:hover .item-details {
+            display: block;
+        }
+
     </style>
      <script type="importmap">
       {
@@ -281,7 +333,7 @@
                     </div>
                 </div>
                  <div class="mt-4 text-xs mono">
-                    <span class="font-semibold text-gray-700">Premium Account</span>
+                    <span class="font-semibold text-gray-700">Account</span>
                 </div>
             </div>
         </aside>
@@ -1282,13 +1334,13 @@
                     </div>`;
 
                 const items = [
-                    { title: "Customer Insights", color: "text-purple-700", desc: "Understanding the customer's problems deeply.", insight: "Insight: Users value clarity over comprehensiveness." },
-                    { title: "Vision", color: "text-blue-700", desc: "The long-term mission and direction.", insight: "Insight: Long-term goal is to be the 'central nervous system' for startups." },
-                    { title: "Product", color: "text-green-700", desc: "What we build and for whom.", insight: "Insight: 'Scenario planning' is the key differentiator."},
-                    { title: "Revenue Generation", color: "text-yellow-700", desc: "Marketing, sales, and GTM strategy.", insight: "Insight: Deal velocity has slowed since pricing update." },
-                    { title: "Team", color: "text-red-700", desc: "Culture, hiring, and performance.", insight: "Insight: Growing tension between sales and product teams." },
-                    { title: "Fundraising", color: "text-indigo-700", desc: "Narrative, metrics, and process.", insight: "Insight: Narrative needs to address rising CAC for Series A." },
-                    { title: "Competitor Analysis", color: "text-gray-700", desc: "Market landscape and positioning.", insight: "Insight: Competitor's funding validates our focus on the 'why'."},
+                    { title: "Customer Insights", color: "text-purple-700", desc: "Understanding the customer's problems deeply.", insight: "Insight: ESA feedback indicates our orbital decay predictions are 15% more accurate than their internal models." },
+                    { title: "Vision", color: "text-blue-700", desc: "The long-term mission and direction.", insight: "Insight: Vision is to become the OS for satellite constellation management." },
+                    { title: "Product", color: "text-green-700", desc: "What we build and for whom.", insight: "Insight: Core IP is our patented collision avoidance algorithm."},
+                    { title: "Revenue Generation", color: "text-yellow-700", desc: "Marketing, sales, and GTM strategy.", insight: "Insight: Initial traction comes from paid pilots with national space agencies." },
+                    { title: "Team", color: "text-red-700", desc: "Culture, hiring, and performance.", insight: "Insight: Need to hire a specialist in RF engineering." },
+                    { title: "Fundraising", color: "text-indigo-700", desc: "Narrative, metrics, and process.", insight: "Insight: Seed round focus is on de-risking the technology." },
+                    { title: "Competitor Analysis", color: "text-gray-700", desc: "Market landscape and positioning.", insight: "Insight: US competitor just won a NASA contract, validating the market."},
                 ];
                 
                 const radius = 260; // radius of the circle
@@ -1304,10 +1356,12 @@
                     itemDiv.style.transform = `translate(${x}px, ${y}px)`;
                     
                     itemDiv.innerHTML = `
-                        <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 text-center h-full flex flex-col justify-center">
-                            <h3 class="font-bold ${item.color}">${item.title}</h3>
-                            <p class="text-xs text-gray-500 mt-1">${item.desc}</p>
-                            <div class="bg-white border-t border-gray-200 mt-2 pt-2">
+                        <div class="item-content">
+                            <h3 class="font-bold p-2 ${item.color}">${item.title}</h3>
+                        </div>
+                        <div class="item-details">
+                             <p class="text-xs text-gray-500">${item.desc}</p>
+                             <div class="bg-gray-100 border-t border-gray-200 mt-2 pt-2">
                                  <p class="text-xs text-gray-800 font-semibold">${item.insight}</p>
                             </div>
                         </div>
