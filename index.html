@@ -214,15 +214,16 @@
             position: absolute;
             top: 50%;
             left: 50%;
-            width: 150px; /* Adjust as needed */
-            margin: -45px 0 0 -75px; /* Half of width and height */
-            height: 90px;
+            width: 180px; /* Adjust as needed */
+            margin: -55px 0 0 -90px; /* Half of width and height */
+            height: 110px;
         }
         .center-item {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
+            text-align: center;
         }
     </style>
      <script type="importmap">
@@ -276,7 +277,7 @@
                     <img id="user-avatar" class="h-8 w-8 rounded-full object-cover" src="https://placehold.co/100x100/5B21B6/FFFFFF?text=A" alt="User Avatar">
                     <div class="ml-3">
                         <p id="user-name" class="text-sm font-semibold text-gray-800">Alex (CEO)</p>
-                        <p id="user-company" class="text-xs text-gray-500">Acme Inc.</p>
+                        <p id="user-company" class="text-xs text-gray-500">SGDL</p>
                     </div>
                 </div>
                  <div class="mt-4 text-xs mono">
@@ -295,12 +296,7 @@
                         <p class="text-center text-sm text-gray-600 mb-8 max-w-2xl mx-auto">These foundational streams represent the core of your startup's strategy. Each is a living conversation, constantly updated. Our AI connects these streams to uncover strategic insights, identify contradictions, and recommend actions based on your complete business context.</p>
 
                         <div class="circle-container">
-                             <div class="center-item">
-                                <button id="view-strategic-insights-btn" class="bg-purple-600 text-white font-bold py-3 px-5 rounded-lg shadow-lg hover:bg-purple-700 transition-all transform hover:scale-105">
-                                    Strategic Insights
-                                </button>
-                            </div>
-                            <!-- Items will be positioned by JS -->
+                             <!-- Items will be positioned by JS -->
                         </div>
                     </div>
                 </div>
@@ -319,6 +315,10 @@
                                 <div class="w-8 h-8 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center flex-shrink-0 font-bold text-sm">YOU</div>
                                 <div class="p-3 rounded-lg user-bubble flex-1 text-sm">"Voice memo from last night: '...the real long-term vision is not just to be a reporting tool, but to become the central nervous system for startup decision making...'"</div>
                             </div>
+                             <div class="flex items-start gap-3">
+                                <div class="w-8 h-8 rounded-full bg-purple-100 text-purple-700 flex items-center justify-center flex-shrink-0 font-bold text-sm">AI</div>
+                                <div class="p-3 rounded-lg ai-bubble flex-1 text-sm">"Based on this, I've tagged 'decision support' and 'operating system' as core vision pillars. This will help me prioritize insights that align with this direction."</div>
+                            </div>
                         </div>
                         <!-- Customer Insights -->
                         <div class="bg-white p-6 border border-gray-200 rounded-lg">
@@ -326,6 +326,10 @@
                              <div class="flex items-start gap-3 mb-4">
                                 <div class="w-8 h-8 rounded-full bg-purple-100 text-purple-700 flex items-center justify-center flex-shrink-0 font-bold text-sm">AI</div>
                                 <div class="p-3 rounded-lg ai-bubble flex-1 text-sm">"Summary of 5 recent user interviews: The phrase 'too many dashboards' appeared 4 times. Users feel overwhelmed by data, not empowered by it. They value clarity over comprehensiveness."</div>
+                            </div>
+                             <div class="flex items-start gap-3">
+                                <div class="w-8 h-8 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center flex-shrink-0 font-bold text-sm">YOU</div>
+                                <div class="p-3 rounded-lg user-bubble flex-1 text-sm">"That's a powerful insight. Let's make 'clarity over comprehensiveness' a product principle for Q4. The next feature we build must simplify a workflow, not just add more data."</div>
                             </div>
                         </div>
                         <!-- Product -->
@@ -335,6 +339,10 @@
                                 <div class="w-8 h-8 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center flex-shrink-0 font-bold text-sm">YOU</div>
                                 <div class="p-3 rounded-lg user-bubble flex-1 text-sm">"Note to self: The 'scenario planning' feature seems to be our key differentiator based on feedback. We should double down on that instead of building the requested calendar integration."</div>
                             </div>
+                             <div class="flex items-start gap-3">
+                                <div class="w-8 h-8 rounded-full bg-purple-100 text-purple-700 flex items-center justify-center flex-shrink-0 font-bold text-sm">AI</div>
+                                <div class="p-3 rounded-lg ai-bubble flex-1 text-sm">"Contradiction detected: The decision to double down on 'scenario planning' (internal note) conflicts with the current Product Roadmap in Notion, which prioritizes the calendar integration for Q4. I recommend a review."</div>
+                            </div>
                         </div>
                         <!-- Revenue Generation -->
                          <div class="bg-white p-6 border border-gray-200 rounded-lg">
@@ -342,6 +350,10 @@
                              <div class="flex items-start gap-3 mb-4">
                                 <div class="w-8 h-8 rounded-full bg-purple-100 text-purple-700 flex items-center justify-center flex-shrink-0 font-bold text-sm">AI</div>
                                 <div class="p-3 rounded-lg ai-bubble flex-1 text-sm">"Hubspot data shows deal velocity has slowed by 15% in the last 30 days, primarily in the 'Negotiation' stage. This coincides with the pricing page update on Sep 15th."</div>
+                            </div>
+                            <div class="flex items-start gap-3">
+                                <div class="w-8 h-8 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center flex-shrink-0 font-bold text-sm">YOU</div>
+                                <div class="p-3 rounded-lg user-bubble flex-1 text-sm">"Good catch. The new pricing might be causing friction in legal/procurement. Let's A/B test the old pricing page for a week and see if velocity recovers. I'll launch the 'Pricing Model Validation' playbook to dig deeper."</div>
                             </div>
                         </div>
                         <!-- Team -->
@@ -351,6 +363,10 @@
                                 <div class="w-8 h-8 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center flex-shrink-0 font-bold text-sm">YOU</div>
                                 <div class="p-3 rounded-lg user-bubble flex-1 text-sm">"Voice memo: '...feeling some tension between sales and product. Sales wants features to close deals now, product is focused on the long-term platform play... need to address this in the next all-hands.'"</div>
                             </div>
+                             <div class="flex items-start gap-3">
+                                <div class="w-8 h-8 rounded-full bg-purple-100 text-purple-700 flex items-center justify-center flex-shrink-0 font-bold text-sm">AI</div>
+                                <div class="p-3 rounded-lg ai-bubble flex-1 text-sm">"This is a common scaling challenge. I've surfaced the 'Outcome-Oriented Roadmapping' playbook, which can help align Sales and Product around shared business goals instead of feature requests."</div>
+                            </div>
                         </div>
                         <!-- Fundraising -->
                          <div class="bg-white p-6 border border-gray-200 rounded-lg">
@@ -359,6 +375,10 @@
                                 <div class="w-8 h-8 rounded-full bg-purple-100 text-purple-700 flex items-center justify-center flex-shrink-0 font-bold text-sm">AI</div>
                                 <div class="p-3 rounded-lg ai-bubble flex-1 text-sm">"Insight: Your last three weekly reports have highlighted rising CAC. For the upcoming Series A, it will be critical to frame this as a strategic investment in upmarket customers, not an efficiency problem. I suggest we start crafting that narrative now."</div>
                             </div>
+                             <div class="flex items-start gap-3">
+                                <div class="w-8 h-8 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center flex-shrink-0 font-bold text-sm">YOU</div>
+                                <div class="p-3 rounded-lg user-bubble flex-1 text-sm">"Agreed. Let's create a new note titled 'Series A Narrative' and start dropping in proof points. Specifically, let's pull the LTV of our first two enterprise customers vs. our mid-market cohort."</div>
+                            </div>
                         </div>
                         <!-- Competitor Analysis -->
                          <div class="bg-white p-6 border border-gray-200 rounded-lg">
@@ -366,6 +386,10 @@
                              <div class="flex items-start gap-3 mb-4">
                                 <div class="w-8 h-8 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center flex-shrink-0 font-bold text-sm">YOU</div>
                                 <div class="p-3 rounded-lg user-bubble flex-1 text-sm">"Competitor 'DataGlimpse' just announced a $20M round. Their focus seems to be on enterprise data visualization. This reinforces our strategy to focus on the 'why' and the decision-making layer, not just data presentation."</div>
+                            </div>
+                             <div class="flex items-start gap-3">
+                                <div class="w-8 h-8 rounded-full bg-purple-100 text-purple-700 flex items-center justify-center flex-shrink-0 font-bold text-sm">AI</div>
+                                <div class="p-3 rounded-lg ai-bubble flex-1 text-sm">"Correct. This market validation strengthens our positioning. I've updated our 'Competitor Analysis' stream and will monitor their hiring patterns on LinkedIn to see if they invest in roles related to data science or business intelligence, which could signal a move up the stack towards our territory."</div>
                             </div>
                         </div>
                     </div>
@@ -1248,20 +1272,23 @@
                 
                 container.innerHTML = `
                     <div class="center-item">
+                         <div class="bg-white p-4 rounded-lg border-2 border-purple-600 text-center mb-4 shadow-lg">
+                            <h3 class="font-bold text-gray-900">Operalta Engine</h3>
+                            <p class="text-xs text-gray-500">Connecting dots across all strategic streams.</p>
+                        </div>
                         <button id="view-strategic-insights-btn" class="bg-purple-600 text-white font-bold py-3 px-5 rounded-lg shadow-lg hover:bg-purple-700 transition-all transform hover:scale-105">
                             Strategic Insights
                         </button>
                     </div>`;
 
                 const items = [
-                    { title: "Customer Insights", color: "text-purple-700", desc: "Understanding the customer's problems deeply." },
-                    { title: "Vision", color: "text-blue-700", desc: "The long-term mission and direction." },
-                    { title: "Product", color: "text-green-700", desc: "What we build and for whom." },
-                    { title: "Revenue Generation", color: "text-yellow-700", desc: "Marketing, sales, and GTM strategy." },
-                    { title: "Operalta Engine", color: "text-gray-900", desc: "Connecting dots across all strategic streams." },
-                    { title: "Team", color: "text-red-700", desc: "Culture, hiring, and performance." },
-                    { title: "Fundraising", color: "text-indigo-700", desc: "Narrative, metrics, and process." },
-                    { title: "Competitor Analysis", color: "text-gray-700", desc: "Market landscape and positioning." },
+                    { title: "Customer Insights", color: "text-purple-700", desc: "Understanding the customer's problems deeply.", insight: "Insight: Users value clarity over comprehensiveness." },
+                    { title: "Vision", color: "text-blue-700", desc: "The long-term mission and direction.", insight: "Insight: Long-term goal is to be the 'central nervous system' for startups." },
+                    { title: "Product", color: "text-green-700", desc: "What we build and for whom.", insight: "Insight: 'Scenario planning' is the key differentiator."},
+                    { title: "Revenue Generation", color: "text-yellow-700", desc: "Marketing, sales, and GTM strategy.", insight: "Insight: Deal velocity has slowed since pricing update." },
+                    { title: "Team", color: "text-red-700", desc: "Culture, hiring, and performance.", insight: "Insight: Growing tension between sales and product teams." },
+                    { title: "Fundraising", color: "text-indigo-700", desc: "Narrative, metrics, and process.", insight: "Insight: Narrative needs to address rising CAC for Series A." },
+                    { title: "Competitor Analysis", color: "text-gray-700", desc: "Market landscape and positioning.", insight: "Insight: Competitor's funding validates our focus on the 'why'."},
                 ];
                 
                 const radius = 260; // radius of the circle
@@ -1279,7 +1306,8 @@
                     itemDiv.innerHTML = `
                         <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 text-center h-full flex flex-col justify-center">
                             <h3 class="font-bold ${item.color}">${item.title}</h3>
-                            <p class="text-xs text-gray-500">${item.desc}</p>
+                            <p class="text-xs text-gray-500 mt-1">${item.desc}</p>
+                             <p class="text-xs text-gray-800 font-semibold mt-2">${item.insight}</p>
                         </div>
                     `;
                     container.appendChild(itemDiv);
