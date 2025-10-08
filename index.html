@@ -222,6 +222,7 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
+            cursor: pointer;
         }
         .center-item::before {
             content: '';
@@ -233,6 +234,10 @@
             border: 2px dashed #c4b5fd; /* violet-300 */
             border-radius: 50%;
             transform: translate(-50%, -50%);
+            transition: all 0.2s ease-in-out;
+        }
+        .center-item:hover::before {
+             border-color: var(--accent);
         }
         .circle-item {
             position: absolute;
@@ -256,27 +261,31 @@
             transition: all 0.2s ease-in-out;
         }
         .circle-item .item-details {
-            display: none;
+            opacity: 0;
+            visibility: hidden;
             position: absolute;
-            top: 105%;
+            top: 110%;
             left: 50%;
-            transform: translateX(-50%);
-            width: 220px;
+            transform: translateX(-50%) scale(0.95);
+            width: 240px;
             padding: 0.75rem;
             background-color: white;
             border: 1px solid #e5e7eb;
             border-radius: 0.5rem;
-            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            box-shadow: 0 4px Dd-2xl rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
             z-index: 10;
+            transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s;
         }
-        .circle-item:hover .item-content {
+        .circle-item:hover .item-content, .circle-item.active .item-content {
             background-color: #eef2ff;
             border-color: var(--accent);
         }
-        .circle-item:hover .item-details {
-            display: block;
+        .circle-item:hover .item-details, .circle-item.active .item-details {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(-50%) scale(1);
         }
-
+        
     </style>
      <script type="importmap">
       {
@@ -356,92 +365,96 @@
                  <div id="page-strategic-insights" class="hidden p-4 sm:p-8 md:p-12">
                     <header class="mb-8">
                         <button id="back-to-sgdl-btn" class="text-sm text-gray-600 hover:text-purple-700 font-semibold mb-2">← Back to SGDL Overview</button>
-                        <h1 class="text-2xl sm:text-3xl font-bold tracking-tight">Strategic Insights</h1>
+                        <h1 class="text-2xl sm:text-3xl font-bold tracking-tight">Streams and Insights</h1>
                         <p class="text-gray-500 mt-1 mono text-sm">Example conversation streams fueling the Operalta Engine.</p>
                     </header>
                     <div class="space-y-8">
                         <!-- Vision -->
                         <div class="bg-white p-6 border border-gray-200 rounded-lg">
                             <h3 class="font-bold text-blue-700 mb-3">Vision</h3>
-                             <div class="flex items-start gap-3 mb-4">
+                             <div class="flex items-start gap-3 mb-4 p-3 rounded-lg user-bubble">
                                 <div class="w-8 h-8 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center flex-shrink-0 font-bold text-sm">YOU</div>
-                                <div class="p-3 rounded-lg user-bubble flex-1 text-sm">"Voice memo from last night: '...the real long-term vision is not just to be a reporting tool, but to become the central nervous system for startup decision making...'"</div>
+                                <div class="flex-1 text-sm">"Voice memo: '...the real long-term vision is not just to be a reporting tool, but to become the central nervous system for satellite constellation management... an OS for the new space economy.'"</div>
                             </div>
-                             <div class="flex items-start gap-3">
+                             <div class="flex items-start gap-3 mb-4 p-3 rounded-lg ai-bubble">
                                 <div class="w-8 h-8 rounded-full bg-purple-100 text-purple-700 flex items-center justify-center flex-shrink-0 font-bold text-sm">AI</div>
-                                <div class="p-3 rounded-lg ai-bubble flex-1 text-sm">"Based on this, I've tagged 'decision support' and 'operating system' as core vision pillars. This will help me prioritize insights that align with this direction."</div>
+                                <div class="flex-1 text-sm">"Based on this, I've tagged 'decision support' and 'operating system for space' as core vision pillars. This will help me prioritize insights that align with this direction."</div>
+                            </div>
+                            <div class="flex items-start gap-3 p-3 rounded-lg user-bubble">
+                                <div class="w-8 h-8 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center flex-shrink-0 font-bold text-sm">YOU</div>
+                                <div class="flex-1 text-sm">"Exactly. And it's not just about avoiding collisions, it's about optimizing flight paths, managing power consumption, the whole lifecycle. That's the big picture."</div>
                             </div>
                         </div>
                         <!-- Customer Insights -->
                         <div class="bg-white p-6 border border-gray-200 rounded-lg">
                             <h3 class="font-bold text-purple-700 mb-3">Customer Insights</h3>
-                             <div class="flex items-start gap-3 mb-4">
+                             <div class="flex items-start gap-3 mb-4 p-3 rounded-lg ai-bubble">
                                 <div class="w-8 h-8 rounded-full bg-purple-100 text-purple-700 flex items-center justify-center flex-shrink-0 font-bold text-sm">AI</div>
-                                <div class="p-3 rounded-lg ai-bubble flex-1 text-sm">"Summary of 5 recent user interviews: The phrase 'too many dashboards' appeared 4 times. Users feel overwhelmed by data, not empowered by it. They value clarity over comprehensiveness."</div>
+                                <div class="flex-1 text-sm">"From Notion 'ESA Pilot Feedback': The phrase 'data integration overhead' was mentioned twice. They love the accuracy of our predictions but find it cumbersome to pipe in their own telemetry data."</div>
                             </div>
-                             <div class="flex items-start gap-3">
+                             <div class="flex items-start gap-3 p-3 rounded-lg user-bubble">
                                 <div class="w-8 h-8 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center flex-shrink-0 font-bold text-sm">YOU</div>
-                                <div class="p-3 rounded-lg user-bubble flex-1 text-sm">"That's a powerful insight. Let's make 'clarity over comprehensiveness' a product principle for Q4. The next feature we build must simplify a workflow, not just add more data."</div>
+                                <div class="flex-1 text-sm">"That's a critical friction point. We need to prioritize building a more robust API and maybe a few key direct integrations. This is a bigger pain point than I realized."</div>
                             </div>
                         </div>
                         <!-- Product -->
                         <div class="bg-white p-6 border border-gray-200 rounded-lg">
                             <h3 class="font-bold text-green-700 mb-3">Product</h3>
-                             <div class="flex items-start gap-3 mb-4">
+                              <div class="flex items-start gap-3 mb-4 p-3 rounded-lg user-bubble">
                                 <div class="w-8 h-8 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center flex-shrink-0 font-bold text-sm">YOU</div>
-                                <div class="p-3 rounded-lg user-bubble flex-1 text-sm">"Note to self: The 'scenario planning' feature seems to be our key differentiator based on feedback. We should double down on that instead of building the requested calendar integration."</div>
+                                <div class="flex-1 text-sm">"From Slack #product: 'We've hit a breakthrough on the orbital decay model. By incorporating solar flare activity, we can improve long-term prediction accuracy by another 5-7%.'"</div>
                             </div>
                              <div class="flex items-start gap-3">
                                 <div class="w-8 h-8 rounded-full bg-purple-100 text-purple-700 flex items-center justify-center flex-shrink-0 font-bold text-sm">AI</div>
-                                <div class="p-3 rounded-lg ai-bubble flex-1 text-sm">"Contradiction detected: The decision to double down on 'scenario planning' (internal note) conflicts with the current Product Roadmap in Notion, which prioritizes the calendar integration for Q4. I recommend a review."</div>
+                                <div class="p-3 rounded-lg ai-bubble flex-1 text-sm">"Excellent. This strengthens our core IP. I've updated the 'Patent Strategy' document in Notion to include this new modeling technique as a potential claim for our next filing."</div>
                             </div>
                         </div>
                         <!-- Revenue Generation -->
                          <div class="bg-white p-6 border border-gray-200 rounded-lg">
                             <h3 class="font-bold text-yellow-700 mb-3">Revenue Generation</h3>
-                             <div class="flex items-start gap-3 mb-4">
+                             <div class="flex items-start gap-3 mb-4 p-3 rounded-lg ai-bubble">
                                 <div class="w-8 h-8 rounded-full bg-purple-100 text-purple-700 flex items-center justify-center flex-shrink-0 font-bold text-sm">AI</div>
-                                <div class="p-3 rounded-lg ai-bubble flex-1 text-sm">"Hubspot data shows deal velocity has slowed by 15% in the last 30 days, primarily in the 'Negotiation' stage. This coincides with the pricing page update on Sep 15th."</div>
+                                <div class="flex-1 text-sm">"Analysis of HubSpot data shows that leads who download our 'State of Space Debris' whitepaper are 3x more likely to convert to a paid pilot. This is our highest converting content asset."</div>
                             </div>
-                            <div class="flex items-start gap-3">
+                            <div class="flex items-start gap-3 p-3 rounded-lg user-bubble">
                                 <div class="w-8 h-8 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center flex-shrink-0 font-bold text-sm">YOU</div>
-                                <div class="p-3 rounded-lg user-bubble flex-1 text-sm">"Good catch. The new pricing might be causing friction in legal/procurement. Let's A/B test the old pricing page for a week and see if velocity recovers. I'll launch the 'Pricing Model Validation' playbook to dig deeper."</div>
+                                <div class="flex-1 text-sm">"Interesting. Let's double down. Can we create a marketing campaign around that whitepaper for Q4? Maybe a webinar with the author."</div>
                             </div>
                         </div>
                         <!-- Team -->
                         <div class="bg-white p-6 border border-gray-200 rounded-lg">
                             <h3 class="font-bold text-red-700 mb-3">Team</h3>
-                             <div class="flex items-start gap-3 mb-4">
+                             <div class="flex items-start gap-3 mb-4 p-3 rounded-lg user-bubble">
                                 <div class="w-8 h-8 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center flex-shrink-0 font-bold text-sm">YOU</div>
-                                <div class="p-3 rounded-lg user-bubble flex-1 text-sm">"Voice memo: '...feeling some tension between sales and product. Sales wants features to close deals now, product is focused on the long-term platform play... need to address this in the next all-hands.'"</div>
+                                <div class="flex-1 text-sm">"From Slack #hiring: 'The candidate pool for the RF engineering role is very shallow. We've only had two qualified applicants in three weeks.'"</div>
                             </div>
                              <div class="flex items-start gap-3">
                                 <div class="w-8 h-8 rounded-full bg-purple-100 text-purple-700 flex items-center justify-center flex-shrink-0 font-bold text-sm">AI</div>
-                                <div class="p-3 rounded-lg ai-bubble flex-1 text-sm">"This is a common scaling challenge. I've surfaced the 'Outcome-Oriented Roadmapping' playbook, which can help align Sales and Product around shared business goals instead of feature requests."</div>
+                                <div class="p-3 rounded-lg ai-bubble flex-1 text-sm">"This role appears to be a bottleneck. Given its criticality for the next product milestone, I recommend activating the 'Hard-to-Fill-Roles' playbook, which includes strategies for outbound sourcing and leveraging university partnerships."</div>
                             </div>
                         </div>
                         <!-- Fundraising -->
                          <div class="bg-white p-6 border border-gray-200 rounded-lg">
                             <h3 class="font-bold text-indigo-700 mb-3">Fundraising</h3>
-                             <div class="flex items-start gap-3 mb-4">
+                             <div class="flex items-start gap-3 mb-4 p-3 rounded-lg ai-bubble">
                                 <div class="w-8 h-8 rounded-full bg-purple-100 text-purple-700 flex items-center justify-center flex-shrink-0 font-bold text-sm">AI</div>
-                                <div class="p-3 rounded-lg ai-bubble flex-1 text-sm">"Insight: Your last three weekly reports have highlighted rising CAC. For the upcoming Series A, it will be critical to frame this as a strategic investment in upmarket customers, not an efficiency problem. I suggest we start crafting that narrative now."</div>
+                                <div class="flex-1 text-sm">"Insight: In our last investor update, we promised a working prototype for the ESA pilot by Oct 15th. Brex data shows our burn rate is 10% higher than projected, which reduces our runway post-pilot if there are delays."</div>
                             </div>
                              <div class="flex items-start gap-3">
                                 <div class="w-8 h-8 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center flex-shrink-0 font-bold text-sm">YOU</div>
-                                <div class="p-3 rounded-lg user-bubble flex-1 text-sm">"Agreed. Let's create a new note titled 'Series A Narrative' and start dropping in proof points. Specifically, let's pull the LTV of our first two enterprise customers vs. our mid-market cohort."</div>
+                                <div class="flex-1 text-sm">"Okay, we need to flag this risk. Let's make sure the next update frames the higher burn as a strategic investment to accelerate the prototype delivery and de-risk the pilot program."</div>
                             </div>
                         </div>
                         <!-- Competitor Analysis -->
                          <div class="bg-white p-6 border border-gray-200 rounded-lg">
                             <h3 class="font-bold text-gray-700 mb-3">Competitor Analysis</h3>
-                             <div class="flex items-start gap-3 mb-4">
+                             <div class="flex items-start gap-3 mb-4 p-3 rounded-lg user-bubble">
                                 <div class="w-8 h-8 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center flex-shrink-0 font-bold text-sm">YOU</div>
-                                <div class="p-3 rounded-lg user-bubble flex-1 text-sm">"Competitor 'DataGlimpse' just announced a $20M round. Their focus seems to be on enterprise data visualization. This reinforces our strategy to focus on the 'why' and the decision-making layer, not just data presentation."</div>
+                                <div class="flex-1 text-sm">"From Slack #random: 'Did anyone see that OrbitGuard just raised a $15M Series A? Their focus is purely on debris tracking, not avoidance.'"</div>
                             </div>
                              <div class="flex items-start gap-3">
                                 <div class="w-8 h-8 rounded-full bg-purple-100 text-purple-700 flex items-center justify-center flex-shrink-0 font-bold text-sm">AI</div>
-                                <div class="p-3 rounded-lg ai-bubble flex-1 text-sm">"Correct. This market validation strengthens our positioning. I've updated our 'Competitor Analysis' stream and will monitor their hiring patterns on LinkedIn to see if they invest in roles related to data science or business intelligence, which could signal a move up the stack towards our territory."</div>
+                                <div class="p-3 rounded-lg ai-bubble flex-1 text-sm">"Confirmed. This validates the market size for the problem space. It also reinforces our strategic differentiation, as we're positioned as a solution provider (avoidance) rather than just a data provider (tracking). I've updated the competitive landscape in Notion."</div>
                             </div>
                         </div>
                     </div>
@@ -802,7 +815,6 @@
                         document.getElementById('guide-step-4'), document.getElementById('guide-step-5'), document.getElementById('guide-step-6')
                     ]
                 },
-                viewStrategicInsightsBtn: document.getElementById('view-strategic-insights-btn'),
                 backToSgdlBtn: document.getElementById('back-to-sgdl-btn'),
             };
 
@@ -1323,14 +1335,12 @@
                 if (!container) return;
                 
                 container.innerHTML = `
-                    <div class="center-item">
+                    <div id="center-clickable-area" class="center-item">
                          <div class="p-4 rounded-lg text-center mb-4">
                             <h3 class="font-bold text-gray-900">Operalta Engine</h3>
                             <p class="text-xs text-gray-500">Connecting dots across all strategic streams.</p>
                         </div>
-                        <button id="view-strategic-insights-btn" class="bg-purple-600 text-white font-bold py-3 px-5 rounded-lg shadow-lg hover:bg-purple-700 transition-all transform hover:scale-105">
-                            Strategic Insights
-                        </button>
+                        <p class="text-purple-700 font-semibold text-sm">Deepdive into streams and insights</p>
                     </div>`;
 
                 const items = [
@@ -1369,8 +1379,18 @@
                     container.appendChild(itemDiv);
                 });
                 
-                // Re-add event listener after innerHTML is overwritten
-                document.getElementById('view-strategic-insights-btn').addEventListener('click', () => showPage('strategic-insights'));
+                // Add click listener for mobile toggle
+                container.querySelectorAll('.circle-item').forEach(item => {
+                    item.addEventListener('click', (e) => {
+                        // On mobile, a click should toggle the details
+                        if (window.innerWidth < 768) {
+                             e.currentTarget.classList.toggle('active');
+                        }
+                    });
+                });
+                
+                // Re-add event listener for center click
+                document.getElementById('center-clickable-area').addEventListener('click', () => showPage('strategic-insights'));
             }
 
 
