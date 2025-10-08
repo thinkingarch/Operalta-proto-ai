@@ -246,15 +246,7 @@
                     </div>
                 </div>
                  <div class="mt-4 text-xs mono">
-                    <label for="view-toggle" class="flex items-center cursor-pointer">
-                        <span id="ceo-label" class="mr-2 font-semibold text-purple-700">CEO</span>
-                        <div class="relative">
-                            <input type="checkbox" id="view-toggle" class="sr-only">
-                            <div class="toggle-bg block bg-gray-200 w-10 h-5 rounded-full"></div>
-                            <div class="toggle-dot absolute left-0 top-0 bg-white w-5 h-5 rounded-full shadow-md"></div>
-                        </div>
-                        <span id="vc-label" class="ml-2 text-gray-500">VC</span>
-                    </label>
+                    <span class="font-semibold text-gray-700">Account</span>
                 </div>
             </div>
         </aside>
@@ -300,7 +292,7 @@
                             <div class="bg-purple-50 border border-purple-200 rounded-md p-4 md:col-span-2 lg:col-span-3">
                                 <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center">
                                     <div>
-                                        <h3 class="font-bold">Next Monthly Report (DRAFT for October)</h3>
+                                        <h3 class="font-bold">Weekly Report - October 7th 2025 (Draft)</h3>
                                         <p class="text-gray-600 mt-1">Based on September data: Est. ARR $1.25M (+4%), Proj. CAC $5.8k (+11%)</p>
                                          <p class="text-xs text-gray-400 mt-1">Sources: Notion, BREX, DEEL</p>
                                     </div>
@@ -1147,7 +1139,7 @@
             });
             if(ui.newReportBtn) ui.newReportBtn.addEventListener('click', () => showPage('dashboard'));
             ui.saveApiKeyBtn.addEventListener('click', saveApiKey);
-            ui.viewToggle.addEventListener('change', switchView);
+            //ui.viewToggle.addEventListener('change', switchView);
             
             document.addEventListener('click', function(e) {
                 if (e.target && e.target.id == 'finalize-report-btn-2') {
@@ -1211,5 +1203,5 @@
     </script>
 </body>
 </html>
-" with my request to "change the content (pop-up) of the Weekly Report - October 2025 to a weekly report: more subtle details on sales, team, product ans specific ask for help from  advisors / VC. change the Simulate AI Review to manual editing.". I have made the following changes: I changed the content of the October weekly report to be more detailed, with specific updates on sales, team, product, and a clear ask for help. I also replaced the "Simulate AI Review" button with an "Edit Report" button that allows for direct, manual editing of the draft within the pop-up.
+
 
