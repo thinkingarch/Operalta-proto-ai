@@ -156,6 +156,8 @@
             background-color: #eef2ff;
             border-bottom-right-radius: 0.25rem;
         }
+        .cto-bubble { background-color: #ecfeff; }
+        .cmo-bubble { background-color: #fff1f2; }
 
         .input-wrapper {
             position: relative;
@@ -342,7 +344,15 @@
                     </div>
                 </div>
                  <div class="mt-4 text-xs mono">
-                    <span class="font-semibold text-gray-700">Premium Account</span>
+                    <label for="view-toggle" class="flex items-center cursor-pointer">
+                        <span id="ceo-label" class="mr-2 font-semibold text-purple-700">CEO</span>
+                        <div class="relative">
+                            <input type="checkbox" id="view-toggle" class="sr-only">
+                            <div class="toggle-bg block bg-gray-200 w-10 h-5 rounded-full"></div>
+                            <div class="toggle-dot absolute left-0 top-0 bg-white w-5 h-5 rounded-full shadow-md"></div>
+                        </div>
+                        <span id="vc-label" class="ml-2 text-gray-500">VC</span>
+                    </label>
                 </div>
             </div>
         </aside>
@@ -366,14 +376,14 @@
                     <header class="mb-8">
                         <button id="back-to-sgdl-btn" class="text-sm text-gray-600 hover:text-purple-700 font-semibold mb-2">← Back to SGDL Overview</button>
                         <h1 class="text-2xl sm:text-3xl font-bold tracking-tight">Streams and Insights</h1>
-                        <p class="text-gray-500 mt-1 mono text-sm">Example conversation streams fueling the Operalta Engine.</p>
+                        <p class="text-gray-500 mt-1 mono text-sm">Conversation Streams fueling the Operalta Engine</p>
                     </header>
                     <div class="space-y-8">
                         <!-- Vision -->
                         <div class="bg-white p-6 border border-gray-200 rounded-lg">
                             <h3 class="font-bold text-blue-700 mb-3">Vision</h3>
                              <div class="flex items-start gap-3 mb-4 p-3 rounded-lg user-bubble">
-                                <div class="w-8 h-8 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center flex-shrink-0 font-bold text-sm">YOU</div>
+                                <div class="w-8 h-8 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center flex-shrink-0 font-bold text-sm">CEO</div>
                                 <div class="flex-1 text-sm">"Voice memo: '...the real long-term vision is not just to be a reporting tool, but to become the central nervous system for satellite constellation management... an OS for the new space economy.'"</div>
                             </div>
                              <div class="flex items-start gap-3 mb-4 p-3 rounded-lg ai-bubble">
@@ -381,7 +391,7 @@
                                 <div class="flex-1 text-sm">"Based on this, I've tagged 'decision support' and 'operating system for space' as core vision pillars. This will help me prioritize insights that align with this direction."</div>
                             </div>
                             <div class="flex items-start gap-3 p-3 rounded-lg user-bubble">
-                                <div class="w-8 h-8 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center flex-shrink-0 font-bold text-sm">YOU</div>
+                                <div class="w-8 h-8 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center flex-shrink-0 font-bold text-sm">CEO</div>
                                 <div class="flex-1 text-sm">"Exactly. And it's not just about avoiding collisions, it's about optimizing flight paths, managing power consumption, the whole lifecycle. That's the big picture."</div>
                             </div>
                         </div>
@@ -392,16 +402,20 @@
                                 <div class="w-8 h-8 rounded-full bg-purple-100 text-purple-700 flex items-center justify-center flex-shrink-0 font-bold text-sm">AI</div>
                                 <div class="flex-1 text-sm">"From Notion 'ESA Pilot Feedback': The phrase 'data integration overhead' was mentioned twice. They love the accuracy of our predictions but find it cumbersome to pipe in their own telemetry data."</div>
                             </div>
-                             <div class="flex items-start gap-3 p-3 rounded-lg user-bubble">
-                                <div class="w-8 h-8 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center flex-shrink-0 font-bold text-sm">YOU</div>
-                                <div class="flex-1 text-sm">"That's a critical friction point. We need to prioritize building a more robust API and maybe a few key direct integrations. This is a bigger pain point than I realized."</div>
+                             <div class="flex items-start gap-3 mb-4 p-3 rounded-lg cto-bubble">
+                                 <div class="w-8 h-8 rounded-full bg-sky-100 text-sky-700 flex items-center justify-center flex-shrink-0 font-bold text-sm">CTO</div>
+                                <div class="flex-1 text-sm">"This is a recurring theme. We should dedicate a sprint to building a self-serve data ingestion pipeline. It's becoming a sales blocker."</div>
+                            </div>
+                            <div class="flex items-start gap-3 p-3 rounded-lg cmo-bubble">
+                                <div class="w-8 h-8 rounded-full bg-rose-100 text-rose-700 flex items-center justify-center flex-shrink-0 font-bold text-sm">CMO</div>
+                                <div class="flex-1 text-sm">"Can we turn this into a marketing win? 'SGDL: Ingest any satellite telemetry data in under 5 minutes.' Something that directly addresses the pain point."</div>
                             </div>
                         </div>
                         <!-- Product -->
                         <div class="bg-white p-6 border border-gray-200 rounded-lg">
                             <h3 class="font-bold text-green-700 mb-3">Product</h3>
-                              <div class="flex items-start gap-3 mb-4 p-3 rounded-lg user-bubble">
-                                <div class="w-8 h-8 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center flex-shrink-0 font-bold text-sm">YOU</div>
+                              <div class="flex items-start gap-3 mb-4 p-3 rounded-lg cto-bubble">
+                                <div class="w-8 h-8 rounded-full bg-sky-100 text-sky-700 flex items-center justify-center flex-shrink-0 font-bold text-sm">CTO</div>
                                 <div class="flex-1 text-sm">"From Slack #product: 'We've hit a breakthrough on the orbital decay model. By incorporating solar flare activity, we can improve long-term prediction accuracy by another 5-7%.'"</div>
                             </div>
                              <div class="flex items-start gap-3 mb-4 p-3 rounded-lg ai-bubble">
@@ -409,7 +423,7 @@
                                 <div class="flex-1 text-sm">"Excellent. This strengthens our core IP. I've updated the 'Patent Strategy' document in Notion to include this new modeling technique as a potential claim for our next filing."</div>
                             </div>
                              <div class="flex items-start gap-3 p-3 rounded-lg user-bubble">
-                                <div class="w-8 h-8 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center flex-shrink-0 font-bold text-sm">YOU</div>
+                                <div class="w-8 h-8 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center flex-shrink-0 font-bold text-sm">CEO</div>
                                 <div class="flex-1 text-sm">"From voice memo: 'I'm worried our UI is becoming too complex for operators who are monitoring multiple constellations. We need to simplify the primary dashboard.'"</div>
                             </div>
                         </div>
@@ -420,9 +434,9 @@
                                 <div class="w-8 h-8 rounded-full bg-purple-100 text-purple-700 flex items-center justify-center flex-shrink-0 font-bold text-sm">AI</div>
                                 <div class="flex-1 text-sm">"Analysis of HubSpot data shows that leads who download our 'State of Space Debris' whitepaper are 3x more likely to convert to a paid pilot. This is our highest converting content asset."</div>
                             </div>
-                            <div class="flex items-start gap-3 mb-4 p-3 rounded-lg user-bubble">
-                                <div class="w-8 h-8 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center flex-shrink-0 font-bold text-sm">YOU</div>
-                                <div class="flex-1 text-sm">"Interesting. Let's double down. Can we create a marketing campaign around that whitepaper for Q4? Maybe a webinar with the author."</div>
+                            <div class="flex items-start gap-3 mb-4 p-3 rounded-lg cmo-bubble">
+                                <div class="w-8 h-8 rounded-full bg-rose-100 text-rose-700 flex items-center justify-center flex-shrink-0 font-bold text-sm">CMO</div>
+                                <div class="flex-1 text-sm">"Interesting. Let's double down. I'll spin up a LinkedIn campaign targeting engineers at our key accounts with the whitepaper. Budget: $5k for a 2-week test."</div>
                             </div>
                             <div class="flex items-start gap-3 p-3 rounded-lg ai-bubble">
                                 <div class="w-8 h-8 rounded-full bg-purple-100 text-purple-700 flex items-center justify-center flex-shrink-0 font-bold text-sm">AI</div>
@@ -433,7 +447,7 @@
                         <div class="bg-white p-6 border border-gray-200 rounded-lg">
                             <h3 class="font-bold text-red-700 mb-3">Team</h3>
                              <div class="flex items-start gap-3 mb-4 p-3 rounded-lg user-bubble">
-                                <div class="w-8 h-8 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center flex-shrink-0 font-bold text-sm">YOU</div>
+                                <div class="w-8 h-8 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center flex-shrink-0 font-bold text-sm">CEO</div>
                                 <div class="flex-1 text-sm">"From Slack #hiring: 'The candidate pool for the RF engineering role is very shallow. We've only had two qualified applicants in three weeks.'"</div>
                             </div>
                              <div class="flex items-start gap-3">
@@ -449,7 +463,7 @@
                                 <div class="flex-1 text-sm">"Insight: In our last investor update, we promised a working prototype for the ESA pilot by Oct 15th. Brex data shows our burn rate is 10% higher than projected, which reduces our runway post-pilot if there are delays."</div>
                             </div>
                              <div class="flex items-start gap-3 mb-4 p-3 rounded-lg user-bubble">
-                                <div class="w-8 h-8 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center flex-shrink-0 font-bold text-sm">YOU</div>
+                                <div class="w-8 h-8 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center flex-shrink-0 font-bold text-sm">CEO</div>
                                 <div class="flex-1 text-sm">"Okay, we need to flag this risk. Let's make sure the next update frames the higher burn as a strategic investment to accelerate the prototype delivery and de-risk the pilot program."</div>
                             </div>
                             <div class="flex items-start gap-3 p-3 rounded-lg ai-bubble">
@@ -460,8 +474,8 @@
                         <!-- Competitor Analysis -->
                          <div class="bg-white p-6 border border-gray-200 rounded-lg">
                             <h3 class="font-bold text-gray-700 mb-3">Competitor Analysis</h3>
-                             <div class="flex items-start gap-3 mb-4 p-3 rounded-lg user-bubble">
-                                <div class="w-8 h-8 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center flex-shrink-0 font-bold text-sm">YOU</div>
+                             <div class="flex items-start gap-3 mb-4 p-3 rounded-lg cmo-bubble">
+                                <div class="w-8 h-8 rounded-full bg-rose-100 text-rose-700 flex items-center justify-center flex-shrink-0 font-bold text-sm">CMO</div>
                                 <div class="flex-1 text-sm">"From Slack #random: 'Did anyone see that OrbitGuard just raised a $15M Series A? Their focus is purely on debris tracking, not avoidance.'"</div>
                             </div>
                              <div class="flex items-start gap-3">
@@ -1074,7 +1088,34 @@
             }
             
             function switchView() {
-                // ... existing view switching code ...
+                currentView = ui.viewToggle.checked ? 'vc' : 'ceo';
+                if (currentView === 'vc') {
+                    ui.ceoView.classList.add('hidden');
+                    ui.vcView.classList.remove('hidden');
+                    ui.ceoNav.classList.add('hidden');
+                    ui.vcNav.classList.remove('hidden');
+                    ui.userName.textContent = 'Sarah (VC)';
+                    ui.userCompany.textContent = 'Atomic Ventures';
+                    ui.userAvatar.src = 'https://placehold.co/100x100/c026d3/FFFFFF?text=S';
+                    ui.ceoLabel.classList.remove('font-semibold', 'text-purple-700');
+                    ui.ceoLabel.classList.add('text-gray-500');
+                    ui.vcLabel.classList.add('font-semibold', 'text-purple-700');
+                    ui.vcLabel.classList.remove('text-gray-500');
+                    showPage('vc-dashboard');
+                } else {
+                    ui.vcView.classList.add('hidden');
+                    ui.ceoView.classList.remove('hidden');
+                    ui.vcNav.classList.add('hidden');
+                    ui.ceoNav.classList.remove('hidden');
+                    ui.userName.textContent = 'Alex (CEO)';
+                    ui.userCompany.textContent = 'SGDL';
+                    ui.userAvatar.src = 'https://placehold.co/100x100/5B21B6/FFFFFF?text=A';
+                    ui.vcLabel.classList.remove('font-semibold', 'text-purple-700');
+                    ui.vcLabel.classList.add('text-gray-500');
+                    ui.ceoLabel.classList.add('font-semibold', 'text-purple-700');
+                    ui.ceoLabel.classList.remove('text-gray-500');
+                    showPage('dashboard');
+                }
             }
             
             // Modal Logic
@@ -1135,7 +1176,26 @@
             }
 
             function showCompanyDetailModal(companyId) {
-                // ... existing company detail modal code ...
+                 const company = db.companies[companyId];
+                const report = db.reports[companyId];
+                if (!company) return;
+
+                const content = document.createElement('div');
+                content.innerHTML = `
+                    <div class="mb-4">
+                        <h3 class="font-bold">Key Metrics</h3>
+                        <div class="text-sm grid grid-cols-3 gap-2 mt-2">
+                            <div><p class="text-xs text-gray-500">ARR</p><p class="font-semibold">${company.metrics.arr}</p></div>
+                            <div><p class="text-xs text-gray-500">Growth</p><p class="font-semibold">${company.metrics.growth}</p></div>
+                            <div><p class="text-xs text-gray-500">Runway</p><p class="font-semibold">${company.metrics.runway}</p></div>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="font-bold">Latest Update</h3>
+                        <div class="prose prose-sm max-w-none mt-2 text-xs">${report ? report.content : 'No recent update.'}</div>
+                    </div>
+                `;
+                showModal(company.name, content);
             }
 
             function showPlaybookModal(playbookId) {
@@ -1258,7 +1318,32 @@
             }
 
             function populateVcPortfolio() {
-                // ... existing portfolio population code ...
+                const container = ui.vcPortfolioList;
+                if (!container) return;
+                container.innerHTML = '';
+                Object.entries(db.companies).forEach(([id, company]) => {
+                    const statusColors = {
+                        'On Track': 'bg-green-100 text-green-800',
+                        'Needs Attention': 'bg-yellow-100 text-yellow-800',
+                        'At Risk': 'bg-red-100 text-red-800',
+                    };
+                    const card = document.createElement('div');
+                    card.className = 'bg-white border border-gray-200 p-4 rounded-lg cursor-pointer hover:shadow-md';
+                    card.dataset.companyId = id;
+                    card.innerHTML = `
+                        <div class="flex justify-between items-start">
+                            <h3 class="font-bold">${company.name}</h3>
+                            <span class="text-xs font-semibold px-2 py-1 rounded-full ${statusColors[company.status]}">${company.status}</span>
+                        </div>
+                        <div class="text-xs text-gray-500 mt-4 grid grid-cols-3 gap-2">
+                           <div><p>ARR</p><p class="font-semibold text-gray-800">${company.metrics.arr}</p></div>
+                           <div><p>Growth</p><p class="font-semibold text-gray-800">${company.metrics.growth}</p></div>
+                           <div><p>Runway</p><p class="font-semibold text-gray-800">${company.metrics.runway}</p></div>
+                        </div>
+                    `;
+                    card.addEventListener('click', () => showCompanyDetailModal(id));
+                    container.appendChild(card);
+                });
             }
             
             function showGuidedPlaybook(playbookId) {
@@ -1421,7 +1506,7 @@
             });
             if(ui.newReportBtn) ui.newReportBtn.addEventListener('click', () => showPage('dashboard'));
             ui.saveApiKeyBtn.addEventListener('click', saveApiKey);
-            //ui.viewToggle.addEventListener('change', switchView);
+            ui.viewToggle.addEventListener('change', switchView);
             
             document.addEventListener('click', function(e) {
                 if (e.target && e.target.id == 'finalize-report-btn-2') {
