@@ -272,7 +272,7 @@
             background-color: white;
             border: 1px solid #e5e7eb;
             border-radius: 0.5rem;
-            box-shadow: 0 4px Dd-2xl rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
             z-index: 10;
             transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s;
         }
@@ -342,7 +342,7 @@
                     </div>
                 </div>
                  <div class="mt-4 text-xs mono">
-                    <span class="font-semibold text-gray-700">Account</span>
+                    <span class="font-semibold text-gray-700">Premium Account</span>
                 </div>
             </div>
         </aside>
@@ -404,9 +404,13 @@
                                 <div class="w-8 h-8 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center flex-shrink-0 font-bold text-sm">YOU</div>
                                 <div class="flex-1 text-sm">"From Slack #product: 'We've hit a breakthrough on the orbital decay model. By incorporating solar flare activity, we can improve long-term prediction accuracy by another 5-7%.'"</div>
                             </div>
-                             <div class="flex items-start gap-3">
+                             <div class="flex items-start gap-3 mb-4 p-3 rounded-lg ai-bubble">
                                 <div class="w-8 h-8 rounded-full bg-purple-100 text-purple-700 flex items-center justify-center flex-shrink-0 font-bold text-sm">AI</div>
-                                <div class="p-3 rounded-lg ai-bubble flex-1 text-sm">"Excellent. This strengthens our core IP. I've updated the 'Patent Strategy' document in Notion to include this new modeling technique as a potential claim for our next filing."</div>
+                                <div class="flex-1 text-sm">"Excellent. This strengthens our core IP. I've updated the 'Patent Strategy' document in Notion to include this new modeling technique as a potential claim for our next filing."</div>
+                            </div>
+                             <div class="flex items-start gap-3 p-3 rounded-lg user-bubble">
+                                <div class="w-8 h-8 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center flex-shrink-0 font-bold text-sm">YOU</div>
+                                <div class="flex-1 text-sm">"From voice memo: 'I'm worried our UI is becoming too complex for operators who are monitoring multiple constellations. We need to simplify the primary dashboard.'"</div>
                             </div>
                         </div>
                         <!-- Revenue Generation -->
@@ -416,9 +420,13 @@
                                 <div class="w-8 h-8 rounded-full bg-purple-100 text-purple-700 flex items-center justify-center flex-shrink-0 font-bold text-sm">AI</div>
                                 <div class="flex-1 text-sm">"Analysis of HubSpot data shows that leads who download our 'State of Space Debris' whitepaper are 3x more likely to convert to a paid pilot. This is our highest converting content asset."</div>
                             </div>
-                            <div class="flex items-start gap-3 p-3 rounded-lg user-bubble">
+                            <div class="flex items-start gap-3 mb-4 p-3 rounded-lg user-bubble">
                                 <div class="w-8 h-8 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center flex-shrink-0 font-bold text-sm">YOU</div>
                                 <div class="flex-1 text-sm">"Interesting. Let's double down. Can we create a marketing campaign around that whitepaper for Q4? Maybe a webinar with the author."</div>
+                            </div>
+                            <div class="flex items-start gap-3 p-3 rounded-lg ai-bubble">
+                                <div class="w-8 h-8 rounded-full bg-purple-100 text-purple-700 flex items-center justify-center flex-shrink-0 font-bold text-sm">AI</div>
+                                <div class="flex-1 text-sm">"From Slack #sales: 'Just got off the phone with AstroScale. They're asking for on-premise deployment options. This is the third time this has come up with a large enterprise prospect.'"</div>
                             </div>
                         </div>
                         <!-- Team -->
@@ -440,9 +448,13 @@
                                 <div class="w-8 h-8 rounded-full bg-purple-100 text-purple-700 flex items-center justify-center flex-shrink-0 font-bold text-sm">AI</div>
                                 <div class="flex-1 text-sm">"Insight: In our last investor update, we promised a working prototype for the ESA pilot by Oct 15th. Brex data shows our burn rate is 10% higher than projected, which reduces our runway post-pilot if there are delays."</div>
                             </div>
-                             <div class="flex items-start gap-3">
+                             <div class="flex items-start gap-3 mb-4 p-3 rounded-lg user-bubble">
                                 <div class="w-8 h-8 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center flex-shrink-0 font-bold text-sm">YOU</div>
                                 <div class="flex-1 text-sm">"Okay, we need to flag this risk. Let's make sure the next update frames the higher burn as a strategic investment to accelerate the prototype delivery and de-risk the pilot program."</div>
+                            </div>
+                            <div class="flex items-start gap-3 p-3 rounded-lg ai-bubble">
+                                <div class="w-8 h-8 rounded-full bg-purple-100 text-purple-700 flex items-center justify-center flex-shrink-0 font-bold text-sm">AI</div>
+                                <div class="flex-1 text-sm">"From Notion 'Investor CRM': Seraphim Space is our top choice for the Seed round. I've analyzed their portfolio; 4 of their 10 recent investments have a dual-use (commercial/defense) application, which aligns with our GTM strategy."</div>
                             </div>
                         </div>
                         <!-- Competitor Analysis -->
@@ -1340,7 +1352,7 @@
                             <h3 class="font-bold text-gray-900">Operalta Engine</h3>
                             <p class="text-xs text-gray-500">Connecting dots across all strategic streams.</p>
                         </div>
-                        <p class="text-purple-700 font-semibold text-sm">Deepdive into streams and insights</p>
+                        <p class="text-purple-700 font-semibold text-sm">Deepdive into<br>Streams and Insights</p>
                     </div>`;
 
                 const items = [
