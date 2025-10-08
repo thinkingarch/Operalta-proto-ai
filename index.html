@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Operalta — Platform Prototype</title>
+    <title>Operalta — AI Startup Advisor</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -16,979 +16,836 @@
             --glass-bg: rgba(255, 255, 255, 0.65);
             --glass-border: rgba(0, 0, 0, 0.07);
             --glass-shadow: rgba(0, 0, 0, 0.05);
-            --glass-recording-bg: rgba(248, 248, 248, 0.75);
-            --glass-recording-border: rgba(0, 0, 0, 0.1);
         }
         
         body {
-            font-family: 'Space Grotesk', -apple-system, sans-serif;
-            background-color: #f9fafb;
+            font-family: 'Space Grotesk', sans-serif;
+            background-color: #f7f7f7;
+            background-image:
+                linear-gradient(var(--grid-color) 1px, transparent 1px),
+                linear-gradient(to right, var(--grid-color) 1px, #f7f7f7 1px);
+            background-size: 20px 20px;
         }
+
+        .font-mono { font-family: 'Space Mono', monospace; }
+        .font-grotesk { font-family: 'Space Grotesk', sans-serif; }
         
-        .mono {
-            font-family: 'Space Mono', monospace;
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 4px 6px var(--glass-shadow);
         }
 
-        .baseline-grid {
-            background-image: linear-gradient(var(--grid-color) 1px, transparent 1px);
-            background-size: 100% 16px;
+        .btn-primary {
+             background-color: var(--accent); color: white;
         }
-        
-        .sidebar-link { transition: all 0.2s ease; }
-        .sidebar-link:hover, .sidebar-link.active { background-color: #f3f4f6; color: #111827; }
-        .sidebar-link.active { font-weight: 600; }
-        #sidebar { transition: transform 0.3s ease-in-out; }
+        .btn-primary:hover {
+            background-color: #4c1d95;
+        }
 
-        /* CEO/VC Toggle Switch */
-        .toggle-dot { transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-        input:checked ~ .toggle-bg { background-color: var(--accent); }
-        input:checked ~ .toggle-dot { transform: translateX(100%); }
-
-        /* Dictation App Styles Integration */
-        .recording-interface {
-            transition: all 0.45s ease-in-out;
-            z-index: 10;
+        /* View Toggle Switch */
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 240px;
+            height: 38px;
         }
-        .recording-interface.is-live {
-            position: fixed;
-            bottom: 0; left: 0; right: 0;
-            height: 350px;
-            z-index: 1000;
-            background-color: var(--glass-recording-bg);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-top: 1px solid var(--glass-recording-border);
-            box-shadow: 0 -4px 20px var(--glass-shadow);
-            justify-content: flex-start;
-            padding: 20px;
-        }
-        .live-recording-title, #liveWaveformCanvas, .live-recording-timer {
+        .toggle-switch input {
             opacity: 0;
-            transform: translateY(15px);
-            transition: opacity 0.3s ease-out 0.1s, transform 0.35s ease-out 0.1s;
+            width: 0;
+            height: 0;
         }
-        .recording-interface.is-live .live-recording-title,
-        .recording-interface.is-live #liveWaveformCanvas,
-        .recording-interface.is-live .live-recording-timer {
-            opacity: 1;
-            transform: translateY(0);
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #e9e9e9;
+            transition: .4s;
+            border-radius: 34px;
+            display: flex;
+            align-items: center;
         }
-        #liveWaveformCanvas { width: 100%; max-width: 340px; height: 70px; margin-bottom: 18px; border-radius: 4px; }
-        .live-recording-timer { font-family: var(--font-mono); font-size: 44px; font-weight: 400; margin-bottom: 22px; text-align: center; }
-        
-        .record-button { position: relative; width: 72px; height: 72px; border-radius: 50%; border: none; outline: none; background: none; cursor: pointer; z-index: 1; }
-        .record-button-inner { position: relative; width: 100%; height: 100%; border-radius: 50%; background: var(--glass-bg); border: 1px solid var(--glass-border); display: flex; align-items: center; justify-content: center; color: #111827; font-size: 24px; z-index: 2; box-shadow: 0 2px 8px rgba(0,0,0,0.1); transition: all 0.3s ease; backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); }
-        .record-button:hover .record-button-inner { transform: scale(1.08); }
-        .record-button.recording .record-button-inner { background-color: var(--color-recording); border-color: transparent; color: white; }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 30px;
+            width: 116px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 34px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        input:checked + .slider:before {
+            transform: translateX(116px);
+        }
+        .slider-text {
+            position: relative;
+            z-index: 1;
+            width: 50%;
+            text-align: center;
+            font-weight: 500;
+            color: #777;
+            transition: color .4s;
+        }
+        input:checked + .slider .slider-text:first-child { color: #777; }
+        input:checked + .slider .slider-text:last-child { color: #333; }
+        input:not(:checked) + .slider .slider-text:first-child { color: #333; }
+        input:not(:checked) + .slider .slider-text:last-child { color: #777; }
 
-        @keyframes wave { 0% { transform: scale(0.4); opacity: 0.8; } 100% { transform: scale(1.8); opacity: 0; } }
-        .record-waves { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 200px; height: 200px; z-index: 1; opacity: 0; transition: opacity 0.3s ease; pointer-events: none; }
-        .record-button.recording .record-waves { opacity: 1; }
-        .wave { fill: none; stroke: var(--color-recording); stroke-width: 1.5px; opacity: 0; transform-origin: center; }
-        .record-button.recording .wave1 { animation: wave 2s infinite ease-out; }
-        .record-button.recording .wave2 { animation: wave 2s infinite ease-out 0.4s; }
-        
-        .notion-block {
-            border-left: 3px solid var(--accent);
-            padding-left: 1rem;
-            margin-top: 0.5rem;
-        }
-        
-        /* Modal Styles */
-        .modal-overlay {
-            transition: opacity 0.3s ease;
-        }
-        .modal-content {
-            transition: transform 0.3s ease, opacity 0.3s ease;
-        }
-        
-        /* Playbook Category Filter */
-        .playbook-category-btn { transition: all 0.2s ease; border: 1px solid #e5e7eb; }
-        .playbook-category-btn.active, .playbook-category-btn:hover {
+        /* Sidebar Navigation */
+        .nav-link.active {
             background-color: var(--accent);
             color: white;
-            border-color: var(--accent);
+            box-shadow: 0 2px 5px rgba(91, 33, 182, 0.3);
+        }
+        .nav-link { transition: all 0.2s ease-in-out; }
+        .nav-link:hover { transform: translateX(2px); }
+
+        /* Recording Button */
+        #record-btn.recording {
+            animation: pulse-red 2s infinite;
+        }
+        @keyframes pulse-red {
+            0% { box-shadow: 0 0 0 0 rgba(255, 59, 48, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(255, 59, 48, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 59, 48, 0); }
+        }
+
+        /* Chat UI */
+        .chat-bubble { max-width: 80%; }
+        .user-bubble { background-color: var(--accent); color: white; }
+        .ai-bubble { background-color: #e5e7eb; color: #1f2937; }
+        .chat-input-container {
+            position: sticky;
+            bottom: 0;
+            background: rgba(247,247,247, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 1rem;
+            border-top: 1px solid var(--grid-color);
+        }
+         #chat-input { resize: none; }
+         #chat-input:focus { box-shadow: 0 0 0 2px var(--accent); border-color: var(--accent); }
+
+         /* Scrollbar styles */
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 3px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #9ca3af; }
+
+        .playbook-category-btn.active {
+            background-color: var(--accent);
+            color: white;
+        }
+        .playbook-category-btn {
+            transition: all 0.2s ease-in-out;
         }
     </style>
-     <script type="importmap">
-      {
-        "imports": {
-          "@google/genai": "https://esm.sh/@google/genai@^0.8.0",
-          "marked": "https://esm.sh/marked@^4.0.0"
-        }
-      }
-    </script>
 </head>
-<body class="text-gray-900 overflow-x-hidden">
+<body class="text-gray-800">
+    <div class="min-h-screen flex flex-col md:flex-row p-4 gap-4">
 
-    <div class="relative min-h-screen md:flex">
-        <!-- Mobile Header -->
-        <div class="md:hidden flex justify-between items-center bg-white border-b border-gray-200 p-4 sticky top-0 z-40">
-            <a href="#" class="font-bold text-sm tracking-wider">Operalta</a>
-            <button id="mobile-menu-btn">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
-            </button>
-        </div>
-
-        <!-- Sidebar Navigation -->
-        <aside id="sidebar" class="w-64 flex-shrink-0 bg-white border-r border-gray-200 flex flex-col fixed inset-y-0 left-0 z-50 transform -translate-x-full md:relative md:translate-x-0">
-            <div class="h-16 flex items-center px-6 border-b border-gray-200">
-                <a href="#" class="font-bold text-sm tracking-wider flex items-center gap-2"><span>Operalta</span></a>
+        <!-- Sidebar -->
+        <nav id="sidebar" class="w-full md:w-64 glass-card rounded-xl p-4 flex flex-col">
+            <div class="flex items-center gap-3 mb-8">
+                <div class="w-10 h-10 bg-purple-200 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-rocket text-purple-700"></i>
+                </div>
+                <h1 class="text-2xl font-bold font-grotesk text-gray-900">Operalta</h1>
             </div>
             
-            <nav id="ceo-nav" class="flex-1 px-4 py-6 space-y-2">
-                <a href="#" id="nav-dashboard" class="sidebar-link active flex items-center px-4 py-2 text-sm text-gray-600 rounded-md"><svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>Dashboard</a>
-                <a href="#" id="nav-reports" class="sidebar-link flex items-center px-4 py-2 text-sm text-gray-600 rounded-md"><svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>Reports</a>
-                <a href="#" id="nav-playbooks" class="sidebar-link flex items-center px-4 py-2 text-sm text-gray-600 rounded-md"><svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v11.494m-9-5.747h18"></path></svg>Playbooks</a>
-                <a href="#" id="nav-integrations" class="sidebar-link flex items-center px-4 py-2 text-sm text-gray-600 rounded-md"><svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>Integrations</a>
-                <a href="#" id="nav-settings" class="sidebar-link flex items-center px-4 py-2 text-sm text-gray-600 rounded-md"><svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>Settings</a>
-            </nav>
-            <nav id="vc-nav" class="hidden flex-1 px-4 py-6 space-y-2">
-                <a href="#" id="nav-vc-dashboard" class="sidebar-link active flex items-center px-4 py-2 text-sm text-gray-600 rounded-md"><svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2a4 4 0 00-4-4H3s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1h-2a4 4 0 00-4 4v2"></path><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"></path><path d="M17.63 17.63A4 4 0 1014 14a4 4 0 003.63 3.63z"></path></svg>Portfolio</a>
-                <a href="#" id="nav-vc-playbooks" class="sidebar-link flex items-center px-4 py-2 text-sm text-gray-600 rounded-md"><svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v11.494m-9-5.747h18"></path></svg>Playbooks</a>
-                 <a href="#" id="nav-vc-settings" class="sidebar-link flex items-center px-4 py-2 text-sm text-gray-600 rounded-md"><svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>Settings</a>
-            </nav>
-            
-             <div class="px-4 py-4 mt-auto border-t border-gray-200">
-                <div class="flex items-center mb-4">
-                    <img id="user-avatar" class="h-8 w-8 rounded-full object-cover" src="https://placehold.co/100x100/5B21B6/FFFFFF?text=A" alt="User Avatar">
-                    <div class="ml-3">
-                        <p id="user-name" class="text-sm font-semibold text-gray-800">Alex (CEO)</p>
-                        <p id="user-company" class="text-xs text-gray-500">Acme Inc.</p>
-                    </div>
-                </div>
-                 <div class="mt-4 text-xs mono">
-                    <label for="view-toggle" class="flex items-center cursor-pointer">
-                        <span id="ceo-label" class="mr-2 font-semibold text-purple-700">CEO</span>
-                        <div class="relative">
-                            <input type="checkbox" id="view-toggle" class="sr-only">
-                            <div class="toggle-bg block bg-gray-200 w-10 h-5 rounded-full"></div>
-                            <div class="toggle-dot absolute left-0 top-0 bg-white w-5 h-5 rounded-full shadow-md"></div>
-                        </div>
-                        <span id="vc-label" class="ml-2 text-gray-500">VC</span>
-                    </label>
-                </div>
+            <div id="ceo-nav" class="space-y-2">
+                <a href="#" class="nav-link flex items-center gap-3 p-3 rounded-lg active" onclick="showPage('dashboard')">
+                    <i class="fas fa-chart-pie w-5 text-center"></i><span>Dashboard</span>
+                </a>
+                <a href="#" class="nav-link flex items-center gap-3 p-3 rounded-lg" onclick="showPage('reports')">
+                    <i class="fas fa-file-alt w-5 text-center"></i><span>Reports</span>
+                </a>
+                <a href="#" class="nav-link flex items-center gap-3 p-3 rounded-lg" onclick="showPage('playbooks')">
+                    <i class="fas fa-book w-5 text-center"></i><span>Playbooks</span>
+                </a>
+                <a href="#" class="nav-link flex items-center gap-3 p-3 rounded-lg" onclick="showPage('settings')">
+                    <i class="fas fa-cog w-5 text-center"></i><span>Settings</span>
+                </a>
             </div>
-        </aside>
+            
+             <div id="vc-nav" class="hidden space-y-2">
+                <a href="#" class="nav-link flex items-center gap-3 p-3 rounded-lg active" onclick="showPage('vc-dashboard')">
+                    <i class="fas fa-tachometer-alt w-5 text-center"></i><span>Portfolio</span>
+                </a>
+                <a href="#" class="nav-link flex items-center gap-3 p-3 rounded-lg" onclick="showPage('vc-playbooks')">
+                    <i class="fas fa-book-open w-5 text-center"></i><span>Playbook Library</span>
+                </a>
+                 <a href="#" class="nav-link flex items-center gap-3 p-3 rounded-lg" onclick="showPage('settings')">
+                    <i class="fas fa-cog w-5 text-center"></i><span>Settings</span>
+                </a>
+            </div>
 
-        <!-- Main Content Area -->
-        <main class="flex-1">
+            <div class="mt-auto text-center">
+                <label for="view-toggle" class="toggle-switch">
+                    <input type="checkbox" id="view-toggle">
+                    <span class="slider">
+                        <span class="slider-text">Founder</span>
+                        <span class="slider-text">Investor</span>
+                    </span>
+                </label>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="flex-1 glass-card rounded-xl overflow-hidden flex flex-col">
+            <!-- CEO Views -->
             <div id="ceo-view">
-                <div id="page-dashboard" class="p-4 sm:p-8 md:p-12 baseline-grid">
-                    <div id="api-key-banner" class="hidden bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-6 rounded-r-lg" role="alert">
-                        <p class="font-bold">Action Required</p>
-                        <p>Please <a href="#" id="banner-settings-link" class="underline font-semibold">add your Gemini API key</a> in the settings to enable recording.</p>
-                    </div>
-                    <header class="mb-8"><h1 class="text-2xl sm:text-3xl font-bold tracking-tight">CEO Dashboard</h1><p class="text-gray-500 mt-1 mono text-sm">Welcome back, Alex. Your augmented co-founder is ready.</p></header><div class="bg-white p-6 sm:p-8 border border-gray-200 rounded-lg shadow-sm mb-8"><div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4"><h2 class="text-lg font-bold">Create Weekly Update</h2><span class="text-xs mono text-gray-500 mt-1 sm:mt-0">Voice Memo → AI Synthesis → Investor Report</span></div><div class="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6"><button id="start-recording-btn" class="w-16 h-16 bg-purple-700 text-white rounded-full flex items-center justify-center hover:bg-purple-800 transition-all transform hover:scale-105 shadow-lg flex-shrink-0"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path></svg></button><div class="flex-1"><p class="font-semibold">Record a 5-minute voice memo</p><p class="text-sm text-gray-600">Summarize your week: wins, challenges, and key metrics. Our AI will do the rest.</p></div></div></div>
-                     <div class="bg-white p-6 sm:p-8 border border-gray-200 rounded-lg shadow-sm">
-                        <h2 class="text-lg font-bold mb-4">Recent Activity</h2>
-                        <div class="text-sm text-gray-500">No recent reports. Record an update to get started.</div>
+                <div id="page-dashboard" class="page p-6 h-full">
+                    <h2 class="text-3xl font-bold mb-6">Founder Dashboard</h2>
+                     <!-- Placeholder content -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <div class="bg-white/50 p-6 rounded-lg shadow-sm">
+                            <h3 class="font-bold text-lg mb-2">ARR</h3>
+                            <p class="text-3xl font-mono">$1.2M</p>
+                            <p class="text-green-600">+12% MoM</p>
+                        </div>
+                        <div class="bg-white/50 p-6 rounded-lg shadow-sm">
+                            <h3 class="font-bold text-lg mb-2">Burn Rate</h3>
+                            <p class="text-3xl font-mono">-$85k/mo</p>
+                            <p class="text-gray-500">14 mos runway</p>
+                        </div>
+                         <div class="bg-white/50 p-6 rounded-lg shadow-sm">
+                            <h3 class="font-bold text-lg mb-2">Active Users</h3>
+                            <p class="text-3xl font-mono">1,402</p>
+                            <p class="text-green-600">+5% WoW</p>
+                        </div>
                     </div>
                 </div>
-                
-                <div id="page-recording" class="hidden p-4 sm:p-8 md:p-12">
-                    <header class="mb-8"><h1 class="text-2xl sm:text-3xl font-bold tracking-tight">New Weekly Update</h1></header>
-                    <div id="processing-state" class="hidden text-center py-16"><div class="inline-block w-8 h-8 border-2 border-purple-700 border-t-transparent rounded-full animate-spin mb-4"></div><h3 id="processing-status" class="font-bold">Processing audio...</h3><p class="text-sm text-gray-600 mt-2">This usually takes less than a minute.</p></div>
-                    <div id="completed-state" class="hidden grid grid-cols-1 lg:grid-cols-2 gap-12">
-                        <!-- AI Analysis -->
-                        <div id="extracted-intelligence">
-                             <h4 class="font-bold text-sm mb-4">Extracted Intelligence</h4>
-                             <div class="bg-white p-6 border border-gray-200 rounded-lg space-y-4">
-                                <!-- Content injected here -->
+                <div id="page-reports" class="page p-6 h-full hidden">
+                     <!-- Recording and Report Generation UI -->
+                     <div class="max-w-3xl mx-auto flex flex-col items-center justify-center text-center h-full">
+                         <h2 class="text-3xl font-bold mb-4">Create Investor Update</h2>
+                         <p class="text-gray-600 mb-8">Record a voice memo of your weekly update. The AI will transcribe, analyze, and draft a professional report for you.</p>
+                         
+                         <button id="record-btn" class="w-24 h-24 bg-red-500 text-white rounded-full flex items-center justify-center text-4xl shadow-lg transition-transform duration-200 ease-in-out transform hover:scale-105">
+                             <i class="fas fa-microphone"></i>
+                         </button>
+                         <p id="recording-status" class="mt-4 text-gray-500 h-6">Click to start recording</p>
+                         
+                         <div id="report-generation" class="w-full mt-8 text-left hidden">
+                             <h3 class="font-bold text-xl mb-4 text-center">Analysis & Generation</h3>
+                             <div class="space-y-4">
+                                 <div>
+                                     <h4 class="font-semibold">1. Transcription</h4>
+                                     <p id="transcription-text" class="text-sm bg-gray-100 p-3 rounded-lg h-24 overflow-y-auto custom-scrollbar"></p>
+                                 </div>
+                                 <div>
+                                     <h4 class="font-semibold">2. AI Analysis</h4>
+                                     <pre id="analysis-json" class="text-sm bg-gray-800 text-white p-3 rounded-lg h-32 overflow-y-auto custom-scrollbar"></pre>
+                                 </div>
+                                 <div>
+                                     <h4 class="font-semibold">3. Draft Report</h4>
+                                     <div id="draft-report-markdown" class="text-sm bg-gray-100 p-3 rounded-lg h-40 overflow-y-auto custom-scrollbar prose"></div>
+                                 </div>
                              </div>
-                        </div>
-                        <!-- Strategic Update -->
-                        <div id="strategic-update">
-                            <h4 class="font-bold text-sm mb-4">Strategic Update</h4>
-                            <div class="bg-white border-2 border-gray-200 p-6 rounded-lg shadow-lg">
-                                <!-- Content injected here -->
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="page-reports" class="hidden p-4 sm:p-8 md:p-12">
-                    <header class="mb-8 flex justify-between items-center">
-                        <div>
-                            <h1 class="text-2xl sm:text-3xl font-bold tracking-tight">Reports</h1>
-                            <p class="text-gray-500 mt-1 mono text-sm">History of all generated investor updates.</p>
-                        </div>
-                        <button id="new-report-btn" class="bg-purple-700 text-white px-4 py-2 text-sm font-bold hover:bg-purple-800 transition-colors rounded-md">New Report</button>
-                    </header>
-                    <div class="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
-                        <table class="w-full text-sm">
-                            <thead class="bg-gray-50"><tr class="text-left text-xs text-gray-500 uppercase tracking-wider"><th class="p-4 font-semibold">Date</th><th class="p-4 font-semibold">Title</th><th class="p-4 font-semibold">Status</th><th class="p-4 font-semibold hidden md:table-cell">Key Metric</th><th class="p-4"></th></tr></thead>
-                            <tbody class="divide-y divide-gray-200">
-                                <tr><td class="p-4">Sep 5, 2025</td><td class="p-4 font-semibold">Weekly Update - W36</td><td class="p-4"><span class="px-2 py-1 text-xs font-semibold text-green-800 bg-green-100 rounded-full">Sent</span></td><td class="p-4 hidden md:table-cell">23% MoM Growth</td><td class="p-4 text-right"><a href="#" class="text-purple-700 hover:underline view-report-link" data-report-id="w36">View</a></td></tr>
-                                <tr><td class="p-4">Aug 29, 2025</td><td class="p-4 font-semibold">Weekly Update - W35</td><td class="p-4"><span class="px-2 py-1 text-xs font-semibold text-green-800 bg-green-100 rounded-full">Sent</span></td><td class="p-4 hidden md:table-cell">Onboarded 2 Enterprise clients</td><td class="p-4 text-right"><a href="#" class="text-purple-700 hover:underline view-report-link" data-report-id="w35">View</a></td></tr>
-                                 <tr><td class="p-4">Aug 22, 2025</td><td class="p-4 font-semibold">Weekly Update - W34</td><td class="p-4"><span class="px-2 py-1 text-xs font-semibold text-yellow-800 bg-yellow-100 rounded-full">Draft</span></td><td class="p-4 hidden md:table-cell">Hiring top priority</td><td class="p-4 text-right"><a href="#" class="text-purple-700 hover:underline view-report-link" data-report-id="w34">View</a></td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <div id="page-playbooks" class="hidden p-4 sm:p-8 md:p-12">
-                    <header class="mb-8 flex justify-between items-baseline">
-                         <div>
-                            <h1 class="text-2xl sm:text-3xl font-bold tracking-tight">Playbook Library</h1>
-                            <p class="text-gray-500 mt-1 mono text-sm">1,247+ proven strategies from top-tier companies.</p>
-                        </div>
-                    </header>
-                    <div id="playbook-category-filters" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 text-center mb-12">
-                         <div class="playbook-category-btn aspect-square flex flex-col items-center justify-center cursor-pointer p-2 rounded-md" data-category="Growth"><span class="text-2xl mb-1">⬆</span><span class="text-xs font-bold">GROWTH</span></div>
-                         <div class="playbook-category-btn aspect-square flex flex-col items-center justify-center cursor-pointer p-2 rounded-md" data-category="Hiring"><span class="text-2xl mb-1">◐</span><span class="text-xs font-bold">HIRING</span></div>
-                         <div class="playbook-category-btn aspect-square flex flex-col items-center justify-center cursor-pointer p-2 rounded-md" data-category="Fundraising"><span class="text-2xl mb-1">◈</span><span class="text-xs font-bold">FUNDRAISING</span></div>
-                         <div class="playbook-category-btn aspect-square flex flex-col items-center justify-center cursor-pointer p-2 rounded-md" data-category="Product"><span class="text-2xl mb-1">◉</span><span class="text-xs font-bold">PRODUCT</span></div>
-                         <div class="playbook-category-btn aspect-square flex flex-col items-center justify-center cursor-pointer p-2 rounded-md" data-category="Sales"><span class="text-2xl mb-1">▣</span><span class="text-xs font-bold">SALES</span></div>
-                         <div class="playbook-category-btn aspect-square flex flex-col items-center justify-center cursor-pointer p-2 rounded-md" data-category="Legal"><span class="text-2xl mb-1">◊</span><span class="text-xs font-bold">LEGAL</span></div>
-                    </div>
-                     <div id="ceo-playbook-list" class="space-y-8">
-                        <!-- Playbook content will be injected here by JS -->
-                    </div>
-                </div>
-
-                <div id="page-integrations" class="hidden p-4 sm:p-8 md:p-12">
-                     <header class="mb-8"><h1 class="text-2xl sm:text-3xl font-bold tracking-tight">Integrations</h1><p class="text-gray-500 mt-1 mono text-sm">Connect Operalta to your existing workflow.</p></header>
-                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                        <div class="bg-white border border-gray-200 rounded-lg p-6 flex flex-col"><div class="flex items-center mb-4"><img src="https://placehold.co/40x40/000000/FFFFFF?text=N" class="w-10 h-10 mr-4"><h3 class="text-lg font-bold">Notion</h3></div><p class="text-sm text-gray-600 flex-1 mb-4">Sync your company wiki, roadmaps, and KPIs to provide context for AI analysis.</p><button class="w-full bg-green-500 text-white py-2 text-sm font-bold rounded-md">Connected</button></div>
-                        <div class="bg-white border border-gray-200 rounded-lg p-6 flex flex-col"><div class="flex items-center mb-4"><img src="https://placehold.co/40x40/4A154B/FFFFFF?text=S" class="w-10 h-10 mr-4"><h3 class="text-lg font-bold">Slack</h3></div><p class="text-sm text-gray-600 flex-1 mb-4">Send report summaries and get notifications directly in your team's channels.</p><button class="w-full bg-gray-200 text-gray-800 py-2 text-sm font-bold hover:bg-gray-300 rounded-md">Connect</button></div>
-                        <div class="bg-white border border-gray-200 rounded-lg p-6 flex flex-col"><div class="flex items-center mb-4"><img src="https://placehold.co/40x40/635BFF/FFFFFF?text=S" class="w-10 h-10 mr-4"><h3 class="text-lg font-bold">Stripe</h3></div><p class="text-sm text-gray-600 flex-1 mb-4">Automatically pull in key financial metrics like ARR, MRR, and growth rates.</p><button class="w-full bg-gray-200 text-gray-800 py-2 text-sm font-bold hover:bg-gray-300 rounded-md">Connect</button></div>
+                             <div class="text-center mt-6">
+                                 <button id="finalize-report-btn" class="btn-primary font-bold py-2 px-6 rounded-full">Finalize & Share</button>
+                             </div>
+                         </div>
                      </div>
                 </div>
-                
-                <div id="page-settings" class="hidden p-4 sm:p-8 md:p-12">
-                    <header class="mb-8"><h1 class="text-2xl sm:text-3xl font-bold tracking-tight">Settings</h1></header>
-                    <div class="bg-white p-6 sm:p-8 border border-gray-200 rounded-lg shadow-sm max-w-2xl">
-                        <h2 class="text-lg font-bold mb-1">API Configuration</h2>
-                        <p class="text-sm text-gray-600 mb-4">A valid Google Gemini API key is required for audio transcription and analysis.</p>
-                        <div class="space-y-2">
-                            <label for="api-key-input" class="text-sm font-semibold text-gray-700">Gemini API Key</label>
-                            <input type="password" id="api-key-input" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm" placeholder="Enter your API key">
+                <div id="page-playbooks" class="page p-6 h-full hidden flex-col">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-3xl font-bold">AI Co-Pilot</h2>
+                        <button id="browse-library-btn" class="text-sm font-medium text-purple-700 hover:text-purple-900">
+                           <i class="fas fa-list-ul mr-2"></i> Browse Playbook Library
+                        </button>
+                    </div>
+
+                    <!-- Conversational AI View -->
+                    <div id="ai-chat-view" class="flex-1 flex flex-col overflow-hidden">
+                        <div id="chat-history" class="flex-1 p-4 space-y-4 overflow-y-auto custom-scrollbar">
+                            <!-- Chat messages will be appended here -->
                         </div>
-                        <div class="mt-4 flex items-center justify-between">
-                            <button id="save-api-key-btn" class="bg-purple-700 text-white px-4 py-2 text-sm font-bold hover:bg-purple-800 transition-colors rounded-md">Save Key</button>
-                            <span id="api-key-status" class="text-sm text-green-600"></span>
+                        <div class="chat-input-container">
+                            <form id="chat-form" class="flex items-center gap-2">
+                                <textarea id="chat-input" class="w-full p-2 border rounded-lg focus:outline-none" placeholder="Describe your biggest challenge this week..." rows="1"></textarea>
+                                <button type="submit" class="btn-primary rounded-full w-10 h-10 flex-shrink-0 flex items-center justify-center">
+                                    <i class="fas fa-paper-plane"></i>
+                                </button>
+                            </form>
                         </div>
-                        <p class="text-xs text-gray-500 mt-4">You can get a key from <a href="https://aistudio.google.com/app/apikey" target="_blank" class="text-purple-700 underline">Google AI Studio</a>. Your key is stored securely in your browser's local storage.</p>
+                    </div>
+
+                    <!-- Playbook Library View (hidden by default) -->
+                    <div id="playbook-library-view" class="hidden">
+                         <div id="playbook-category-filters" class="flex flex-wrap gap-2 mb-4">
+                             <!-- Categories will be populated here -->
+                         </div>
+                         <div id="ceo-playbooks-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            <!-- Playbooks will be populated here -->
+                         </div>
+                    </div>
+                </div>
+                <div id="page-settings" class="page p-6 h-full hidden">
+                    <h2 class="text-3xl font-bold mb-6">Settings</h2>
+                     <div class="max-w-md">
+                        <label for="api-key" class="block font-medium mb-1">Gemini API Key</label>
+                        <input type="password" id="api-key" class="w-full p-2 border rounded-lg" placeholder="Enter your API key">
+                        <button id="save-api-key" class="mt-4 btn-primary font-bold py-2 px-4 rounded-lg">Save Key</button>
+                        <p class="text-xs text-gray-500 mt-2">Your API key is stored securely in your browser's local storage.</p>
                     </div>
                 </div>
             </div>
 
+             <!-- VC Views -->
             <div id="vc-view" class="hidden">
-                 <div id="page-vc-dashboard" class="p-4 sm:p-8 md:p-12">
-                    <header class="mb-8">
-                        <h1 class="text-2xl sm:text-3xl font-bold tracking-tight">Portfolio Dashboard</h1>
-                        <p class="text-gray-500 mt-1 mono text-sm">High-level intelligence on your investments.</p>
-                    </header>
-
-                    <div class="mb-8 bg-white border border-gray-200 rounded-lg p-6">
-                        <h2 class="font-bold mb-4">Portfolio Health Overview</h2>
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
-                            <div><p class="text-3xl font-bold text-green-600">8</p><p class="text-sm text-gray-500">On Track</p></div>
-                            <div><p class="text-3xl font-bold text-yellow-500">2</p><p class="text-sm text-gray-500">Needs Attention</p></div>
-                            <div><p class="text-3xl font-bold text-red-600">0</p><p class="text-sm text-gray-500">At Risk</p></div>
-                        </div>
-                    </div>
-                    
-                    <div class="mb-8 bg-white border border-gray-200 rounded-lg p-6">
-                        <h2 class="font-bold mb-4">AI-Generated Cross-Portfolio Insights</h2>
-                        <ul class="space-y-3 text-sm">
-                            <li class="flex items-start gap-3"><span class="text-purple-600 mt-1">◈</span><span><strong>Positive Trend:</strong> 5 companies mentioned successful enterprise pilots this week, suggesting strong Q4 pipeline.</span></li>
-                            <li class="flex items-start gap-3"><span class="text-yellow-600 mt-1">!</span><span><strong>Potential Risk:</strong> 3 companies in the B2C space noted rising customer acquisition costs (CAC). <a href="#" class="text-purple-700 underline playbook-link" data-playbook-id="plg">Suggest "Product-Led Growth" playbook</a>.</span></li>
-                            <li class="flex items-start gap-3"><span class="text-blue-600 mt-1">→</span><span><strong>Opportunity:</strong> Innovate Inc. and Synergy AI are both hiring for senior product roles. Consider an introduction between their VPs of Product to share best practices.</span></li>
-                        </ul>
-                    </div>
-
-                    <div id="vc-portfolio-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        <!-- Portfolio companies injected by JS -->
+                <div id="page-vc-dashboard" class="page p-6 h-full">
+                    <h2 class="text-3xl font-bold mb-6">Portfolio Overview</h2>
+                    <div id="vc-portfolio-list" class="space-y-4">
+                         <!-- Portfolio companies will be populated here -->
                     </div>
                 </div>
-                 <div id="page-vc-playbooks" class="hidden p-4 sm:p-8 md:p-12">
-                     <header class="mb-8 flex justify-between items-baseline">
-                         <div>
-                            <h1 class="text-2xl sm:text-3xl font-bold tracking-tight">Firm Playbooks</h1>
-                            <p class="text-gray-500 mt-1 mono text-sm">Proprietary strategies for your portfolio companies.</p>
-                        </div>
-                        <button id="author-playbook-btn" class="bg-purple-700 text-white px-4 py-2 text-sm font-bold hover:bg-purple-800 transition-colors rounded-md">Author New Playbook</button>
-                    </header>
-                    <div class="mb-8">
-                        <h2 class="font-bold mb-4">Atomic Ventures' Custom Playbooks</h2>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div class="bg-white border border-gray-200 p-6 rounded-lg playbook-link cursor-pointer hover:shadow-md" data-playbook-id="board-meetings"><h3 class="font-bold mb-2">Our Guide to Board Meetings</h3><p class="text-sm text-gray-600">The essential template and best practices for running an effective board meeting.</p></div>
-                            <div class="bg-white border border-gray-200 p-6 rounded-lg playbook-link cursor-pointer hover:shadow-md" data-playbook-id="term-sheet"><h3 class="font-bold mb-2">Term Sheet Negotiation 101</h3><p class="text-sm text-gray-600">Key terms and strategies for a successful fundraise.</p></div>
-                        </div>
-                    </div>
-                     <div>
-                        <h2 class="font-bold mb-4">Playbooks Popular in Your Portfolio</h2>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div class="bg-white border border-gray-200 p-6 rounded-lg playbook-link cursor-pointer hover:shadow-md" data-playbook-id="eng-hiring"><h3 class="font-bold mb-2">Scaling Engineering Teams</h3><p class="text-sm text-gray-600">From 10 to 100 engineers. The definitive guide by Revolut.</p></div>
-                            <div class="bg-white border border-gray-200 p-6 rounded-lg playbook-link cursor-pointer hover:shadow-md" data-playbook-id="seed-deck"><h3 class="font-bold mb-2">The Perfect Seed Deck</h3><p class="text-sm text-gray-600">As recommended by Y Combinator for all their early-stage founders.</p></div>
-                        </div>
-                    </div>
-                 </div>
-                 <div id="page-vc-settings" class="hidden p-4 sm:p-8 md:p-12">
-                      <header class="mb-8"><h1 class="text-2xl sm:text-3xl font-bold tracking-tight">Settings</h1></header>
-                      <p>VC settings page placeholder.</p>
-                 </div>
+                 <div id="page-vc-playbooks" class="page p-6 h-full hidden">
+                    <h2 class="text-3xl font-bold mb-6">Playbook Library</h2>
+                    <p class="text-gray-600">Browse and manage the playbooks available to your portfolio companies.</p>
+                    <button id="author-playbook-btn" class="my-4 btn-primary font-bold py-2 px-4 rounded-lg">Author New Playbook</button>
+                    <!-- Simplified list for VC -->
+                </div>
             </div>
         </main>
-        
-        <div id="recording-interface" class="recording-interface hidden flex-col items-center">
-            <div id="liveRecordingTitle" class="live-recording-title hidden text-lg font-semibold">New Recording</div>
-            <canvas id="liveWaveformCanvas" class="hidden"></canvas>
-            <div id="liveRecordingTimerDisplay" class="live-recording-timer hidden">00:00.00</div>
-            <div id="recording-status-text" class="status-text text-gray-500 mb-4">Ready to record</div>
-            <div class="recording-controls">
-                <button id="recordButton" class="record-button" title="Start Recording"><div class="record-button-inner"><i class="fas fa-microphone"></i></div><svg class="record-waves" viewBox="0 0 200 200"><circle class="wave wave1" cx="100" cy="100" r="40" /><circle class="wave wave2" cx="100" cy="100" r="70" /></svg></button>
-            </div>
-        </div>
+    </div>
 
-        <!-- Generic Modal -->
-        <div id="modal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-50 z-50 flex items-center justify-center p-4">
-            <div id="modal-overlay" class="absolute inset-0"></div>
-            <div id="modal-content" class="modal-content bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto relative transform scale-95 opacity-0">
-                <div class="p-6">
-                    <div class="flex justify-between items-center pb-4 border-b border-gray-200">
-                        <h2 id="modal-title" class="text-xl font-bold">Modal Title</h2>
-                        <button id="modal-close-btn" class="text-gray-400 hover:text-gray-600 text-3xl leading-none">&times;</button>
-                    </div>
-                    <div id="modal-body" class="py-6">
-                        <!-- Modal content goes here -->
-                    </div>
-                </div>
+    <!-- Modal -->
+    <div id="modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 hidden">
+        <div id="modal-content" class="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] flex flex-col">
+            <div class="p-4 border-b flex justify-between items-center">
+                <h3 id="modal-title" class="text-xl font-bold">Modal Title</h3>
+                <button id="modal-close-btn" class="text-gray-500 hover:text-gray-800">&times;</button>
+            </div>
+            <div id="modal-body" class="p-6 overflow-y-auto prose max-w-none">
+                <!-- Modal content goes here -->
             </div>
         </div>
     </div>
-
+    
     <script type="module">
-        import { GoogleGenAI } from "@google/genai";
-        import { marked } from "marked";
+        // Mock Database
+        const db = {
+            playbooks: [
+                 // This will be populated by the detailed knowledge base below
+            ],
+            playbookKnowledgeBase: {
+                // Pre-Seed Playbooks
+                "PS.01": {
+                    title: "The Product-Market Fit Engine",
+                    category: "Product",
+                    stage: "Pre-Seed",
+                    diagnostic: "Stagnant user growth, high churn after signup, lukewarm user feedback, feature requests are all over the place.",
+                    actions: [
+                        "Aggressively survey users with the Superhuman PMF question: 'How would you feel if you could no longer use our product?'",
+                        "Segment users into 'Very disappointed', 'Somewhat disappointed', and 'Not disappointed'.",
+                        "Ignore the latter two groups. Focus exclusively on the 'Very disappointed' cohort.",
+                        "Interview these power users to deeply understand their 'why'. What job are they hiring your product to do?",
+                        "Build your product roadmap entirely around doubling down on what this core group loves."
+                    ],
+                    validation: "Are we willing to ignore some users and shrink our potential market in the short term to build something a small group of power users truly loves?",
+                    implementation: "Use tools like Tally or SurveyMonkey. Trigger the survey via email after a user has had enough time to experience the core value prop (e.g., 2 weeks).",
+                    result: "A crystal-clear, focused product roadmap. A renewed sense of purpose for the team.",
+                    impact_metric: "% of users answering 'Very disappointed' (Goal: >40%)"
+                },
+                "GS.01": {
+                    title: "The First 100 Users",
+                    category: "Growth",
+                    stage: "Pre-Seed",
+                    diagnostic: "Product is built, but user count is zero or near-zero. No clear channel for acquiring initial users.",
+                    actions: [
+                        "Do things that don't scale.",
+                        "Manually recruit users from relevant online communities (Reddit, Slack groups, Twitter).",
+                        "Personally onboard every single user.",
+                        "Write personalized emails. Do not automate anything at this stage.",
+                        "Leverage your personal and professional networks."
+                    ],
+                    validation: "Are we, as founders, willing to spend the majority of our time on manual, non-scalable user acquisition instead of coding?",
+                    implementation: "Create a spreadsheet to track every potential user you reach out to. Follow up relentlessly.",
+                    result: "A core group of initial users who feel personally invested in the product's success.",
+                    impact_metric: "Number of active, engaged users."
+                },
+                // Seed Playbooks
+                "GA.01": {
+                    title: "Finding Your Scalable GTM Channel",
+                    category: "Growth",
+                    stage: "Seed",
+                    diagnostic: "Initial traction is strong but comes from non-scalable sources (founder selling, word-of-mouth). Growth is linear, not exponential.",
+                    actions: [
+                        "Identify the top 3 potential scalable channels (e.g., PLG, Content Marketing, Paid Ads).",
+                        "Run disciplined, time-boxed experiments in each channel with a clear hypothesis and budget.",
+                        "Track metrics obsessively (CAC, conversion rates, payback period).",
+                        "Kill losing experiments quickly and ruthlessly.",
+                        "Once a winning channel is identified, pour resources into it and scale aggressively."
+                    ],
+                    validation: "Are we willing to accept that our initial assumptions about our GTM strategy might be wrong and let the data guide us?",
+                    implementation: "Use a simple sprint process for each channel experiment. Hold weekly reviews to assess progress against goals.",
+                    result: "Identification of at least one repeatable, scalable customer acquisition channel.",
+                    impact_metric: "Customer Acquisition Cost (CAC) and LTV/CAC Ratio."
+                },
+                "PA.04": {
+                    title: "Addressing Technical Debt",
+                    category: "Product",
+                    stage: "Seed",
+                    diagnostic: "Shipping velocity is slowing down. Small changes cause unpredictable bugs. Engineers are losing motivation and express frustration with the 'brittle' codebase.",
+                    actions: [
+                        "Declare a 'fix-it' sprint or allocate a percentage of every sprint (e.g., 20%) to tech debt.",
+                        "Create a prioritized backlog of tech debt items based on their impact on developer velocity and system stability.",
+                        "Focus on improving automated test coverage.",
+                        "Refactor the most painful parts of the codebase.",
+                        "Communicate to the board and company that you are intentionally slowing down feature development to increase long-term speed."
+                    ],
+                    validation: "Are we willing to trade short-term feature output for long-term stability and developer productivity?",
+                    implementation: "Use code quality tools to identify hotspots. Track developer sentiment through informal check-ins. Make tech debt a regular part of sprint planning.",
+                    result: "Improved developer morale, increased shipping velocity, and a more stable platform.",
+                    impact_metric: "Cycle Time (from commit to deploy) and Bug Rate."
+                },
+                 // Add more playbooks from the document here...
+            },
+            reports: [
+                { id: 1, company: 'Starlight AI', date: '2025-10-06', status: 'Submitted', content: '...' },
+                { id: 2, company: 'Momentum', date: '2025-10-05', status: 'Submitted', content: '...' },
+            ],
+            portfolio: [
+                { name: 'Starlight AI', ceo: 'Dr. Elena Vance', health: 'green', arr: '$2.1M', growth: '+15% MoM' },
+                { name: 'Momentum', ceo: 'Alex Chen', health: 'yellow', arr: '$850k', growth: '+5% MoM' },
+                { name: 'QuantumLeap', ceo: 'Ben Carter', health: 'red', arr: '$300k', growth: '-2% MoM' },
+            ],
+        };
 
-        const MODEL_NAME = 'gemini-1.5-flash';
+        // Populate playbooks from the knowledge base
+        db.playbooks = Object.entries(db.playbookKnowledgeBase).map(([code, data]) => ({
+            id: code,
+            ...data
+        }));
 
+
+        // UI Elements
+        const ui = {
+            viewToggle: document.getElementById('view-toggle'),
+            ceoView: document.getElementById('ceo-view'),
+            vcView: document.getElementById('vc-view'),
+            ceoNav: document.getElementById('ceo-nav'),
+            vcNav: document.getElementById('vc-nav'),
+            sidebar: document.getElementById('sidebar'),
+            apiKeyInput: document.getElementById('api-key'),
+            saveApiKeyBtn: document.getElementById('save-api-key'),
+            recordBtn: document.getElementById('record-btn'),
+            recordingStatus: document.getElementById('recording-status'),
+            reportGenerationDiv: document.getElementById('report-generation'),
+            transcriptionText: document.getElementById('transcription-text'),
+            analysisJson: document.getElementById('analysis-json'),
+            draftReportMarkdown: document.getElementById('draft-report-markdown'),
+            finalizeReportBtn: document.getElementById('finalize-report-btn'),
+            modal: document.getElementById('modal'),
+            modalContent: document.getElementById('modal-content'),
+            modalTitle: document.getElementById('modal-title'),
+            modalBody: document.getElementById('modal-body'),
+            modalCloseBtn: document.getElementById('modal-close-btn'),
+            playbookCategoryFilters: document.getElementById('playbook-category-filters'),
+            ceoPlaybooksList: document.getElementById('ceo-playbooks-list'),
+            vcPortfolioList: document.getElementById('vc-portfolio-list'),
+            // New AI Chat UI elements
+            aiChatView: document.getElementById('ai-chat-view'),
+            playbookLibraryView: document.getElementById('playbook-library-view'),
+            browseLibraryBtn: document.getElementById('browse-library-btn'),
+            chatHistory: document.getElementById('chat-history'),
+            chatForm: document.getElementById('chat-form'),
+            chatInput: document.getElementById('chat-input'),
+        };
+
+        // Global State
+        let currentView = 'ceo';
+        let currentPage = 'dashboard';
+        let geminiApiKey = localStorage.getItem('geminiApiKey') || '';
+        let dictationService;
+
+        // --- Core Services ---
+        
         class DictationService {
-            constructor(options) {
-                this.genAI = null;
-                this.apiKey = options.apiKey;
-                
-                if (this.apiKey) {
-                    try {
-                        this.genAI = new GoogleGenAI({ apiKey: this.apiKey });
-                    } catch (e) {
-                        console.error("Failed to initialize GoogleGenAI:", e);
-                    }
-                }
-                
-                this.recordButton = options.recordButton;
-                this.statusTextElement = options.statusTextElement;
-                this.onProcessingComplete = options.onProcessingComplete;
-                this.onRecordingStart = options.onRecordingStart;
-                this.onRecordingStop = options.onRecordingStop;
-                
-                this.liveWaveformCanvas = document.getElementById('liveWaveformCanvas');
-                this.liveRecordingTimerDisplay = document.getElementById('liveRecordingTimerDisplay');
-                this.recordingInterface = document.getElementById('recording-interface');
-                this.liveRecordingTitle = document.getElementById('liveRecordingTitle');
-
-                if (this.liveWaveformCanvas) {
-                    this.liveWaveformCtx = this.liveWaveformCanvas.getContext('2d');
-                }
-                
-                this.audioChunks = [];
-                this.isRecording = false;
-                this.mediaRecorder = null;
-                this.stream = null;
-                this.audioContext = null;
-
-                this.bindEventListeners();
-            }
-            
-            isReady() {
-                return this.genAI !== null;
+             // ... [omitted for brevity - same as index-2.html]
+        }
+        
+        class ConversationalAIService {
+            constructor(apiKey, knowledgeBase, uiElements) {
+                this.apiKey = apiKey;
+                this.apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${this.apiKey}`;
+                this.knowledgeBase = knowledgeBase;
+                this.ui = uiElements;
+                this.state = {
+                    phase: 'DIAGNOSING', // DIAGNOSING, RECOMMENDING, OPERATIONALIZING_STEP_*, FEEDBACK
+                    activePlaybook: null,
+                    currentStep: 0,
+                };
+                this.initialize();
             }
 
-            bindEventListeners() {
-                this.recordButton.addEventListener('click', () => this.toggleRecording());
-                window.addEventListener('resize', () => this.handleResize());
-            }
-            
-            handleResize() { if (this.isRecording) requestAnimationFrame(() => this.setupCanvasDimensions()); }
-
-            setupCanvasDimensions() {
-                if (!this.liveWaveformCanvas || !this.liveWaveformCtx) return;
-                const canvas = this.liveWaveformCanvas;
-                const dpr = window.devicePixelRatio || 1;
-                const rect = canvas.getBoundingClientRect();
-                canvas.width = rect.width * dpr;
-                canvas.height = rect.height * dpr;
-                this.liveWaveformCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+            initialize() {
+                this.addMessage('ai', "Welcome. I'm your AI Co-Pilot. To get started, please describe the single biggest challenge you're facing this week.");
+                this.ui.chatForm.addEventListener('submit', this.handleUserInput.bind(this));
             }
 
-            async toggleRecording() {
-                if (!this.isReady()) {
-                    console.error("Dictation service not ready. API Key might be missing or invalid.");
-                    this.statusTextElement.textContent = 'API Key invalid.';
-                    this.statusTextElement.style.color = 'red';
-                    return;
-                }
-                this.isRecording ? await this.stopRecording() : await this.startRecording();
-            }
-            
-            async startRecording() {
+            async handleUserInput(e) {
+                e.preventDefault();
+                const userInput = this.ui.chatInput.value.trim();
+                if (!userInput) return;
+
+                this.addMessage('user', userInput);
+                this.ui.chatInput.value = '';
+                this.ui.chatInput.style.height = 'auto'; // Reset height
+                this.setLoading(true);
+
                 try {
-                    this.audioChunks = [];
-                    this.statusTextElement.textContent = 'Requesting microphone...';
-                    this.stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                    
-                    this.mediaRecorder = new MediaRecorder(this.stream);
-                    this.mediaRecorder.ondataavailable = e => { if (e.data.size > 0) this.audioChunks.push(e.data) };
-                    this.mediaRecorder.onstop = () => {
-                        if (this.onRecordingStop) this.onRecordingStop();
-                        this.stopLiveDisplay();
-                        if (this.audioChunks.length > 0) {
-                            const audioBlob = new Blob(this.audioChunks, { type: this.mediaRecorder?.mimeType || 'audio/webm' });
-                            this.processAudio(audioBlob);
-                        }
-                        if (this.stream) this.stream.getTracks().forEach(track => track.stop());
-                    };
-
-                    this.mediaRecorder.start();
-                    this.isRecording = true;
-                    this.recordButton.classList.add('recording');
-                    this.recordButton.title = 'Stop Recording';
-                    this.startLiveDisplay();
-                    if(this.onRecordingStart) this.onRecordingStart();
-
+                    switch (this.state.phase) {
+                        case 'DIAGNOSING':
+                            await this.diagnoseProblem(userInput);
+                            break;
+                        case 'RECOMMENDING':
+                            // Handle user feedback on recommendation, e.g., "Yes" or "No"
+                            if (userInput.toLowerCase().includes('yes') || userInput.toLowerCase().includes('ok')) {
+                                this.startOperationalization();
+                            } else {
+                                this.resetConversation();
+                                this.addMessage('ai', "I understand. Let's try again. What's the biggest challenge on your mind?");
+                            }
+                            break;
+                        case 'OPERATIONALIZING':
+                             if (userInput.toLowerCase().includes('next') || userInput.toLowerCase().includes('ok') || userInput.toLowerCase().includes('yes')) {
+                                this.advanceStep();
+                            } else if (userInput.toLowerCase().includes('restart')) {
+                                this.resetConversation();
+                                this.addMessage('ai', "Let's start over. What is your current main challenge?");
+                            }
+                            else {
+                                // For more complex interactions, you could send this to the LLM for a nuanced response
+                                this.addMessage('ai', "Got it. When you're ready to proceed to the next step, just say 'next'.");
+                            }
+                            break;
+                        // default:
+                        //     this.addMessage('ai', "I'm not sure how to handle that right now.");
+                    }
                 } catch (error) {
-                    console.error("Error starting recording:", error);
-                    this.statusTextElement.textContent = 'Microphone access denied.';
+                    console.error("AI Service Error:", error);
+                    this.addMessage('ai', "Sorry, I encountered an error. Please check your API key and connection, then try again.");
+                } finally {
+                    this.setLoading(false);
                 }
             }
             
-            async stopRecording() {
-                if (this.mediaRecorder && this.isRecording) {
-                    this.mediaRecorder.stop();
-                    this.isRecording = false;
-                    this.recordButton.classList.remove('recording');
-                    this.recordButton.title = 'Start Recording';
-                    this.statusTextElement.textContent = 'Processing...';
-                }
-            }
-            
-            startLiveDisplay() {
-                this.recordingInterface.classList.add('is-live');
-                ['liveRecordingTitle', 'liveWaveformCanvas', 'liveRecordingTimerDisplay'].forEach(id => document.getElementById(id)?.classList.remove('hidden'));
-                this.setupCanvasDimensions();
-                const icon = this.recordButton.querySelector('i');
-                if(icon) { icon.classList.remove('fa-microphone'); icon.classList.add('fa-stop'); }
-                this.setupAudioVisualizer();
-                this.drawLiveWaveform();
-                this.recordingStartTime = Date.now();
-                if (this.timerIntervalId) clearInterval(this.timerIntervalId);
-                this.timerIntervalId = setInterval(() => this.updateLiveTimer(), 50);
-            }
+            async diagnoseProblem(userInput) {
+                const systemPrompt = `You are an AI startup advisor. Your task is to diagnose a founder's problem and match it to a specific playbook from the provided knowledge base.
+                Analyze the user's message.
+                Compare it to the 'diagnostic' field of each playbook in the JSON knowledge base.
+                Respond ONLY with the unique code (e.g., "PS.01", "GA.01") of the best-matching playbook. Do not add any other text, explanation, or punctuation.
 
-            stopLiveDisplay() {
-                 this.recordingInterface.classList.remove('is-live');
-                 setTimeout(() => this.recordingInterface.classList.add('hidden'), 500);
-                ['liveRecordingTitle', 'liveWaveformCanvas', 'liveRecordingTimerDisplay'].forEach(id => document.getElementById(id)?.classList.add('hidden'));
-                const icon = this.recordButton.querySelector('i');
-                if(icon) { icon.classList.remove('fa-stop'); icon.classList.add('fa-microphone'); }
-                if (this.waveformDrawingId) cancelAnimationFrame(this.waveformDrawingId);
-                if (this.timerIntervalId) clearInterval(this.timerIntervalId);
-                if (this.audioContext && this.audioContext.state !== 'closed') this.audioContext.close();
-                this.audioContext = null;
-            }
+                Knowledge Base:
+                ${JSON.stringify(this.knowledgeBase)}
+                `;
 
-            setupAudioVisualizer() {
-                if (!this.stream) return;
-                this.audioContext = new AudioContext();
-                const source = this.audioContext.createMediaStreamSource(this.stream);
-                this.analyserNode = this.audioContext.createAnalyser();
-                this.analyserNode.fftSize = 256;
-                this.waveformDataArray = new Uint8Array(this.analyserNode.frequencyBinCount);
-                source.connect(this.analyserNode);
-            }
+                const responseText = await this.makeApiCall(systemPrompt, userInput);
+                const playbookCode = responseText.trim().replace(/"/g, ''); // Clean up response
 
-            drawLiveWaveform() {
-                if (!this.isRecording) return;
-                requestAnimationFrame(() => this.drawLiveWaveform());
-                if (!this.analyserNode) return;
-                this.analyserNode.getByteFrequencyData(this.waveformDataArray);
-                const ctx = this.liveWaveformCtx, canvas = this.liveWaveformCanvas;
-                if(!ctx || !canvas) return;
-                ctx.clearRect(0, 0, canvas.clientWidth, canvas.clientHeight);
-                const numBars = this.waveformDataArray.length * 0.5;
-                const barWidth = canvas.clientWidth / numBars * 0.7;
-                let x = 0;
-                ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--color-recording').trim();
-                for (let i = 0; i < numBars; i++) {
-                    const barHeight = (this.waveformDataArray[i] / 255) * canvas.clientHeight;
-                    ctx.fillRect(x, (canvas.clientHeight - barHeight) / 2, barWidth, barHeight);
-                    x += barWidth * 1.3;
-                }
-            }
-            
-            updateLiveTimer() {
-                const elapsedMs = Date.now() - this.recordingStartTime;
-                const minutes = Math.floor(elapsedMs / 60000);
-                const seconds = Math.floor((elapsedMs % 60000) / 1000);
-                const hundredths = Math.floor((elapsedMs % 1000) / 10);
-                this.liveRecordingTimerDisplay.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}.${String(hundredths).padStart(2, '0')}`;
-            }
-
-            async processAudio(audioBlob) {
-                const base64Audio = await new Promise((resolve, reject) => {
-                    const reader = new FileReader();
-                    reader.onloadend = () => resolve(reader.result.split(',')[1]);
-                    reader.onerror = reject;
-                    reader.readAsDataURL(audioBlob);
-                });
-                const mimeType = this.mediaRecorder?.mimeType || 'audio/webm';
-                await this.getTranscription(base64Audio, mimeType);
-            }
-
-            async getTranscription(base64Audio, mimeType) {
-                try {
-                    const contents = [{ text: 'Please provide a verbatim transcript of this audio recording.' }, { inlineData: { mimeType, data: base64Audio } }];
-                    const response = await this.genAI.models.generateContent({ model: MODEL_NAME, contents });
-                    this.getPolishedNote(response.text);
-                } catch (error) { 
-                    console.error("Error during transcription:", error);
-                    this.onProcessingComplete(null, null, { error: `Transcription failed: ${error.message}` }); 
+                if (this.knowledgeBase[playbookCode]) {
+                    this.state.activePlaybook = this.knowledgeBase[playbookCode];
+                    this.state.phase = 'RECOMMENDING';
+                    this.addMessage('ai', `Thank you for sharing. It sounds like you're dealing with symptoms related to: **${this.state.activePlaybook.diagnostic}**`);
+                    setTimeout(() => {
+                         this.addMessage('ai', `Based on that, I recommend we focus on Playbook **${playbookCode}: ${this.state.activePlaybook.title}**. This is designed to address exactly this kind of challenge. Does that sound like the right focus for now?`);
+                    }, 1000);
+                } else {
+                    this.addMessage('ai', "I'm sorry, I couldn't identify a specific playbook for that challenge. Could you please describe it in a different way?");
                 }
             }
 
-            async getPolishedNote(rawTranscription) {
-                 try {
-                    if (!rawTranscription.trim()) { 
-                        this.onProcessingComplete(null, rawTranscription, { arr: 'N/A', growth: 'N/A', runway: 'N/A' });
+            startOperationalization() {
+                this.state.phase = 'OPERATIONALIZING';
+                this.state.currentStep = 0;
+                this.addMessage('ai', `Great. Let's walk through the playbook step-by-step. There are 6 key steps.`);
+                setTimeout(() => this.presentStep(), 500);
+            }
+
+            presentStep() {
+                const playbook = this.state.activePlaybook;
+                if (!playbook) return;
+
+                let message = '';
+                switch(this.state.currentStep) {
+                    case 0: // Diagnostic
+                        message = `**Step 1: Confirm the Diagnostic.** The playbook describes the symptoms as: *"${playbook.diagnostic}"*. Does this accurately reflect what you're experiencing?`;
+                        break;
+                    case 1: // Recommended Actions
+                        message = `**Step 2: Recommended Actions.** Here are the core plays to run:\n\n<ul class='list-disc pl-5'>${playbook.actions.map(action => `<li>${action}</li>`).join('')}</ul>`;
+                        break;
+                    case 2: // Founder Validation
+                         message = `**Step 3: Founder Validation.** This is a critical strategic gut-check. You need to ask yourself: *"${playbook.validation}"* \n\nThis is a go/no-go decision. How do you feel about that?`;
+                        break;
+                    case 3: // Implementation
+                        message = `**Step 4: Implementation.** Here's how to put this into practice: *"${playbook.implementation}"*. \n\nThis provides a concrete starting point.`;
+                        break;
+                    case 4: // Expected Result
+                        message = `**Step 5: Expected Result.** If we execute this playbook correctly, the expected outcome is: *"${playbook.result}"*`;
+                        break;
+                    case 5: // Measured Impact
+                        message = `**Step 6: Measured Impact.** To know if we're succeeding, we must track a specific metric. The key KPI for this playbook is: **${playbook.impact_metric}**.`;
+                        this.addMessage('ai', message);
+                        setTimeout(() => this.concludePlaybook(), 1000);
+                        return; // Exit here to avoid the "say next" message
+                    default:
+                        this.resetConversation();
+                        this.addMessage('ai', "We've completed the playbook. Let's start over. What's your next challenge?");
                         return;
-                    }
-                    const prompt = `
-                        Analyze the following raw transcript of a CEO's weekly update. Your task is to extract key information and create a polished summary.
-                        
-                        Respond with ONLY a JSON object in the following format, with no other text or markdown formatting:
-                        {
-                          "arr": "Extract the current ARR. Format as a string, e.g., '€1.2M'. If not mentioned, return 'N/A'.",
-                          "growth": "Extract the month-over-month growth. Format as a string, e.g., '+23%'. If not mentioned, return 'N/A'.",
-                          "runway": "Extract the current runway. Format as a string, e.g., '18mo'. If not mentioned, return 'N/A'.",
-                          "wins": [
-                            "List key wins as an array of strings."
-                          ],
-                          "challenges": [
-                             "List key challenges as an array of strings."
-                          ],
-                          "insights": [
-                            "List key strategic insights or learnings as an array of strings."
-                          ],
-                          "fullSummary": "Create a polished, professional, and concise investor update in Markdown format based on the transcript. Synthesize the core ideas and structure the output clearly using headings like ### Wins, ### Challenges, and ### Next Steps. Use bullet points for lists of achievements, tasks, or metrics. Remove all filler words and correct grammar."
-                        }
+                }
+                 this.addMessage('ai', message);
+                 if (this.state.currentStep < 5) {
+                    setTimeout(() => this.addMessage('ai', "Say 'next' when you're ready to proceed.", 'subtle'), 500);
+                 }
+            }
 
-                        Here is the raw transcript:
-                        ---
-                        ${rawTranscription}
-                        ---
-                    `;
-                    const contents = [{ text: prompt }];
-                    const result = await this.genAI.models.generateContent({ model: MODEL_NAME, contents });
-                    const jsonText = result.text.match(/```json\n([\s\S]*?)\n```/)[1];
-                    const data = JSON.parse(jsonText);
-                    this.onProcessingComplete(data, rawTranscription, null);
-                } catch (error) { 
-                    console.error("Error during polishing:", error);
-                    this.onProcessingComplete(null, rawTranscription, { error: `AI analysis failed: ${error.message}` });
+            advanceStep() {
+                this.state.currentStep++;
+                this.presentStep();
+            }
+
+            concludePlaybook() {
+                this.addMessage('ai', "You have a clear plan. This is a huge step. I'll set a reminder to check back in a few weeks on how your key metric is progressing. Excellent work.");
+                this.state.phase = 'FEEDBACK'; // Or reset
+            }
+            
+            resetConversation() {
+                this.state.phase = 'DIAGNOSING';
+                this.state.activePlaybook = null;
+                this.state.currentStep = 0;
+            }
+
+            async makeApiCall(systemPrompt, userPrompt) {
+                 if (!this.apiKey) {
+                    throw new Error("API key is not set.");
+                }
+                const payload = {
+                    systemInstruction: { parts: [{ text: systemPrompt }] },
+                    contents: [{ parts: [{ text: userPrompt }] }],
+                };
+                const response = await fetch(this.apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                if (!response.ok) {
+                    throw new Error(`API call failed with status: ${response.status}`);
+                }
+                const result = await response.json();
+                return result.candidates[0].content.parts[0].text;
+            }
+            
+            addMessage(sender, text, type = 'normal') {
+                const bubble = document.createElement('div');
+                bubble.className = `chat-bubble p-3 rounded-lg ${sender === 'user' ? 'self-end user-bubble' : 'self-start ai-bubble'}`;
+                
+                if (type === 'subtle') {
+                   bubble.classList.add('opacity-75', 'italic', 'text-sm');
+                }
+
+                // Basic markdown for bold and lists
+                text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+                bubble.innerHTML = text;
+                
+                if (sender === 'ai') {
+                    const icon = document.createElement('div');
+                    icon.className = 'w-8 h-8 bg-purple-200 rounded-full flex items-center justify-center mr-2 flex-shrink-0';
+                    icon.innerHTML = `<i class="fas fa-robot text-purple-700"></i>`;
+                    const container = document.createElement('div');
+                    container.className = 'flex items-start';
+                    container.appendChild(icon);
+                    container.appendChild(bubble);
+                    this.ui.chatHistory.appendChild(container);
+                } else {
+                    const container = document.createElement('div');
+                    container.className = 'flex justify-end';
+                    container.appendChild(bubble);
+                    this.ui.chatHistory.appendChild(container);
+                }
+                this.ui.chatHistory.scrollTop = this.ui.chatHistory.scrollHeight;
+            }
+
+            setLoading(isLoading) {
+                 const existingSpinner = this.ui.chatHistory.querySelector('.spinner');
+                 if (isLoading) {
+                    if(!existingSpinner) {
+                        const spinnerContainer = document.createElement('div');
+                        spinnerContainer.className = 'spinner flex items-start';
+                        spinnerContainer.innerHTML = `
+                            <div class="w-8 h-8 bg-purple-200 rounded-full flex items-center justify-center mr-2 flex-shrink-0"><i class="fas fa-robot text-purple-700"></i></div>
+                            <div class="ai-bubble p-3 rounded-lg"><span class="animate-pulse">...</span></div>
+                        `;
+                        this.ui.chatHistory.appendChild(spinnerContainer);
+                        this.ui.chatHistory.scrollTop = this.ui.chatHistory.scrollHeight;
+                    }
+                } else {
+                    if (existingSpinner) {
+                        existingSpinner.remove();
+                    }
                 }
             }
         }
+        
+        // --- UI Functions ---
 
-
-        document.addEventListener('DOMContentLoaded', function() {
-            let dictationService = null;
-            let currentView = 'ceo';
-            let latestGeneratedReport = {};
-            let activePlaybookCategories = [];
-
-            const ui = {
-                sidebar: document.getElementById('sidebar'),
-                mobileMenuBtn: document.getElementById('mobile-menu-btn'),
-                ceoView: document.getElementById('ceo-view'),
-                vcView: document.getElementById('vc-view'),
-                ceoNav: document.getElementById('ceo-nav'),
-                vcNav: document.getElementById('vc-nav'),
-                ceoPlaybookList: document.getElementById('ceo-playbook-list'),
-                playbookCategoryFilters: document.getElementById('playbook-category-filters'),
-                vcPortfolioList: document.getElementById('vc-portfolio-list'),
-
-                pages: {
-                     dashboard: document.getElementById('page-dashboard'), recording: document.getElementById('page-recording'), reports: document.getElementById('page-reports'), playbooks: document.getElementById('page-playbooks'), integrations: document.getElementById('page-integrations'), settings: document.getElementById('page-settings'),
-                     vcDashboard: document.getElementById('page-vc-dashboard'), vcPlaybooks: document.getElementById('page-vc-playbooks'), vcSettings: document.getElementById('page-vc-settings'),
-                },
-                navLinks: { 
-                    ceo: { dashboard: document.getElementById('nav-dashboard'), reports: document.getElementById('nav-reports'), playbooks: document.getElementById('nav-playbooks'), integrations: document.getElementById('nav-integrations'), settings: document.getElementById('nav-settings') },
-                    vc: { dashboard: document.getElementById('nav-vc-dashboard'), playbooks: document.getElementById('nav-vc-playbooks'), settings: document.getElementById('nav-vc-settings'), }
-                },
-                startRecordingBtn: document.getElementById('start-recording-btn'), newReportBtn: document.getElementById('new-report-btn'), recordButton: document.getElementById('recordButton'),
-                recordingInterface: document.getElementById('recording-interface'), processingState: document.getElementById('processing-state'), processingStatus: document.getElementById('processing-status'), completedState: document.getElementById('completed-state'),
-                
-                extractedIntelligenceContainer: document.getElementById('extracted-intelligence'),
-                strategicUpdateContainer: document.getElementById('strategic-update'),
-
-                authorPlaybookBtn: document.getElementById('author-playbook-btn'),
-
-                apiKeyBanner: document.getElementById('api-key-banner'), bannerSettingsLink: document.getElementById('banner-settings-link'), apiKeyInput: document.getElementById('api-key-input'),
-                saveApiKeyBtn: document.getElementById('save-api-key-btn'), apiKeyStatus: document.getElementById('api-key-status'),
-                viewToggle: document.getElementById('view-toggle'), userName: document.getElementById('user-name'), userCompany: document.getElementById('user-company'), userAvatar: document.getElementById('user-avatar'),
-                ceoLabel: document.getElementById('ceo-label'), vcLabel: document.getElementById('vc-label'),
-
-                modal: document.getElementById('modal'), modalOverlay: document.getElementById('modal-overlay'), modalContent: document.getElementById('modal-content'),
-                modalTitle: document.getElementById('modal-title'), modalBody: document.getElementById('modal-body'), modalCloseBtn: document.getElementById('modal-close-btn'),
-            };
-
-            const db = {
-                companies: {
-                    innovate: { name: 'Innovate Inc.', status: 'On Track', metrics: { arr: '€2.1M', growth: '+18%', runway: '24mo' } },
-                    quantum: { name: 'QuantumLeap', status: 'Needs Attention', metrics: { arr: '€800K', growth: '-5%', runway: '9mo' } },
-                    synergy: { name: 'Synergy AI', status: 'On Track', metrics: { arr: '€4.5M', growth: '+25%', runway: '16mo' } },
-                    dataforge: { name: 'DataForge', status: 'On Track', metrics: { arr: '€1.5M', growth: '+12%', runway: '20mo' } },
-                    nextech: { name: 'NexTech', status: 'On Track', metrics: { arr: '€3.2M', growth: '+15%', runway: '18mo' } },
-                    cloudscape: { name: 'Cloudscape', status: 'Needs Attention', metrics: { arr: '€950K', growth: '+2%', runway: '11mo' } },
-                    biogen: { name: 'BioGen', status: 'On Track', metrics: { arr: '€1.8M', growth: '+20%', runway: '22mo' } },
-                    finwise: { name: 'FinWise', status: 'On Track', metrics: { arr: '€5.1M', growth: '+19%', runway: '15mo' } },
-                    logix: { name: 'Logix', status: 'On Track', metrics: { arr: '€2.8M', growth: '+14%', runway: '19mo' } },
-                    zenith: { name: 'Zenith VR', status: 'On Track', metrics: { arr: '€1.1M', growth: '+30%', runway: '14mo' } },
-                },
-                reports: {
-                    w36: { title: 'Weekly Update - W36', date: 'Sep 5, 2025', metrics: { arr: '€1.2M', growth: '+23%', runway: '18mo' }, content: '<h3>Wins</h3><ul><li>Strong month with 23% MoM growth.</li><li>Closed 3 enterprise deals totaling €240k in new ARR.</li></ul><h3>Challenges</h3><ul><li>Engineering hiring remains top priority.</li></ul>' },
-                    w35: { title: 'Weekly Update - W35', date: 'Aug 29, 2025', metrics: { arr: '€1.1M', growth: '+15%', runway: '19mo' }, content: '<h3>Wins</h3><ul><li>Onboarded 2 major enterprise clients: Globex Corp and Innovate LLC.</li><li>Successful launch of the new analytics dashboard.</li></ul><h3>Next Steps</h3><ul><li>Begin planning for Series A raise in Q1 2026.</li></ul>' },
-                    w34: { title: 'Weekly Update - W34', date: 'Aug 22, 2025', metrics: { arr: '€1.05M', growth: '+5%', runway: '20mo' }, content: '<h3>Challenges</h3><ul><li>Unexpected churn from a mid-market customer.</li><li>Technical debt is slowing down feature development.</li></ul>' },
-                    innovate: { title: 'Weekly Update - Innovate Inc.', date: 'Sep 5, 2025', metrics: { arr: '€2.1M', growth: '+18%', runway: '24mo' }, content: '<h3>Wins</h3><ul><li>Product-market fit scores are at an all-time high after the v2.1 launch.</li><li>Closed a strategic partnership with a major distributor.</li></ul>' },
-                    quantum: { title: 'Weekly Update - QuantumLeap', date: 'Sep 5, 2025', metrics: { arr: '€800K', growth: '-5%', runway: '9mo' }, content: '<h3>Challenges</h3><ul><li>Marketing experiment with paid social showed higher than expected CAC.</li><li>Key engineering hire resigned.</li></ul><h3>Next Steps</h3><ul><li>Focusing on organic channels for Q4.</li><li>Opening up search for a new lead engineer.</li></ul>' },
-                    synergy: { title: 'Weekly Update - Synergy AI', date: 'Sep 5, 2025', metrics: { arr: '€4.5M', growth: '+25%', runway: '16mo' }, content: '<h3>Wins</h3><ul><li>Landed our first F500 customer.</li><li>Team morale is very high after the offsite.</li></ul>' },
-                },
-                playbooks: {
-                    'plg': { category: 'Growth', title: 'Product-Led Growth Engine', company: 'SLACK', content: '<h3>Key Idea</h3><p>Focus on making the product itself the primary driver of user acquisition, conversion, and expansion.</p><ul><li>Freemium model to reduce friction.</li><li>Seamless user onboarding.</li><li>Built-in virality (e.g., inviting colleagues).</li></ul>' },
-                    'outbound': { category: 'Growth', title: 'Outbound Sales Cadence', company: 'HUBSPOT', content: '<h3>Key Idea</h3><p>A structured sequence of touchpoints (email, call, social) to engage prospects.</p><ol><li>Day 1: Personalized Email</li><li>Day 3: LinkedIn Connection Request</li><li>Day 5: Follow-up Email + Call</li></ol>' },
-                    'eng-hiring': { category: 'Hiring', title: 'Scaling Engineering Teams', company: 'REVOLUT', content: `<h3>Key Principles</h3><ul><li><strong>Hire for Slope, Not Just Experience:</strong> Look for candidates with a steep learning curve and high potential, not just years on a resume.</li><li><strong>Bar Raiser Interviews:</strong> Involve a senior engineer from a different team in the final interview loop to maintain a consistently high bar for talent.</li><li><strong>Practical Problem Solving:</strong> Use a take-home project or a pair-programming session that mirrors real-world work.</li></ul>` },
-                    'remote': { category: 'Hiring', title: 'Remote Transformation', company: 'GITLAB', content: '<h3>Key Idea</h3><p>Build a thriving, productive company with no physical offices.</p><ul><li>Document everything in a central handbook.</li><li>Promote asynchronous communication.</li><li>Invest in tools for remote collaboration.</li></ul>' },
-                    'seed-deck': { category: 'Fundraising', title: 'The Perfect Seed Deck', company: 'Y COMBINATOR', content: `<h3>The 10-Slide Structure</h3><ol><li>Title</li><li>Problem</li><li>Solution</li><li>Market Size</li><li>Product</li><li>Traction</li><li>Team</li><li>Competition</li><li>Business Model</li><li>The Ask</li></ol>` },
-                    'board-meeting': { category: 'Fundraising', title: 'Board Meeting Excellence', company: 'SPOTIFY', content: '<h3>Key Idea</h3><p>Structure board meetings around strategic decisions, not just updates.</p><ul><li>Send materials 48 hours in advance.</li><li>Focus 80% of time on forward-looking strategy.</li><li>Use a data-driven appendix for metrics.</li></ul>' },
-                    'product-docs': { category: 'Product', title: 'Writing Great Product Docs', company: 'INTERCOM', content: '<h3>Key Idea</h3><p>Structure product docs around the "Why, What, and How" to ensure clarity for the entire team.</p><ul><li><strong>Why:</strong> The problem you are solving and for whom.</li><li><strong>What:</strong> The scope of the feature, including user stories and success metrics.</li><li><strong>How:</strong> High-level technical approach and design mocks.</li></ul>' },
-                    'user-interviews': { category: 'Product', title: 'Effective User Interviews', company: 'STRIPE', content: '<h3>Key Idea</h3><p>Ask open-ended questions about past behavior, not future intentions. Focus on understanding their problems deeply rather than pitching your solution.</p>' },
-                    'enterprise-sales': { category: 'Sales', title: 'Enterprise Sales Playbook', company: 'SALESFORCE', content: '<h3>Key Idea</h3><p>Navigate complex sales cycles by mapping the organization, identifying the champion, economic buyer, and technical buyer, and building consensus across the buying committee.</p>' },
-                    'saas-pricing': { category: 'Sales', title: 'Value-Based SaaS Pricing', company: 'TWILIO', content: '<h3>Key Idea</h3><p>Price your product based on the value it delivers to the customer segment, not on your costs or competitor prices. Common models include per-user, usage-based, and tiered pricing.</p>' },
-                    'cap-table': { category: 'Legal', title: 'Cap Table Management', company: 'CARTA', content: '<h3>Key Idea</h3><p>Maintain a clean and accurate capitalization table from day one. It is the single source of truth for company ownership and is critical for fundraising and employee equity.</p>' },
-                    'nda': { category: 'Legal', title: 'When to Use an NDA', company: 'WILSON SONSINI', content: '<h3>Key Idea</h3><p>Use Non-Disclosure Agreements sparingly. They are standard for M&A or deep strategic partnerships, but create unnecessary friction when talking to most VCs or potential hires.</p>' },
-                    'board-meetings': { title: "Our Guide to Board Meetings", content: "<h3>The Atomic Ventures Board Meeting Framework</h3><p>The essential template and best practices for running an effective board meeting that drives decisions, not just reporting.</p><ol><li><strong>Pre-Meeting:</strong> Send a concise pre-read 72 hours in advance, highlighting key decisions needed.</li><li><strong>Meeting Structure:</strong> 10% review of past performance, 60% strategic discussion on 2-3 key topics, 30% open discussion and administrative.</li><li><strong>Post-Meeting:</strong> Send minutes and action items within 24 hours.</li></ol>" },
-                    'term-sheet': { title: "Term Sheet Negotiation 101", content: "<h3>Key Terms for Founders</h3><p>Key terms and strategies for a successful fundraise, focusing on founder-friendly outcomes.</p><ul><li><strong>Valuation:</strong> Understand pre-money vs. post-money.</li><li><strong>Liquidation Preference:</strong> Aim for 1x, non-participating.</li><li><strong>Board Composition:</strong> Ensure founder control or a balanced board.</li><li><strong>Vesting:</strong> Standard is 4-year vest with a 1-year cliff.</li></ul>" }
-                }
-            };
-
-            function showPage(pageName) {
-                const pageMap = {
-                    'dashboard': ui.pages.dashboard, 'recording': ui.pages.recording, 'reports': ui.pages.reports, 'playbooks': ui.pages.playbooks, 'integrations': ui.pages.integrations, 'settings': ui.pages.settings,
-                    'vc-dashboard': ui.pages.vcDashboard, 'vc-playbooks': ui.pages.vcPlaybooks, 'vc-settings': ui.pages.vcSettings,
-                };
-                Object.values(pageMap).forEach(page => page?.classList.add('hidden'));
-                pageMap[pageName]?.classList.remove('hidden');
-
-                const navMap = currentView === 'ceo' ? ui.navLinks.ceo : ui.navLinks.vc;
-                const navKey = pageName.replace('vc-', '');
-                Object.values(navMap).forEach(link => link?.classList.remove('active'));
-                navMap[navKey]?.classList.add('active');
-                
-                if (ui.sidebar.classList.contains('translate-x-0')) {
-                    ui.sidebar.classList.remove('translate-x-0');
-                    ui.sidebar.classList.add('-translate-x-full');
-                }
-            }
+        function showPage(pageId) {
+            document.querySelectorAll('.page').forEach(page => page.classList.add('hidden'));
+            document.getElementById(`page-${pageId}`).classList.remove('hidden');
             
-            function initializeDictationService(apiKey) {
-                dictationService = new DictationService({
-                    apiKey: apiKey, recordButton: ui.recordButton, statusTextElement: document.getElementById('recording-status-text'),
-                    onRecordingStart: () => ui.recordingInterface.classList.remove('hidden'),
-                    onRecordingStop: () => {
-                        showPage('recording'); ui.recordingInterface.classList.add('hidden'); ui.processingState.classList.remove('hidden'); ui.completedState.classList.add('hidden'); ui.processingStatus.textContent = 'Transcribing audio...';
-                    },
-                    onProcessingComplete: (data, rawText, error) => {
-                         latestGeneratedReport = { ...data, raw: rawText };
-                         renderCompletedState(latestGeneratedReport);
-                         ui.processingState.classList.add('hidden');
-                         ui.completedState.classList.remove('hidden');
-                    }
-                });
-                updateRecordButtonState();
+            const navId = currentView === 'ceo' ? '#ceo-nav' : '#vc-nav';
+            document.querySelectorAll(`${navId} .nav-link`).forEach(link => link.classList.remove('active'));
+            document.querySelector(`${navId} a[onclick="showPage('${pageId}')"]`).classList.add('active');
+            currentPage = pageId;
+        }
+
+        function toggleView() {
+            currentView = ui.viewToggle.checked ? 'vc' : 'ceo';
+            if (currentView === 'ceo') {
+                ui.ceoView.classList.remove('hidden');
+                ui.vcView.classList.add('hidden');
+                ui.ceoNav.classList.remove('hidden');
+                ui.vcNav.classList.add('hidden');
+                showPage('dashboard');
+            } else {
+                ui.ceoView.classList.add('hidden');
+                ui.vcView.classList.remove('hidden');
+                ui.ceoNav.classList.add('hidden');
+                ui.vcNav.classList.remove('hidden');
+                showPage('vc-dashboard');
             }
+        }
 
-             function renderCompletedState(data) {
-                if (data.error) {
-                    ui.extractedIntelligenceContainer.innerHTML = `<h4 class="font-bold text-sm mb-4">Error</h4><div class="bg-white p-6 border border-red-200 rounded-lg"><p class="text-red-600">${data.error}</p></div>`;
-                    ui.strategicUpdateContainer.innerHTML = `<h4 class="font-bold text-sm mb-4">Strategic Update</h4><div class="bg-white border-2 border-gray-200 p-6 rounded-lg shadow-lg"><p class="text-gray-500">Could not be generated due to an error.</p></div>`;
-                    return;
-                }
-
-                const renderList = (items) => items && items.length > 0 ? `<ul>${items.map(item => `<li class="flex items-start gap-2"><span class="text-purple-600">→</span><span>${item}</span></li>`).join('')}</ul>` : '<p class="text-gray-500">None mentioned.</p>';
-                 const fullSummaryHtml = data.fullSummary ? marked.parse(data.fullSummary) : '<p class="text-gray-500">Summary not available.</p>';
-
-
-                const intelligenceHtml = `
-                    <div class="space-y-4">
-                        <div><h4 class="font-bold text-sm mb-2 text-green-600">Key Wins</h4>${renderList(data.wins)}</div>
-                        <div><h4 class="font-bold text-sm mb-2 text-amber-600">Key Challenges</h4>${renderList(data.challenges)}</div>
-                        <div><h4 class="font-bold text-sm mb-2 text-blue-600">Strategic Insights</h4>${renderList(data.insights)}</div>
-                        <div class="pt-4 border-t"><h4 class="font-bold text-sm mb-2">Full Transcript</h4><p class="text-xs italic text-gray-500 max-h-32 overflow-y-auto">${data.raw || 'Not available.'}</p></div>
-                    </div>`;
-                ui.extractedIntelligenceContainer.querySelector('.bg-white').innerHTML = intelligenceHtml;
-                
-                const strategicHtml = `
-                    <div class="flex items-center justify-between mb-6"><div><h3 class="font-bold text-xl">Strategic Update</h3><p class="text-sm text-gray-600 mono">Week ${new Date().getWeek()} • ${new Date().getFullYear()}</p></div><span class="text-sm bg-green-100 text-green-800 px-3 py-1 rounded-full">Momentum Building</span></div>
-                     <div class="grid grid-cols-3 gap-4 mb-6">
-                        <div class="text-center p-3 bg-gray-50 rounded"><p class="font-bold text-xl">${data.arr || 'N/A'}</p><p class="text-xs text-gray-600">ARR</p></div>
-                        <div class="text-center p-3 bg-gray-50 rounded"><p class="font-bold text-xl ${data.growth && data.growth.startsWith('+') ? 'text-green-600' : 'text-red-600'}">${data.growth || 'N/A'}</p><p class="text-xs text-gray-600">Growth</p></div>
-                        <div class="text-center p-3 bg-gray-50 rounded"><p class="font-bold text-xl">${data.runway || 'N/A'}</p><p class="text-xs text-gray-600">Runway</p></div>
-                    </div>
-                    <div class="prose prose-sm max-w-none">${fullSummaryHtml}</div>
-                    <button id="finalize-report-btn-2" class="mt-6 w-full bg-purple-700 text-white py-2 text-sm font-bold hover:bg-purple-800 transition-colors rounded-md">Finalize & Share →</button>
-                `;
-                ui.strategicUpdateContainer.querySelector('.bg-white').innerHTML = strategicHtml;
-                 document.getElementById('finalize-report-btn-2').addEventListener('click', showShareModal);
-            }
+        function saveApiKey() {
+            geminiApiKey = ui.apiKeyInput.value;
+            localStorage.setItem('geminiApiKey', geminiApiKey);
+            alert('API Key saved!');
+            // Re-initialize services that depend on the key
+            initializeServices();
+        }
+        
+        function populateCeoPlaybooks() {
+            const activeCategories = [...ui.playbookCategoryFilters.querySelectorAll('.playbook-category-btn.active')].map(btn => btn.dataset.category);
             
-            Date.prototype.getWeek = function() { var d = new Date(Date.UTC(this.getFullYear(), this.getMonth(), this.getDate())); var dayNum = d.getUTCDay() || 7; d.setUTCDate(d.getUTCDate() + 4 - dayNum); var yearStart = new Date(Date.UTC(d.getUTCFullYear(),0,1)); return Math.ceil((((d - yearStart) / 86400000) + 1)/7) };
-            
-            function updateRecordButtonState() {
-                const isReady = dictationService && dictationService.isReady();
-                const buttons = [ui.startRecordingBtn, ui.recordButton, ui.newReportBtn];
-                buttons.forEach(btn => {
-                    if (btn) {
-                        btn.disabled = !isReady; btn.style.cursor = isReady ? 'pointer' : 'not-allowed'; btn.style.opacity = isReady ? '1' : '0.5'; btn.title = isReady ? 'Start Recording' : 'API Key not configured';
-                    }
-                });
-                ui.apiKeyBanner.classList.toggle('hidden', isReady);
-            }
+            const filteredPlaybooks = activeCategories.length === 0 
+                ? db.playbooks 
+                : db.playbooks.filter(p => activeCategories.includes(p.category));
 
-            function saveApiKey() {
-                const apiKey = ui.apiKeyInput.value.trim();
-                if(apiKey) {
-                    localStorage.setItem('geminiApiKey', apiKey);
-                    initializeDictationService(apiKey);
-                    ui.apiKeyStatus.textContent = 'API Key saved!';
-                     setTimeout(() => {
-                        ui.apiKeyStatus.textContent = '';
-                        if (dictationService.isReady()) showPage('dashboard');
-                    }, 2000);
-                }
-            }
-            
-            function switchView() {
-                const isVcView = ui.viewToggle.checked;
-                currentView = isVcView ? 'vc' : 'ceo';
-                ui.ceoView.classList.toggle('hidden', isVcView); ui.vcView.classList.toggle('hidden', !isVcView); ui.ceoNav.classList.toggle('hidden', isVcView); ui.vcNav.classList.toggle('hidden', !isVcView);
-                if (isVcView) {
-                    ui.userName.textContent = 'Sarah (Partner)'; ui.userCompany.textContent = 'Alpha Ventures'; ui.userAvatar.src = 'https://placehold.co/100x100/8B5CF6/FFFFFF?text=S';
-                    ui.vcLabel.classList.add('font-semibold', 'text-purple-700'); ui.vcLabel.classList.remove('text-gray-500'); ui.ceoLabel.classList.remove('font-semibold', 'text-purple-700'); ui.ceoLabel.classList.add('text-gray-500');
-                    showPage('vc-dashboard');
-                } else {
-                    ui.userName.textContent = 'Alex (CEO)'; ui.userCompany.textContent = 'Acme Inc.'; ui.userAvatar.src = 'https://placehold.co/100x100/5B21B6/FFFFFF?text=A';
-                    ui.ceoLabel.classList.add('font-semibold', 'text-purple-700'); ui.ceoLabel.classList.remove('text-gray-500'); ui.vcLabel.classList.remove('font-semibold', 'text-purple-700'); ui.vcLabel.classList.add('text-gray-500');
-                    showPage('dashboard');
-                }
-            }
-            
-            // Modal Logic
-            function showModal(title, body) {
-                ui.modalTitle.textContent = title;
-                ui.modalBody.innerHTML = '';
-                ui.modalBody.appendChild(body);
-                ui.modal.classList.remove('hidden');
-                setTimeout(() => { ui.modalOverlay.classList.remove('opacity-0'); ui.modalContent.classList.remove('scale-95', 'opacity-0'); }, 10);
-            }
+            ui.ceoPlaybooksList.innerHTML = filteredPlaybooks.map(playbook => `
+                <div class="bg-white/60 p-4 rounded-lg shadow-sm">
+                    <span class="text-xs font-mono bg-purple-100 text-purple-800 px-2 py-1 rounded-full">${playbook.id}</span>
+                    <h3 class="font-bold mt-2">${playbook.title}</h3>
+                    <p class="text-sm text-gray-600">${playbook.category} - ${playbook.stage}</p>
+                    <button class="text-sm font-bold text-purple-700 mt-3 playbook-link" data-playbook-id="${playbook.id}">View Playbook &rarr;</button>
+                </div>
+            `).join('');
 
-            function hideModal() {
-                ui.modalOverlay.classList.add('opacity-0');
-                ui.modalContent.classList.add('scale-95', 'opacity-0');
-                setTimeout(() => ui.modal.classList.add('hidden'), 300);
-            }
-            
-            function showShareModal() {
-                const content = document.createElement('div');
-                content.innerHTML = `
-                    <p class="text-sm text-gray-600 mb-4">Share this report with your stakeholders.</p>
-                    <div class="mb-6"> <label class="text-sm font-bold text-gray-700">Shareable Link</label> <div class="flex mt-1"> <input id="share-link-input" type="text" readonly value="https://operal.ta/r/8ab3f-cde21" class="mono text-sm flex-1 p-2 border border-gray-300 rounded-l-md bg-gray-50"> <button id="copy-link-btn" class="bg-gray-200 px-4 py-2 text-sm font-semibold rounded-r-md hover:bg-gray-300">Copy</button> </div> </div>
-                    <div> <label class="text-sm font-bold text-gray-700">Send to Stakeholders</label> <div class="mt-2 border border-gray-200 rounded-md"> <div class="p-3 flex items-center justify-between"><span class="font-semibold">Alpha Ventures</span><span class="text-xs text-gray-500">sarah@alphavc.com</span></div> <div class="p-3 border-t border-gray-200 flex items-center justify-between"><span class="font-semibold">Seed Fund Inc.</span><span class="text-xs text-gray-500">updates@seed.inc</span></div> </div> </div>
-                    <button id="send-update-btn" class="w-full bg-purple-700 text-white py-2 text-sm font-bold hover:bg-purple-800 transition-colors rounded-md mt-6">Send Update</button>`;
-                showModal('Share Report', content);
-                content.querySelector('#copy-link-btn').addEventListener('click', (e) => { const btn = e.currentTarget; navigator.clipboard.writeText(content.querySelector('#share-link-input').value); btn.textContent = 'Copied!'; setTimeout(() => btn.textContent = 'Copy', 2000); });
-                content.querySelector('#send-update-btn').addEventListener('click', (e) => { const btn = e.currentTarget; btn.textContent = 'Sent!'; btn.classList.replace('bg-purple-700', 'bg-green-500'); setTimeout(() => hideModal(), 1500); });
-            }
+            // Re-add event listeners
+             document.querySelectorAll('.playbook-link').forEach(link => link.addEventListener('click', (e) => { 
+                e.preventDefault(); 
+                showPlaybookModal(e.currentTarget.dataset.playbookId); 
+            }));
+        }
+        
+        function populatePlaybookCategories() {
+            const categories = [...new Set(db.playbooks.map(p => p.category))];
+            ui.playbookCategoryFilters.innerHTML = categories.map(cat => `
+                <button class="playbook-category-btn bg-gray-200 text-gray-700 px-3 py-1 rounded-full text-sm" data-category="${cat}">
+                    ${cat}
+                </button>
+            `).join('');
+        }
 
-            function showViewReportModal(reportId) {
-                const report = db.reports[reportId]; if (!report) return;
-                const content = document.createElement('div');
-                const growthClass = report.metrics.growth.startsWith('+') ? 'text-green-600' : 'text-red-600';
-                content.innerHTML = `
-                    <div class="grid grid-cols-3 gap-4 mb-6 text-center">
-                        <div><p class="font-bold text-2xl">${report.metrics.arr}</p><p class="text-xs text-gray-600">ARR</p></div>
-                        <div><p class="font-bold text-2xl ${growthClass}">${report.metrics.growth}</p><p class="text-xs text-gray-600">MoM Growth</p></div>
-                        <div><p class="font-bold text-2xl">${report.metrics.runway}</p><p class="text-xs text-gray-600">Runway</p></div>
-                    </div>
-                    <div class="prose prose-sm max-w-none">${report.content}</div>`;
-                showModal(report.title, content);
-            }
+        function showPlaybookModal(playbookId) {
+            const playbook = db.playbookKnowledgeBase[playbookId];
+            if (!playbook) return;
+            ui.modalTitle.textContent = `${playbookId}: ${playbook.title}`;
+            ui.modalBody.innerHTML = `
+                <h4>Diagnostic Symptoms</h4>
+                <p>${playbook.diagnostic}</p>
+                <h4>Recommended Actions</h4>
+                <ul>${playbook.actions.map(a => `<li>${a}</li>`).join('')}</ul>
+                <h4>Founder Validation Question</h4>
+                <p><em>${playbook.validation}</em></p>
+                <h4>Implementation Guide</h4>
+                <p>${playbook.implementation}</p>
+                <h4>Expected Result</h4>
+                <p>${playbook.result}</p>
+                <h4>Key Metric to Measure Impact</h4>
+                <p><strong>${playbook.impact_metric}</strong></p>
+            `;
+            ui.modal.classList.remove('hidden');
+        }
 
-            function showCompanyDetailModal(companyId) {
-                const company = db.companies[companyId];
-                if (!company) return;
-                 const statusClass = company.status === 'On Track' ? 'text-green-600 bg-green-100' : 'text-yellow-600 bg-yellow-100';
-
-                const content = document.createElement('div');
-                content.innerHTML = `
-                    <div class="mb-6">
-                        <div class="flex justify-between items-start">
-                             <h3 class="text-lg font-bold">Status Overview</h3>
-                             <span class="px-2 py-1 text-xs font-semibold ${statusClass} rounded-full">${company.status}</span>
-                        </div>
-                        <div class="mt-4 grid grid-cols-3 gap-4 text-center">
-                           <div><p class="font-bold text-2xl">${company.metrics.arr}</p><p class="text-xs text-gray-600">ARR</p></div>
-                            <div><p class="font-bold text-2xl ${company.metrics.growth.startsWith('+') ? 'text-green-600' : 'text-red-600'}">${company.metrics.growth}</p><p class="text-xs text-gray-600">MoM Growth</p></div>
-                            <div><p class="font-bold text-2xl">${company.metrics.runway}</p><p class="text-xs text-gray-600">Runway</p></div>
+        function populateVcPortfolio() {
+             ui.vcPortfolioList.innerHTML = db.portfolio.map(company => `
+                <div class="bg-white/60 p-4 rounded-lg shadow-sm flex items-center justify-between">
+                    <div class="flex items-center gap-4">
+                        <span class="w-3 h-3 rounded-full ${company.health === 'green' ? 'bg-green-500' : company.health === 'yellow' ? 'bg-yellow-500' : 'bg-red-500'}"></span>
+                        <div>
+                            <h3 class="font-bold">${company.name}</h3>
+                            <p class="text-sm text-gray-600">${company.ceo}</p>
                         </div>
                     </div>
-                    <div class="mb-6">
-                        <h3 class="text-lg font-bold mb-3">Last 4 Weeks Updates</h3>
-                        <div class="space-y-2 text-sm">
-                            <a href="#" class="flex justify-between p-2 rounded-md hover:bg-gray-50 view-report-link" data-report-id="${companyId}"><span class="font-semibold">W36 Update</span><span class="text-gray-500">Sep 5, 2025</span></a>
-                            <a href="#" class="flex justify-between p-2 rounded-md hover:bg-gray-50 view-report-link" data-report-id="${companyId}"><span class="font-semibold">W35 Update</span><span class="text-gray-500">Aug 29, 2025</span></a>
-                        </div>
+                    <div class="text-right">
+                         <p class="font-mono text-lg">${company.arr}</p>
+                         <p class="text-sm ${company.growth.startsWith('+') ? 'text-green-600' : 'text-red-600'}">${company.growth}</p>
                     </div>
-                     <div>
-                        <h3 class="text-lg font-bold mb-3">Recommended Playbooks</h3>
-                        <div class="space-y-2 text-sm">
-                           <a href="#" class="flex justify-between p-2 rounded-md hover:bg-gray-50 playbook-link" data-playbook-id="enterprise-sales"><span class="font-semibold">Enterprise Sales Playbook</span><span class="text-gray-500 mono text-xs">SALESFORCE</span></a>
-                           <a href="#" class="flex justify-between p-2 rounded-md hover:bg-gray-50 playbook-link" data-playbook-id="eng-hiring"><span class="font-semibold">Scaling Engineering Teams</span><span class="text-gray-500 mono text-xs">REVOLUT</span></a>
-                        </div>
-                    </div>
-                `;
-                 showModal(company.name, content);
-                 content.querySelectorAll('.view-report-link').forEach(link => link.addEventListener('click', (e) => { e.preventDefault(); showViewReportModal(e.currentTarget.dataset.reportId); }));
-                 content.querySelectorAll('.playbook-link').forEach(link => link.addEventListener('click', (e) => { e.preventDefault(); showPlaybookModal(e.currentTarget.dataset.playbookId); }));
+                    <button class="text-sm font-bold text-purple-700">View Report &rarr;</button>
+                </div>
+            `).join('');
+        }
+        
+        function hideModal() {
+            ui.modal.classList.add('hidden');
+        }
+
+        function togglePlaybookView() {
+            const isChatVisible = !ui.aiChatView.classList.contains('hidden');
+            if (isChatVisible) {
+                ui.aiChatView.classList.add('hidden');
+                ui.playbookLibraryView.classList.remove('hidden');
+                ui.browseLibraryBtn.innerHTML = `<i class="fas fa-comments mr-2"></i> Use AI Co-Pilot`;
+            } else {
+                ui.aiChatView.classList.remove('hidden');
+                ui.playbookLibraryView.classList.add('hidden');
+                ui.browseLibraryBtn.innerHTML = `<i class="fas fa-list-ul mr-2"></i> Browse Playbook Library`;
             }
+        }
+        
+        function adjustTextareaHeight() {
+            ui.chatInput.style.height = 'auto';
+            ui.chatInput.style.height = (ui.chatInput.scrollHeight) + 'px';
+        }
 
-            function showPlaybookModal(playbookId) {
-                const playbook = db.playbooks[playbookId]; if (!playbook) return;
-                const content = document.createElement('div');
-                content.innerHTML = `
-                    <div class="prose prose-sm max-w-none">${playbook.content}</div>
-                    <div class="mt-6 pt-4 border-t border-gray-200 flex space-x-4">
-                         <button class="flex-1 bg-purple-100 text-purple-700 px-4 py-2 text-sm font-bold hover:bg-purple-200 transition-colors rounded-md">Add to AI-Coach</button>
-                         <button class="flex-1 bg-gray-200 text-gray-800 px-4 py-2 text-sm font-bold hover:bg-gray-300 transition-colors rounded-md">Read</button>
-                    </div>
-                `;
-                showModal(playbook.title, content);
+        // --- Initialization ---
+
+        function initializeServices() {
+            if (geminiApiKey) {
+                dictationService = new DictationService(geminiApiKey);
+                new ConversationalAIService(geminiApiKey, db.playbookKnowledgeBase, ui);
+            } else {
+                 console.warn("Gemini API Key not found. AI features will be disabled.");
             }
-            
-            function showAuthorPlaybookModal() {
-                 const content = document.createElement('div');
-                content.innerHTML = `
-                    <div class="space-y-4">
-                        <div><label class="text-sm font-bold text-gray-700">Playbook Title</label><input type="text" placeholder="e.g., Our Guide to Board Meetings" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"></div>
-                        <div><label class="text-sm font-bold text-gray-700">Content (Markdown supported)</label><textarea rows="8" placeholder="### Key Principles..." class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"></textarea></div>
-                    </div>
-                    <div class="flex justify-between items-center mt-6">
-                        <button id="share-playbook-btn" class="bg-gray-200 text-gray-800 px-4 py-2 text-sm font-bold hover:bg-gray-300 rounded-md">Share with Portfolio</button>
-                        <button id="save-playbook-btn" class="bg-purple-700 text-white px-4 py-2 text-sm font-bold hover:bg-purple-800 rounded-md">Save Playbook</button>
-                    </div>`;
-                showModal('Author New Playbook', content);
-                 content.querySelector('#save-playbook-btn').addEventListener('click', (e) => { const btn = e.currentTarget; btn.textContent = 'Saved!'; btn.classList.replace('bg-purple-700', 'bg-green-500'); setTimeout(hideModal, 1500); });
-                 content.querySelector('#share-playbook-btn').addEventListener('click', () => alert('Playbook shared with portfolio!'));
-            }
-            
-            function populateCeoPlaybooks() {
-                const activeCategories = Array.from(ui.playbookCategoryFilters.querySelectorAll('.playbook-category-btn.active')).map(btn => btn.dataset.category);
-                
-                const categories = { 'Growth': [], 'Hiring': [], 'Fundraising': [], 'Product': [], 'Sales': [], 'Legal': [] };
-                let visiblePlaybooks = Object.entries(db.playbooks).filter(([id, playbook]) => playbook.category && (activeCategories.length === 0 || activeCategories.includes(playbook.category)));
-
-                if (visiblePlaybooks.length === 0) {
-                    ui.ceoPlaybookList.innerHTML = `<div class="text-center text-gray-500 col-span-full">No playbooks found for the selected categories.</div>`;
-                    return;
-                }
-
-                visiblePlaybooks.forEach(([id, p]) => {
-                    const html = `
-                        <div class="bg-white border border-gray-200 p-4 rounded-lg flex justify-between items-center group">
-                            <div>
-                                <p class="font-semibold">${p.title}</p>
-                                <p class="text-sm text-gray-500">from ${p.company}</p>
-                            </div>
-                            <button class="playbook-view-btn text-xs bg-gray-200 text-gray-700 px-3 py-1 rounded-full font-semibold hover:bg-gray-300" data-playbook-id="${id}">View</button>
-                        </div>`;
-                    if(categories[p.category]) categories[p.category].push(html);
-                });
-                
-                let fullHtml = '';
-                for (const [categoryName, items] of Object.entries(categories)) {
-                    if (items.length) {
-                        fullHtml += `<div><h3 class="font-bold mb-4 pb-2 border-b border-gray-200">${categoryName}</h3><div class="space-y-4 text-sm">${items.join('')}</div></div>`;
-                    }
-                }
-                
-                ui.ceoPlaybookList.innerHTML = fullHtml;
-
-                // Re-add event listeners 
-                document.querySelectorAll('#ceo-playbook-list .playbook-view-btn').forEach(link => {
-                    link.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); showPlaybookModal(e.currentTarget.dataset.playbookId); });
-                });
-            }
-
-            function populateVcPortfolio() {
-                let html = '';
-                for (const [id, company] of Object.entries(db.companies)) {
-                     const statusClass = company.status === 'On Track' ? 'text-green-800 bg-green-100' : 'text-yellow-800 bg-yellow-100';
-                     const growthClass = company.metrics.growth.startsWith('+') ? 'text-green-600' : 'text-red-600';
-                    html += `
-                        <div class="bg-white border border-gray-200 p-6 rounded-lg cursor-pointer hover:shadow-lg transition-shadow" data-company-id="${id}">
-                            <div class="flex justify-between items-start mb-4">
-                                <h3 class="font-bold">${company.name}</h3>
-                                <span class="px-2 py-1 text-xs font-semibold ${statusClass} rounded-full">${company.status}</span>
-                            </div>
-                            <div class="grid grid-cols-3 gap-4 text-center">
-                                <div class="border-r border-gray-200"><p class="text-lg font-bold">${company.metrics.arr}</p><p class="text-xs text-gray-500">ARR</p></div>
-                                <div class="border-r border-gray-200"><p class="text-lg font-bold ${growthClass}">${company.metrics.growth}</p><p class="text-xs text-gray-500">MoM</p></div>
-                                <div><p class="text-lg font-bold">${company.metrics.runway}</p><p class="text-xs text-gray-500">Runway</p></div>
-                            </div>
-                        </div>`;
-                }
-                ui.vcPortfolioList.innerHTML = html;
-                document.querySelectorAll('#vc-portfolio-list > div').forEach(card => card.addEventListener('click', (e) => { e.preventDefault(); showCompanyDetailModal(e.currentTarget.dataset.companyId); }));
-            }
-
-            // Event Listeners Setup
-            Object.entries(ui.navLinks.ceo).forEach(([name, link]) => link?.addEventListener('click', (e) => { e.preventDefault(); showPage(name); }));
-            Object.entries(ui.navLinks.vc).forEach(([name, link]) => link?.addEventListener('click', (e) => { e.preventDefault(); showPage(`vc-${name}`); }));
-            
-            ui.bannerSettingsLink.addEventListener('click', (e) => { e.preventDefault(); showPage('settings'); });
-            ui.mobileMenuBtn.addEventListener('click', () => { ui.sidebar.classList.toggle('-translate-x-full'); });
-            ui.startRecordingBtn.addEventListener('click', () => dictationService?.toggleRecording());
-            if(ui.newReportBtn) ui.newReportBtn.addEventListener('click', () => showPage('dashboard'));
+        }
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            // Event Listeners
+            ui.viewToggle.addEventListener('change', toggleView);
             ui.saveApiKeyBtn.addEventListener('click', saveApiKey);
-            ui.viewToggle.addEventListener('change', switchView);
-            
-            // Event delegation for dynamically created button
-            document.addEventListener('click', function(e) {
-                if (e.target && e.target.id == 'finalize-report-btn-2') {
-                    showShareModal();
-                }
-            });
-
-            if(ui.authorPlaybookBtn) ui.authorPlaybookBtn.addEventListener('click', showAuthorPlaybookModal);
-
-            document.querySelectorAll('.view-report-link').forEach(link => link.addEventListener('click', (e) => { e.preventDefault(); showViewReportModal(e.target.dataset.reportId); }));
-            document.querySelectorAll('#page-vc-playbooks .playbook-link').forEach(link => link.addEventListener('click', (e) => { e.preventDefault(); showPlaybookModal(e.currentTarget.dataset.playbookId); }));
-            
             ui.modalCloseBtn.addEventListener('click', hideModal);
-            ui.modalOverlay.addEventListener('click', hideModal);
-            
+            ui.modal.addEventListener('click', (e) => {
+                if (e.target === ui.modal) hideModal();
+            });
             ui.playbookCategoryFilters.addEventListener('click', (e) => {
                 const targetButton = e.target.closest('.playbook-category-btn');
                 if (targetButton) {
@@ -996,15 +853,17 @@
                     populateCeoPlaybooks();
                 }
             });
+            ui.browseLibraryBtn.addEventListener('click', togglePlaybookView);
+            ui.chatInput.addEventListener('input', adjustTextareaHeight);
 
             // Initial Load
-            const savedApiKey = localStorage.getItem('geminiApiKey');
-            if (savedApiKey) ui.apiKeyInput.value = savedApiKey;
-            initializeDictationService(savedApiKey);
+            ui.apiKeyInput.value = geminiApiKey;
+            initializeServices();
+            populatePlaybookCategories();
             populateCeoPlaybooks();
             populateVcPortfolio();
+            showPage('dashboard'); // Start on the dashboard
         });
     </script>
 </body>
 </html>
-
