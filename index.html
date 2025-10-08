@@ -253,8 +253,8 @@
                         <h2 class="text-lg font-bold mb-4">Live Business Context</h2>
                         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 text-sm">
                             <div class="space-y-1">
-                                <h3 class="font-bold">Sales Pipeline</h3>
-                                <p class="text-gray-600">Stages: 5 | Value: $850k | Probability: 65%</p>
+                                <h3 class="font-bold text-red-600">Sales Pipeline Attention</h3>
+                                <p class="text-gray-600">Globex Corp: Stalled in Negotiation ($120k)</p>
                                 <p class="text-xs text-gray-400">Source: <a href="#" class="text-purple-700 hover:underline">Hubspot</a></p>
                             </div>
                             <div class="space-y-1">
@@ -277,12 +277,14 @@
                                 <p class="text-gray-600">June, July, August | Growth stable at ~15%</p>
                                 <p class="text-xs text-gray-400">Source: <span class="text-gray-500">Notion</span></p>
                             </div>
-                            <div class="bg-purple-50 border border-purple-200 rounded-md p-3">
-                                <h3 class="font-bold">Next Monthly Report (DRAFT)</h3>
-                                <p class="text-gray-600">Metrics updated | Status: Needs Review</p>
-                                <div class="flex items-center justify-between mt-1">
-                                    <p class="text-xs text-gray-400">Sources: Notion, BREX, DEEL</p>
-                                    <button class="text-xs bg-purple-600 text-white font-semibold px-2 py-1 rounded hover:bg-purple-700">Review</button>
+                            <div class="bg-purple-50 border border-purple-200 rounded-md p-4 md:col-span-2 lg:col-span-3">
+                                <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center">
+                                    <div>
+                                        <h3 class="font-bold">Next Monthly Report (DRAFT)</h3>
+                                        <p class="text-gray-600 mt-1">Key Metrics: Est. ARR $1.25M (+4%), Proj. CAC $5.8k (+11%)</p>
+                                         <p class="text-xs text-gray-400 mt-1">Sources: Notion, BREX, DEEL</p>
+                                    </div>
+                                    <button id="review-draft-report-btn" class="mt-2 sm:mt-0 text-sm bg-purple-600 text-white font-semibold px-4 py-2 rounded-md hover:bg-purple-700 whitespace-nowrap">Review Full Draft</button>
                                 </div>
                             </div>
                         </div>
@@ -562,6 +564,7 @@
                 modal: document.getElementById('modal'), modalOverlay: document.getElementById('modal-overlay'), modalContent: document.getElementById('modal-content'),
                 modalTitle: document.getElementById('modal-title'), modalBody: document.getElementById('modal-body'), modalCloseBtn: document.getElementById('modal-close-btn'),
                 
+                reviewDraftReportBtn: document.getElementById('review-draft-report-btn'),
                 playbookLibraryView: document.getElementById('playbook-library-view'),
                 playbookGuideView: document.getElementById('playbook-guide-view'),
                 startGuidedPlaybookBtn: document.getElementById('start-guided-playbook-btn'),
@@ -804,6 +807,47 @@
 
                 showModal(titleHtml, content);
             }
+
+            function showReportDraftModal() {
+                const content = document.createElement('div');
+                content.innerHTML = `
+                    <div class="prose prose-sm max-w-none">
+                        <p class="text-sm text-gray-500">Generated on October 8, 2025</p>
+                        <h3 class="!text-base !font-bold !mt-4 !mb-2">Executive Summary</h3>
+                        <p>September was a month of steady growth, with ARR increasing to an estimated $1.25M. However, this growth came at a higher cost, as CAC rose by 11% to $5.8k. Our primary operational focus is unblocking the Globex Corp deal, which is currently stalled in legal review.</p>
+                        
+                        <h3 class="!text-base !font-bold !mt-6 !mb-2">Key Metrics</h3>
+                        <table class="w-full text-left">
+                            <thead class="border-b"><tr><th class="py-1">Metric</th><th class="py-1">This Month</th><th class="py-1">Last Month</th><th class="py-1">Change</th></tr></thead>
+                            <tbody>
+                                <tr class="border-b"><td class="py-1">ARR</td><td class="py-1">$1.25M</td><td class="py-1">$1.2M</td><td class="py-1 text-green-600">+4%</td></tr>
+                                <tr class="border-b"><td class="py-1">MRR</td><td class="py-1">$104k</td><td class="py-1">$100k</td><td class="py-1 text-green-600">+4%</td></tr>
+                                <tr><td class="py-1">CAC</td><td class="py-1">$5.8k</td><td class="py-1">$5.2k</td><td class="py-1 text-red-600">+11%</td></tr>
+                            </tbody>
+                        </table>
+
+                        <h3 class="!text-base !font-bold !mt-6 !mb-2">Wins This Month</h3>
+                        <ul>
+                            <li>Successfully onboarded 3 new hires in engineering and sales (Source: DEEL).</li>
+                            <li>PMF score increased from 40% to 42% after the latest product update (Source: Notion).</li>
+                        </ul>
+
+                        <h3 class="!text-base !font-bold !mt-6 !mb-2">Challenges</h3>
+                        <ul>
+                            <li>The Globex Corp deal ($120k) is stalled, pending their legal review for the past 2 weeks (Source: Hubspot).</li>
+                            <li>The increase in CAC is primarily driven by lower conversion rates on our new ad campaigns.</li>
+                        </ul>
+                        
+                        <h3 class="!text-base !font-bold !mt-6 !mb-2">Next Steps & Focus for October</h3>
+                        <ul>
+                            <li><strong>Sales:</strong> Personally follow up with the legal contact at Globex Corp to identify and resolve blockers.</li>
+                            <li><strong>Marketing:</strong> Launch A/B tests on landing pages to improve conversion rates and lower CAC.</li>
+                            <li><strong>Product:</strong> Continue to monitor PMF score and user feedback from the latest release.</li>
+                        </ul>
+                    </div>
+                `;
+                showModal('Monthly Report Draft - September 2025', content);
+            }
             
             function showAuthorPlaybookModal() {
                  const content = document.createElement('div');
@@ -872,6 +916,7 @@
             }
             
             function showGuidedPlaybook(playbookId) {
+                showPage('playbooks');
                 currentGuide.playbookId = playbookId;
                 currentGuide.step = 0;
                 const playbook = db.playbooks[playbookId];
@@ -974,7 +1019,8 @@
                     showShareModal();
                 }
             });
-
+            
+            ui.reviewDraftReportBtn.addEventListener('click', showReportDraftModal);
             if(ui.authorPlaybookBtn) ui.authorPlaybookBtn.addEventListener('click', showAuthorPlaybookModal);
             
             ui.startGuidedPlaybookBtn.addEventListener('click', (e) => showGuidedPlaybook(e.currentTarget.dataset.playbookId));
@@ -1023,4 +1069,5 @@
     </script>
 </body>
 </html>
+
 
