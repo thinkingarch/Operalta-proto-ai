@@ -177,6 +177,20 @@
         .input-wrapper .mic-icon:hover {
             color: var(--accent);
         }
+        
+        /* AI Suggestion styles */
+        .ai-suggestion {
+            background-color: #fefce8; /* yellow-50 */
+            border: 1px solid #fde047; /* yellow-300 */
+            border-radius: 0.375rem;
+            padding: 0.75rem;
+            margin-top: 0.5rem;
+            font-size: 0.875rem;
+            color: #854d0e; /* yellow-800 */
+        }
+        .ai-suggestion strong {
+            color: #ca8a04; /* yellow-600 */
+        }
     </style>
      <script type="importmap">
       {
@@ -253,7 +267,7 @@
                         <p class="font-bold">Action Required</p>
                         <p>Please <a href="#" id="banner-settings-link" class="underline font-semibold">add your Gemini API key</a> in the settings to enable recording.</p>
                     </div>
-                    <header class="mb-8"><h1 class="text-2xl sm:text-3xl font-bold tracking-tight">CEO Dashboard</h1><p class="text-gray-500 mt-1 mono text-sm">Welcome back, Alex. Your augmented co-founder is ready.</p></header>
+                    <header class="mb-8"><h1 class="text-2xl sm:text-3xl font-bold tracking-tight">CEO Dashboard</h1><p class="text-gray-500 mt-1 mono text-sm">Wednesday, October 8, 2025</p></header>
                     
                     <div class="bg-white p-6 sm:p-8 border border-gray-200 rounded-lg shadow-sm mb-8">
                         <h2 class="text-lg font-bold mb-4">Live Business Context</h2>
@@ -280,14 +294,14 @@
                             </div>
                              <div class="space-y-1">
                                 <h3 class="font-bold">Previous Monthly Reports</h3>
-                                <p class="text-gray-600">June, July, August | Growth stable at ~15%</p>
+                                <p class="text-gray-600">July, August | Growth stable at ~7% MoM</p>
                                 <p class="text-xs text-gray-400">Source: <span class="text-gray-500">Notion</span></p>
                             </div>
                             <div class="bg-purple-50 border border-purple-200 rounded-md p-4 md:col-span-2 lg:col-span-3">
                                 <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center">
                                     <div>
-                                        <h3 class="font-bold">Next Monthly Report (DRAFT)</h3>
-                                        <p class="text-gray-600 mt-1">Key Metrics: Est. ARR $1.25M (+4%), Proj. CAC $5.8k (+11%)</p>
+                                        <h3 class="font-bold">Next Monthly Report (DRAFT for October)</h3>
+                                        <p class="text-gray-600 mt-1">Based on September data: Est. ARR $1.25M (+4%), Proj. CAC $5.8k (+11%)</p>
                                          <p class="text-xs text-gray-400 mt-1">Sources: Notion, BREX, DEEL</p>
                                     </div>
                                     <button id="review-draft-report-btn" class="mt-2 sm:mt-0 text-sm bg-purple-600 text-white font-semibold px-4 py-2 rounded-md hover:bg-purple-700 whitespace-nowrap">Review Full Draft</button>
@@ -299,7 +313,20 @@
                     <div class="bg-white p-6 sm:p-8 border border-gray-200 rounded-lg shadow-sm mb-8"><div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4"><h2 class="text-lg font-bold">Create Weekly Update</h2><span class="text-xs mono text-gray-500 mt-1 sm:mt-0">Voice Memo → AI Synthesis → Investor Report</span></div><div class="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6"><button id="start-recording-btn" class="w-16 h-16 bg-purple-700 text-white rounded-full flex items-center justify-center hover:bg-purple-800 transition-all transform hover:scale-105 shadow-lg flex-shrink-0"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path></svg></button><div class="flex-1"><p class="font-semibold">Record a 5-minute voice memo</p><p class="text-sm text-gray-600">Summarize your week: wins, challenges, and key metrics. Our AI will do the rest.</p></div></div></div>
                      <div class="bg-white p-6 sm:p-8 border border-gray-200 rounded-lg shadow-sm">
                         <h2 class="text-lg font-bold mb-4">Recent Activity</h2>
-                        <div class="text-sm text-gray-500">No recent reports. Record an update to get started.</div>
+                        <ul class="space-y-3 text-sm">
+                            <li class="flex items-start gap-3">
+                                <span class="text-gray-400 mt-1"><i class="fas fa-file-alt"></i></span>
+                                <div><a href="#" class="font-semibold text-purple-700 hover:underline nav-link" data-page="reports">Drafted September 2025 Monthly Report</a><p class="text-xs text-gray-500">2 days ago</p></div>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <span class="text-gray-400 mt-1"><i class="fas fa-check-circle"></i></span>
+                                <div><a href="#" class="font-semibold text-purple-700 hover:underline nav-link" data-page="playbooks">Completed "Unit Economics Deep Dive" Playbook</a><p class="text-xs text-gray-500">3 days ago</p></div>
+                            </li>
+                             <li class="flex items-start gap-3">
+                                <span class="text-gray-400 mt-1"><i class="fas fa-paper-plane"></i></span>
+                                <div><a href="#" class="font-semibold text-purple-700 hover:underline nav-link" data-page="reports">Sent Q3 2025 Quarterly Report</a><p class="text-xs text-gray-500">7 days ago</p></div>
+                            </li>
+                        </ul>
                     </div>
                 </div>
                 
@@ -336,10 +363,10 @@
                         <table class="w-full text-sm">
                             <thead class="bg-gray-50"><tr class="text-left text-xs text-gray-500 uppercase tracking-wider"><th class="p-4 font-semibold">Date</th><th class="p-4 font-semibold">Title</th><th class="p-4 font-semibold">Status</th><th class="p-4 font-semibold hidden md:table-cell">Key Metric</th><th class="p-4"></th></tr></thead>
                             <tbody class="divide-y divide-gray-200">
+                                <tr><td class="p-4">Oct 1, 2025</td><td class="p-4 font-semibold">Monthly Report - September 2025</td><td class="p-4"><span class="px-2 py-1 text-xs font-semibold text-yellow-800 bg-yellow-100 rounded-full">Draft</span></td><td class="p-4 hidden md:table-cell">ARR $1.25M (+4%)</td><td class="p-4 text-right"><a href="#" class="text-purple-700 hover:underline view-report-link" data-report-id="september2025">View</a></td></tr>
                                 <tr><td class="p-4">Oct 1, 2025</td><td class="p-4 font-bold text-purple-700">Q3 2025 Quarterly Report</td><td class="p-4"><span class="px-2 py-1 text-xs font-semibold text-green-800 bg-green-100 rounded-full">Sent</span></td><td class="p-4 hidden md:table-cell">15% QoQ ARR Growth</td><td class="p-4 text-right"><a href="#" class="text-purple-700 hover:underline view-report-link" data-report-id="q3-2025">View</a></td></tr>
-                                <tr><td class="p-4">Sep 1, 2025</td><td class="p-4 font-semibold">Monthly Report - September 2025</td><td class="p-4"><span class="px-2 py-1 text-xs font-semibold text-yellow-800 bg-yellow-100 rounded-full">Draft</span></td><td class="p-4 hidden md:table-cell">ARR $1.25M (+4%)</td><td class="p-4 text-right"><a href="#" class="text-purple-700 hover:underline view-report-link" data-report-id="september2025">View</a></td></tr>
-                                <tr><td class="p-4">Aug 1, 2025</td><td class="p-4 font-semibold">Monthly Report - August 2025</td><td class="p-4"><span class="px-2 py-1 text-xs font-semibold text-green-800 bg-green-100 rounded-full">Sent</span></td><td class="p-4 hidden md:table-cell">ARR $1.2M (+9%)</td><td class="p-4 text-right"><a href="#" class="text-purple-700 hover:underline view-report-link" data-report-id="august2025">View</a></td></tr>
-                                <tr><td class="p-4">Jul 1, 2025</td><td class="p-4 font-semibold">Monthly Report - July 2025</td><td class="p-4"><span class="px-2 py-1 text-xs font-semibold text-green-800 bg-green-100 rounded-full">Sent</span></td><td class="p-4 hidden md:table-cell">ARR $1.1M (+5%)</td><td class="p-4 text-right"><a href="#" class="text-purple-700 hover:underline view-report-link" data-report-id="july2025">View</a></td></tr>
+                                <tr><td class="p-4">Sep 1, 2025</td><td class="p-4 font-semibold">Monthly Report - August 2025</td><td class="p-4"><span class="px-2 py-1 text-xs font-semibold text-green-800 bg-green-100 rounded-full">Sent</span></td><td class="p-4 hidden md:table-cell">ARR $1.2M (+9%)</td><td class="p-4 text-right"><a href="#" class="text-purple-700 hover:underline view-report-link" data-report-id="august2025">View</a></td></tr>
+                                <tr><td class="p-4">Aug 1, 2025</td><td class="p-4 font-semibold">Monthly Report - July 2025</td><td class="p-4"><span class="px-2 py-1 text-xs font-semibold text-green-800 bg-green-100 rounded-full">Sent</span></td><td class="p-4 hidden md:table-cell">ARR $1.1M (+5%)</td><td class="p-4 text-right"><a href="#" class="text-purple-700 hover:underline view-report-link" data-report-id="july2025">View</a></td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -607,30 +634,32 @@
                 },
                 reports: {
                     'september2025': {
-                        title: 'Monthly Report - September 2025',
+                        title: 'Monthly Report - September 2025 (Draft)',
                         content: `
-                        <p class="text-sm text-gray-500">Generated on October 1, 2025</p>
-                        <h3 class="!text-base !font-bold !mt-4 !mb-2">Executive Summary</h3>
-                        <p>September was a month of steady growth, with ARR increasing to an estimated $1.25M. However, this growth came at a higher cost, as CAC rose by 11% to $5.8k. Our primary operational focus is unblocking the Globex Corp deal, which is currently stalled in legal review.</p>
-                        <h3 class="!text-base !font-bold !mt-6 !mb-2">Key Metrics</h3>
-                        <table class="w-full text-left">
-                            <thead class="border-b"><tr><th class="py-1">Metric</th><th class="py-1">This Month</th><th class="py-1">Last Month</th><th class="py-1">Change</th></tr></thead>
-                            <tbody>
-                                <tr class="border-b"><td class="py-1">ARR</td><td class="py-1">$1.25M</td><td class="py-1">$1.2M</td><td class="py-1 text-green-600">+4%</td></tr>
-                                <tr class="border-b"><td class="py-1">MRR</td><td class="py-1">$104k</td><td class="py-1">$100k</td><td class="py-1 text-green-600">+4%</td></tr>
-                                <tr><td class="py-1">CAC</td><td class="py-1">$5.8k</td><td class="py-1">$5.2k</td><td class="py-1 text-red-600">+11%</td></tr>
-                            </tbody>
-                        </table>
-                        <h3 class="!text-base !font-bold !mt-6 !mb-2">Challenges</h3>
-                        <ul>
-                            <li>The Globex Corp deal ($120k) is stalled, pending their legal review for the past 2 weeks (Source: Hubspot).</li>
-                            <li>The increase in CAC is primarily driven by lower conversion rates on our new ad campaigns.</li>
-                        </ul>`
+                        <div id="report-content-september">
+                            <p class="text-sm text-gray-500">To be sent October 1, 2025</p>
+                            <h3 class="!text-base !font-bold !mt-4 !mb-2">Executive Summary</h3>
+                            <p>September was a month of steady growth, with ARR increasing to an estimated $1.25M. However, this growth came at a higher cost, as CAC rose by 11% to $5.8k. Our primary operational focus is unblocking the Globex Corp deal, which is currently stalled in legal review.</p>
+                            <h3 class="!text-base !font-bold !mt-6 !mb-2">Key Metrics</h3>
+                            <table class="w-full text-left">
+                                <thead class="border-b"><tr><th class="py-1">Metric</th><th class="py-1">This Month</th><th class="py-1">Last Month</th><th class="py-1">Change</th></tr></thead>
+                                <tbody>
+                                    <tr class="border-b"><td class="py-1">ARR</td><td class="py-1">$1.25M</td><td class="py-1">$1.2M</td><td class="py-1 text-green-600">+4%</td></tr>
+                                    <tr class="border-b"><td class="py-1">MRR</td><td class="py-1">$104k</td><td class="py-1">$100k</td><td class="py-1 text-green-600">+4%</td></tr>
+                                    <tr><td class="py-1">CAC</td><td class="py-1">$5.8k</td><td class="py-1">$5.2k</td><td class="py-1 text-red-600">+11%</td></tr>
+                                </tbody>
+                            </table>
+                            <h3 class="!text-base !font-bold !mt-6 !mb-2">Challenges</h3>
+                            <ul>
+                                <li data-ai-tag="challenge-1">The Globex Corp deal ($120k) is stalled, pending their legal review for the past 2 weeks (Source: Hubspot).</li>
+                                <li data-ai-tag="challenge-2">The increase in CAC is primarily driven by lower conversion rates on our new ad campaigns.</li>
+                            </ul>
+                        </div>`
                     },
                     'august2025': {
                         title: 'Monthly Report - August 2025',
                         content: `
-                        <p class="text-sm text-gray-500">Generated on September 1, 2025</p>
+                        <p class="text-sm text-gray-500">Sent on September 1, 2025</p>
                         <h3 class="!text-base !font-bold !mt-4 !mb-2">Executive Summary</h3>
                         <p>August was a strong month, with ARR growing by 9% to $1.2M, driven by the successful onboarding of two major enterprise clients. We also launched the new analytics dashboard, which has received positive initial feedback.</p>
                         <h3 class="!text-base !font-bold !mt-6 !mb-2">Key Metrics</h3>
@@ -651,7 +680,7 @@
                     'july2025': {
                         title: 'Monthly Report - July 2025',
                         content: `
-                        <p class="text-sm text-gray-500">Generated on August 1, 2025</p>
+                        <p class="text-sm text-gray-500">Sent on August 1, 2025</p>
                         <h3 class="!text-base !font-bold !mt-4 !mb-2">Executive Summary</h3>
                         <p>July was a solid month focused on product development and stabilizing our sales pipeline. ARR grew a modest 5% to $1.1M while we kept CAC flat. The team made significant progress on the upcoming v2 analytics dashboard.</p>
                         <h3 class="!text-base !font-bold !mt-6 !mb-2">Key Metrics</h3>
@@ -672,29 +701,29 @@
                     'q3-2025': {
                         title: 'Q3 2025 Quarterly Report',
                         content: `
-                        <p class="text-sm text-gray-500">Generated on October 1, 2025</p>
+                        <p class="text-sm text-gray-500">Sent on October 1, 2025</p>
                         <h3 class="!text-base !font-bold !mt-4 !mb-2">Q3 Executive Summary</h3>
-                        <p>Q3 was a quarter of accelerated growth, with ARR increasing by 15% from $1.05M to $1.25M. This was driven by a successful push into the enterprise segment in August. However, this growth was accompanied by a concerning 16% rise in Customer Acquisition Cost over the quarter, from $5.0k to $5.8k, which will be our primary focus for Q4.</p>
+                        <p>Q3 was a quarter of accelerated growth, with ARR increasing by 19% from $1.05M to $1.25M. This was driven by a successful push into the enterprise segment in August. However, this growth was accompanied by a concerning 16% rise in Customer Acquisition Cost over the quarter, from $5.0k to $5.8k, which will be our primary focus for Q4.</p>
                         <h3 class="!text-base !font-bold !mt-6 !mb-2">Quarterly Metrics</h3>
                          <table class="w-full text-left">
                             <thead class="border-b"><tr><th class="py-1">Metric</th><th class="py-1">End of Q3</th><th class="py-1">End of Q2</th><th class="py-1">QoQ Change</th></tr></thead>
                             <tbody>
-                                <tr class="border-b"><td class="py-1">ARR</td><td class="py-1">$1.25M</td><td class="py-1">$1.05M</td><td class="py-1 text-green-600">+15%</td></tr>
+                                <tr class="border-b"><td class="py-1">ARR</td><td class="py-1">$1.25M</td><td class="py-1">$1.05M</td><td class="py-1 text-green-600">+19%</td></tr>
                                 <tr><td class="py-1">Net New ARR</td><td class="py-1">$200k</td><td class="py-1">$150k</td><td class="py-1 text-green-600">+33%</td></tr>
                                 <tr><td class="py-1">CAC</td><td class="py-1">$5.8k</td><td class="py-1">$5.0k</td><td class="py-1 text-red-600">+16%</td></tr>
                             </tbody>
                         </table>
                         <h3 class="!text-base !font-bold !mt-6 !mb-2">Key Achievements in Q3</h3>
                         <ul>
-                            <li>Landed first two enterprise clients.</li>
-                            <li>Shipped major product update (v2 Dashboard).</li>
-                            <li>Expanded team with 3 key hires.</li>
+                            <li>Landed first two enterprise clients, validating our upmarket strategy.</li>
+                            <li>Shipped major product update (v2 Dashboard), which has increased weekly active users by 15%.</li>
+                            <li>Expanded team with 3 key hires in engineering and sales.</li>
                         </ul>
                         <h3 class="!text-base !font-bold !mt-6 !mb-2">Focus for Q4</h3>
                         <ul>
-                            <li>Optimize marketing spend to reduce CAC.</li>
-                            <li>Unblock stalled enterprise deals.</li>
-                            <li>Begin planning for Series A fundraising.</li>
+                            <li><strong>Unit Economics:</strong> Launch a cross-functional squad to optimize marketing spend and reduce CAC by at least 10%.</li>
+                            <li><strong>Sales:</strong> Unblock stalled enterprise deals, specifically Globex Corp, to secure an additional $120k in ARR.</li>
+                            <li><strong>Strategy:</strong> Begin compiling the data room and narrative for our Series A fundraising process, targeting a Q1 2026 kickoff.</li>
                         </ul>`
                     },
                 },
@@ -859,6 +888,35 @@
 
                 const content = document.createElement('div');
                 content.innerHTML = `<div class="prose prose-sm max-w-none">${report.content}</div>`;
+                
+                if (reportId === 'september2025') {
+                    const buttonContainer = document.createElement('div');
+                    buttonContainer.className = 'mt-6 pt-4 border-t border-gray-200';
+                    buttonContainer.innerHTML = `<button id="simulate-ai-review-btn" class="w-full bg-purple-100 text-purple-700 font-bold py-2 px-4 rounded-md hover:bg-purple-200 transition-colors">Simulate AI Review</button>`;
+                    content.appendChild(buttonContainer);
+
+                    buttonContainer.querySelector('#simulate-ai-review-btn').addEventListener('click', (e) => {
+                        e.preventDefault();
+                        const btn = e.currentTarget;
+                        btn.textContent = 'Applying Suggestions...';
+                        btn.disabled = true;
+
+                        setTimeout(() => {
+                            const challenge1 = content.querySelector('[data-ai-tag="challenge-1"]');
+                            if (challenge1) {
+                                challenge1.innerHTML = `<del class="text-red-400">The Globex Corp deal ($120k) is stalled, pending their legal review for the past 2 weeks</del> <span class="text-green-700">We are proactively working with Globex Corp to unblock their legal review on the $120k deal.</span>`;
+                                const suggestion1 = document.createElement('div');
+                                suggestion1.className = 'ai-suggestion';
+                                suggestion1.innerHTML = `<strong>AI Suggestion:</strong> Rephrased for a more proactive tone. This shows investors you are taking ownership of the problem rather than just stating it.`;
+                                challenge1.parentNode.insertBefore(suggestion1, challenge1.nextSibling);
+                            }
+                            btn.textContent = 'Suggestions Applied';
+                            btn.classList.replace('bg-purple-100', 'bg-green-100');
+                            btn.classList.replace('text-purple-700', 'text-green-700');
+                        }, 1000);
+                    });
+                }
+
                 showModal(report.title, content);
             }
 
@@ -1094,6 +1152,10 @@
                 }
                 if (e.target.classList.contains('connect-btn')) {
                     showConnectModal(e.target.dataset.service);
+                }
+                 if (e.target.classList.contains('nav-link')) {
+                    e.preventDefault();
+                    showPage(e.target.dataset.page);
                 }
             });
             
