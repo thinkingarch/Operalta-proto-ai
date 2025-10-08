@@ -215,8 +215,8 @@
             top: 50%;
             left: 50%;
             width: 180px; /* Adjust as needed */
-            margin: -55px 0 0 -90px; /* Half of width and height */
-            height: 110px;
+            margin: -60px 0 0 -90px; /* Half of width and height */
+            height: 120px;
         }
         .center-item {
             position: absolute;
@@ -1214,7 +1214,7 @@
                     { title: 'Step 1: Understand the "Why"', content: playbook.diagnostic, type: 'ai', prompt: "First, let's confirm the diagnosis. Does this sound like what you're experiencing?" },
                     { title: 'Step 2: Review the High-Level Plan', content: playbook.actions, type: 'ai', prompt: "Here are the recommended actions. At a high level, does this approach make sense for your team?" },
                     { title: 'Step 3: Gut Check & Commit', content: playbook.validation, type: 'ai', prompt: "This is the commitment check. Are you and your team prepared to follow through on this?" },
-                    { title: 'Step 4: Create a Tactical Plan', content: playbook.implementation, type: 'user', prompt: "Now, let's make this tactical. How will you specifically implement these steps at Acme Inc.?" },
+                    { title: 'Step 4: Create a Tactical Plan', content: playbook.implementation, type: 'user', prompt: "Now, let's make this tactical. How will you specifically implement these steps at SGDL?" },
                     { title: 'Step 5: Define the Desired Outcome', content: playbook.result, type: 'ai', prompt: "If we execute this correctly, this is the expected result. Does this outcome align with your strategic goals for this quarter?" },
                     { title: 'Step 6: Set Success Metrics', content: playbook.impact, type: 'user', prompt: "Finally, let's define success. Are these the right KPIs to track? Should we add or modify any?" },
                 ];
@@ -1272,7 +1272,7 @@
                 
                 container.innerHTML = `
                     <div class="center-item">
-                         <div class="bg-white p-4 rounded-lg border-2 border-purple-600 text-center mb-4 shadow-lg">
+                         <div class="p-4 rounded-lg text-center mb-4">
                             <h3 class="font-bold text-gray-900">Operalta Engine</h3>
                             <p class="text-xs text-gray-500">Connecting dots across all strategic streams.</p>
                         </div>
@@ -1307,7 +1307,9 @@
                         <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 text-center h-full flex flex-col justify-center">
                             <h3 class="font-bold ${item.color}">${item.title}</h3>
                             <p class="text-xs text-gray-500 mt-1">${item.desc}</p>
-                             <p class="text-xs text-gray-800 font-semibold mt-2">${item.insight}</p>
+                            <div class="bg-white border-t border-gray-200 mt-2 pt-2">
+                                 <p class="text-xs text-gray-800 font-semibold">${item.insight}</p>
+                            </div>
                         </div>
                     `;
                     container.appendChild(itemDiv);
