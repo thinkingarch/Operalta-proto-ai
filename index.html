@@ -1351,13 +1351,7 @@
                 let fullHtml = '';
                 for (const [categoryName, items] of Object.entries(categories)) {
                     if (items.length) {
-                        const iconMap = {
-                            'Product': '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg>',
-                            'Go-To-Market': '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5"><line x1="12" y1="20" x2="12" y2="10"></line><line x1="18" y1="20" x2="18" y2="4"></line><line x1="6" y1="20" x2="6" y2="16"></line></svg>',
-                            'People & Culture': '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>',
-                            'Finance & Operations': '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>'
-                        };
-                        fullHtml += `<div class="mb-12"><h3 class="text-lg font-bold mb-4 pb-2 border-b-2 border-gray-200 flex items-center gap-3"><span class="text-gray-800">${iconMap[categoryName]}</span><span>${categoryName}</span></h3><div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">${items.join('')}</div></div>`;
+                        fullHtml += `<div class="mb-12"><h3 class="text-lg font-bold mb-4 pb-2 border-b-2 border-gray-200 flex items-center gap-3"><span>${categoryName}</span></h3><div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">${items.join('')}</div></div>`;
                     }
                 }
                 
@@ -1492,7 +1486,7 @@
                     </div>`;
 
                 const items = [
-                    { title: "Customer Insights", color: "text-purple-700", desc: "Understanding the customer's problems deeply.", insight: "Insight: ESA feedback indicates our orbital decay predictions are 15% more accurate than their internal models.", position: "left" },
+                    { title: "Customer Insights", color: "text-purple-700", desc: "Understanding the customer's problems deeply.", insight: "Insight: ESA feedback indicates our orbital decay predictions are 15% more accurate than their internal models.", position: "bottom" },
                     { title: "Vision", color: "text-blue-700", desc: "The long-term mission and direction.", insight: "Insight: Vision is to become the OS for satellite constellation management.", position: "bottom" },
                     { title: "Product", color: "text-green-700", desc: "What we build and for whom.", insight: "Insight: Core IP is our patented collision avoidance algorithm.", position: "left" },
                     { title: "Revenue Generation", color: "text-yellow-700", desc: "Marketing, sales, and GTM strategy.", insight: "Insight: Initial traction comes from paid pilots with national space agencies.", position: "top" },
