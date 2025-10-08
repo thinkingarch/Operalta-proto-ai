@@ -636,23 +636,26 @@
                     'september2025': {
                         title: 'Weekly Report - October 2025 (Draft)',
                         content: `
-                        <div id="report-content-september">
+                        <div id="report-content-september" contenteditable="false" class="prose prose-sm max-w-none focus:outline-none focus:ring-2 focus:ring-purple-500 focus:rounded-md p-2 -m-2">
                             <p class="text-sm text-gray-500">To be sent October 7, 2025</p>
-                            <h3 class="!text-base !font-bold !mt-4 !mb-2">Executive Summary</h3>
-                            <p>September was a month of steady growth, with ARR increasing to an estimated $1.25M. However, this growth came at a higher cost, as CAC rose by 11% to $5.8k. Our primary operational focus is unblocking the Globex Corp deal, which is currently stalled in legal review.</p>
-                            <h3 class="!text-base !font-bold !mt-6 !mb-2">Key Metrics</h3>
-                            <table class="w-full text-left">
-                                <thead class="border-b"><tr><th class="py-1">Metric</th><th class="py-1">This Month</th><th class="py-1">Last Month</th><th class="py-1">Change</th></tr></thead>
-                                <tbody>
-                                    <tr class="border-b"><td class="py-1">ARR</td><td class="py-1">$1.25M</td><td class="py-1">$1.2M</td><td class="py-1 text-green-600">+4%</td></tr>
-                                    <tr class="border-b"><td class="py-1">MRR</td><td class="py-1">$104k</td><td class="py-1">$100k</td><td class="py-1 text-green-600">+4%</td></tr>
-                                    <tr><td class="py-1">CAC</td><td class="py-1">$5.8k</td><td class="py-1">$5.2k</td><td class="py-1 text-red-600">+11%</td></tr>
-                                </tbody>
-                            </table>
-                            <h3 class="!text-base !font-bold !mt-6 !mb-2">Challenges</h3>
+                            <h3 class="!text-base !font-bold !mt-4 !mb-2">Key Metrics Update (W/E Oct 5)</h3>
+                            <p>A solid week focused on execution. We're holding steady on top-line metrics while addressing the underlying efficiency issues identified last month. Pipeline velocity has increased slightly.</p>
+                            
+                            <h3 class="!text-base !font-bold !mt-6 !mb-2">Sales Update</h3>
                             <ul>
-                                <li data-ai-tag="challenge-1">The Globex Corp deal ($120k) is stalled, pending their legal review for the past 2 weeks (Source: Hubspot).</li>
-                                <li data-ai-tag="challenge-2">The increase in CAC is primarily driven by lower conversion rates on our new ad campaigns.</li>
+                                <li><strong>Globex Corp ($120k):</strong> We've established a direct line of communication with their legal team. They've confirmed receipt of our revised draft and have given a timeline of 5 business days for feedback. This is a positive step forward.</li>
+                                <li><strong>New Pipeline:</strong> A promising inbound lead from Acme Dynamics (a Fortune 1000 company) came through this week after a mention in a trade publication. First call is scheduled for Friday.</li>
+                            </ul>
+
+                            <h3 class="!text-base !font-bold !mt-6 !mb-2">Team & Product Update</h3>
+                            <ul>
+                                <li><strong>Team:</strong> Our three new Q3 hires are fully ramped and contributing. Maria (our new AE) has already sourced two qualified opportunities. Team morale is high.</li>
+                                <li><strong>Product:</strong> Adoption of the v2 dashboard is now at 75% of our active user base. We're getting consistent feedback about the "scenario planning" feature being a key differentiator.</li>
+                            </ul>
+
+                            <h3 class="!text-base !font-bold !mt-6 !mb-2">Ask</h3>
+                            <ul>
+                                <li>To de-risk the Globex Corp legal review and streamline future enterprise contracts, we're looking for an introduction to a fractional legal counsel specializing in B2B SaaS enterprise agreements. Any recommendations would be greatly appreciated.</li>
                             </ul>
                         </div>`
                     },
@@ -892,28 +895,28 @@
                 if (reportId === 'september2025') {
                     const buttonContainer = document.createElement('div');
                     buttonContainer.className = 'mt-6 pt-4 border-t border-gray-200';
-                    buttonContainer.innerHTML = `<button id="simulate-ai-review-btn" class="w-full bg-purple-100 text-purple-700 font-bold py-2 px-4 rounded-md hover:bg-purple-200 transition-colors">Simulate AI Review</button>`;
+                    buttonContainer.innerHTML = `<button id="edit-report-btn" class="w-full bg-purple-100 text-purple-700 font-bold py-2 px-4 rounded-md hover:bg-purple-200 transition-colors">Edit Report</button>`;
                     content.appendChild(buttonContainer);
 
-                    buttonContainer.querySelector('#simulate-ai-review-btn').addEventListener('click', (e) => {
+                    buttonContainer.querySelector('#edit-report-btn').addEventListener('click', (e) => {
                         e.preventDefault();
                         const btn = e.currentTarget;
-                        btn.textContent = 'Applying Suggestions...';
-                        btn.disabled = true;
+                        const reportContent = content.querySelector('#report-content-september');
 
-                        setTimeout(() => {
-                            const challenge1 = content.querySelector('[data-ai-tag="challenge-1"]');
-                            if (challenge1) {
-                                challenge1.innerHTML = `<del class="text-red-400">The Globex Corp deal ($120k) is stalled, pending their legal review for the past 2 weeks</del> <span class="text-green-700">We are proactively working with Globex Corp to unblock their legal review on the $120k deal.</span>`;
-                                const suggestion1 = document.createElement('div');
-                                suggestion1.className = 'ai-suggestion';
-                                suggestion1.innerHTML = `<strong>AI Suggestion:</strong> Rephrased for a more proactive tone. This shows investors you are taking ownership of the problem rather than just stating it.`;
-                                challenge1.parentNode.insertBefore(suggestion1, challenge1.nextSibling);
-                            }
-                            btn.textContent = 'Suggestions Applied';
-                            btn.classList.replace('bg-purple-100', 'bg-green-100');
-                            btn.classList.replace('text-purple-700', 'text-green-700');
-                        }, 1000);
+                        if (reportContent.isContentEditable) {
+                            reportContent.contentEditable = false;
+                            btn.textContent = 'Edit Report';
+                            btn.classList.remove('bg-green-100', 'text-green-700');
+                            btn.classList.add('bg-purple-100', 'text-purple-700');
+                            reportContent.style.outline = 'none';
+                        } else {
+                            reportContent.contentEditable = true;
+                            btn.textContent = 'Save Changes';
+                            btn.classList.remove('bg-purple-100', 'text-purple-700');
+                            btn.classList.add('bg-green-100', 'text-green-700');
+                            reportContent.style.outline = '2px solid var(--accent)';
+                            reportContent.focus();
+                        }
                     });
                 }
 
@@ -1208,5 +1211,5 @@
     </script>
 </body>
 </html>
-
+" with my request to "change the content (pop-up) of the Weekly Report - October 2025 to a weekly report: more subtle details on sales, team, product ans specific ask for help from  advisors / VC. change the Simulate AI Review to manual editing.". I have made the following changes: I changed the content of the October weekly report to be more detailed, with specific updates on sales, team, product, and a clear ask for help. I also replaced the "Simulate AI Review" button with an "Edit Report" button that allows for direct, manual editing of the draft within the pop-up.
 
