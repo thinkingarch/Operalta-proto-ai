@@ -266,10 +266,6 @@
             opacity: 0;
             visibility: hidden;
             position: absolute;
-            /* Default bottom */
-            top: 110%;
-            left: 50%;
-            transform: translateX(-50%) scale(0.95);
             width: 240px;
             padding: 0.75rem;
             background-color: white;
@@ -279,15 +275,18 @@
             z-index: 10;
             transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s;
         }
-
-        .circle-item[data-title="Product"] .item-details, .circle-item[data-title="Customer Insights"] .item-details {
+        
+        .circle-item[data-position="top"] .item-details {
+            left: 50%; top: auto; bottom: 110%; transform: translateX(-50%) scale(0.95);
+        }
+        .circle-item[data-position="bottom"] .item-details {
+            left: 50%; top: 110%; transform: translateX(-50%) scale(0.95);
+        }
+        .circle-item[data-position="left"] .item-details {
             top: 50%; left: auto; right: 110%; transform: translateY(-50%) scale(0.95);
         }
-        .circle-item[data-title="Fundraising"] .item-details, .circle-item[data-title="Competitor Analysis"] .item-details {
+        .circle-item[data-position="right"] .item-details {
             top: 50%; right: auto; left: 110%; transform: translateY(-50%) scale(0.95);
-        }
-        .circle-item[data-title="Team"] .item-details, .circle-item[data-title="Revenue Generation"] .item-details {
-            left: 50%; top: auto; bottom: 110%; transform: translateX(-50%) scale(0.95);
         }
 
         .circle-item.active .item-content, .circle-item:hover .item-content {
@@ -298,19 +297,15 @@
         .circle-item.active .item-details, .circle-item:hover .item-details {
             opacity: 1;
             visibility: visible;
-            transform: translate(-50%, 0) scale(1);
         }
-        .circle-item[data-title="Product"].active .item-details, .circle-item[data-title="Product"]:hover .item-details,
-        .circle-item[data-title="Customer Insights"].active .item-details, .circle-item[data-title="Customer Insights"]:hover .item-details {
-            transform: translateY(-50%) scale(1);
+
+        .circle-item[data-position="top"].active .item-details, .circle-item[data-position="top"]:hover .item-details,
+        .circle-item[data-position="bottom"].active .item-details, .circle-item[data-position="bottom"]:hover .item-details {
+             transform: translateX(-50%) scale(1);
         }
-        .circle-item[data-title="Fundraising"].active .item-details, .circle-item[data-title="Fundraising"]:hover .item-details,
-        .circle-item[data-title="Competitor Analysis"].active .item-details, .circle-item[data-title="Competitor Analysis"]:hover .item-details {
-            transform: translateY(-50%) scale(1);
-        }
-        .circle-item[data-title="Team"].active .item-details, .circle-item[data-title="Team"]:hover .item-details,
-        .circle-item[data-title="Revenue Generation"].active .item-details, .circle-item[data-title="Revenue Generation"]:hover .item-details {
-            transform: translateX(-50%) scale(1);
+        .circle-item[data-position="left"].active .item-details, .circle-item[data-position="left"]:hover .item-details,
+        .circle-item[data-position="right"].active .item-details, .circle-item[data-position="right"]:hover .item-details {
+             transform: translateY(-50%) scale(1);
         }
         
     </style>
@@ -673,10 +668,10 @@
                         <div id="playbook-library-content">
                             <h2 class="text-xl font-bold mb-6">Full Playbook Library</h2>
                             <div id="playbook-category-filters" class="flex flex-wrap gap-2 sm:gap-4 mb-12">
-                                <button class="playbook-category-btn text-xs sm:text-sm font-bold px-3 py-2 rounded-full" data-category="Product">🎯 Product</button>
-                                <button class="playbook-category-btn text-xs sm:text-sm font-bold px-3 py-2 rounded-full" data-category="Go-To-Market">📈 Go-To-Market</button>
-                                <button class="playbook-category-btn text-xs sm:text-sm font-bold px-3 py-2 rounded-full" data-category="People & Culture">👥 People & Culture</button>
-                                <button class="playbook-category-btn text-xs sm:text-sm font-bold px-3 py-2 rounded-full" data-category="Finance & Operations">⚙️ Finance & Operations</button>
+                                <button class="playbook-category-btn text-xs sm:text-sm font-bold px-3 py-2 rounded-full" data-category="Product">Product</button>
+                                <button class="playbook-category-btn text-xs sm:text-sm font-bold px-3 py-2 rounded-full" data-category="Go-To-Market">Go-To-Market</button>
+                                <button class="playbook-category-btn text-xs sm:text-sm font-bold px-3 py-2 rounded-full" data-category="People & Culture">People & Culture</button>
+                                <button class="playbook-category-btn text-xs sm:text-sm font-bold px-3 py-2 rounded-full" data-category="Finance & Operations">Finance & Operations</button>
                             </div>
                             <div id="ceo-playbook-list" class="space-y-8">
                                 <!-- Playbook content will be injected here by JS -->
@@ -1497,13 +1492,13 @@
                     </div>`;
 
                 const items = [
-                    { title: "Customer Insights", color: "text-purple-700", desc: "Understanding the customer's problems deeply.", insight: "Insight: ESA feedback indicates our orbital decay predictions are 15% more accurate than their internal models." },
-                    { title: "Vision", color: "text-blue-700", desc: "The long-term mission and direction.", insight: "Insight: Vision is to become the OS for satellite constellation management." },
-                    { title: "Product", color: "text-green-700", desc: "What we build and for whom.", insight: "Insight: Core IP is our patented collision avoidance algorithm."},
-                    { title: "Revenue Generation", color: "text-yellow-700", desc: "Marketing, sales, and GTM strategy.", insight: "Insight: Initial traction comes from paid pilots with national space agencies." },
-                    { title: "Team", color: "text-red-700", desc: "Culture, hiring, and performance.", insight: "Insight: Need to hire a specialist in RF engineering." },
-                    { title: "Fundraising", color: "text-indigo-700", desc: "Narrative, metrics, and process.", insight: "Insight: Seed round focus is on de-risking the technology." },
-                    { title: "Competitor Analysis", color: "text-gray-700", desc: "Market landscape and positioning.", insight: "Insight: US competitor just won a NASA contract, validating the market."},
+                    { title: "Customer Insights", color: "text-purple-700", desc: "Understanding the customer's problems deeply.", insight: "Insight: ESA feedback indicates our orbital decay predictions are 15% more accurate than their internal models.", position: "left" },
+                    { title: "Vision", color: "text-blue-700", desc: "The long-term mission and direction.", insight: "Insight: Vision is to become the OS for satellite constellation management.", position: "bottom" },
+                    { title: "Product", color: "text-green-700", desc: "What we build and for whom.", insight: "Insight: Core IP is our patented collision avoidance algorithm.", position: "left" },
+                    { title: "Revenue Generation", color: "text-yellow-700", desc: "Marketing, sales, and GTM strategy.", insight: "Insight: Initial traction comes from paid pilots with national space agencies.", position: "top" },
+                    { title: "Team", color: "text-red-700", desc: "Culture, hiring, and performance.", insight: "Insight: Need to hire a specialist in RF engineering.", position: "top" },
+                    { title: "Fundraising", color: "text-indigo-700", desc: "Narrative, metrics, and process.", insight: "Insight: Seed round focus is on de-risking the technology.", position: "right" },
+                    { title: "Competitor Analysis", color: "text-gray-700", desc: "Market landscape and positioning.", insight: "Insight: US competitor just won a NASA contract, validating the market.", position: "right"},
                 ];
                 
                 const radius = 260; // radius of the circle
@@ -1517,6 +1512,7 @@
                     const itemDiv = document.createElement('div');
                     itemDiv.className = 'circle-item';
                     itemDiv.dataset.title = item.title;
+                    itemDiv.dataset.position = item.position;
                     itemDiv.style.transform = `translate(${x}px, ${y}px)`;
                     
                     itemDiv.innerHTML = `
@@ -1540,7 +1536,7 @@
                         const isActive = item.classList.contains('active');
                         
                         container.querySelectorAll('.circle-item.active').forEach(activeItem => {
-                            activeItem.classList.remove('active');
+                             activeItem.classList.remove('active');
                         });
                         
                         if (!isActive) {
