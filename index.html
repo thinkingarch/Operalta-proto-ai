@@ -156,6 +156,27 @@
             background-color: #eef2ff;
             border-bottom-right-radius: 0.25rem;
         }
+
+        .input-wrapper {
+            position: relative;
+            width: 100%;
+        }
+        .input-wrapper textarea {
+            width: 100%;
+            padding-right: 2.5rem; /* space for the icon */
+        }
+        .input-wrapper .mic-icon {
+            position: absolute;
+            top: 50%;
+            right: 0.75rem;
+            transform: translateY(-50%);
+            color: #6b7280;
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+        .input-wrapper .mic-icon:hover {
+            color: var(--accent);
+        }
     </style>
      <script type="importmap">
       {
@@ -226,7 +247,48 @@
                         <p class="font-bold">Action Required</p>
                         <p>Please <a href="#" id="banner-settings-link" class="underline font-semibold">add your Gemini API key</a> in the settings to enable recording.</p>
                     </div>
-                    <header class="mb-8"><h1 class="text-2xl sm:text-3xl font-bold tracking-tight">CEO Dashboard</h1><p class="text-gray-500 mt-1 mono text-sm">Welcome back, Alex. Your augmented co-founder is ready.</p></header><div class="bg-white p-6 sm:p-8 border border-gray-200 rounded-lg shadow-sm mb-8"><div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4"><h2 class="text-lg font-bold">Create Weekly Update</h2><span class="text-xs mono text-gray-500 mt-1 sm:mt-0">Voice Memo → AI Synthesis → Investor Report</span></div><div class="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6"><button id="start-recording-btn" class="w-16 h-16 bg-purple-700 text-white rounded-full flex items-center justify-center hover:bg-purple-800 transition-all transform hover:scale-105 shadow-lg flex-shrink-0"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path></svg></button><div class="flex-1"><p class="font-semibold">Record a 5-minute voice memo</p><p class="text-sm text-gray-600">Summarize your week: wins, challenges, and key metrics. Our AI will do the rest.</p></div></div></div>
+                    <header class="mb-8"><h1 class="text-2xl sm:text-3xl font-bold tracking-tight">CEO Dashboard</h1><p class="text-gray-500 mt-1 mono text-sm">Welcome back, Alex. Your augmented co-founder is ready.</p></header>
+                    
+                    <div class="bg-white p-6 sm:p-8 border border-gray-200 rounded-lg shadow-sm mb-8">
+                        <h2 class="text-lg font-bold mb-4">Live Business Context</h2>
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 text-sm">
+                            <div class="space-y-1">
+                                <h3 class="font-bold">Sales Pipeline</h3>
+                                <p class="text-gray-600">Stages: 5 | Value: $850k | Probability: 65%</p>
+                                <p class="text-xs text-gray-400">Source: <a href="#" class="text-purple-700 hover:underline">Hubspot</a></p>
+                            </div>
+                            <div class="space-y-1">
+                                <h3 class="font-bold">Financials</h3>
+                                <p class="text-gray-600">ARR: $1.2M | MRR: $100k | CAC: $5.2k</p>
+                                <p class="text-xs text-gray-400">Source: <span class="text-gray-500">BREX</span></p>
+                            </div>
+                            <div class="space-y-1">
+                                <h3 class="font-bold">Recruitment</h3>
+                                <p class="text-gray-600">New Hires (Q3): 3 | Open Roles: 2</p>
+                                <p class="text-xs text-gray-400">Source: <span class="text-gray-500">DEEL</span></p>
+                            </div>
+                             <div class="space-y-1">
+                                <h3 class="font-bold">Product</h3>
+                                <p class="text-gray-600">PMF Score: 42% (Superhuman method)</p>
+                                <p class="text-xs text-gray-400">Source: <span class="text-gray-500">Notion</span></p>
+                            </div>
+                             <div class="space-y-1">
+                                <h3 class="font-bold">Previous Monthly Reports</h3>
+                                <p class="text-gray-600">June, July, August | Growth stable at ~15%</p>
+                                <p class="text-xs text-gray-400">Source: <span class="text-gray-500">Notion</span></p>
+                            </div>
+                            <div class="bg-purple-50 border border-purple-200 rounded-md p-3">
+                                <h3 class="font-bold">Next Monthly Report (DRAFT)</h3>
+                                <p class="text-gray-600">Metrics updated | Status: Needs Review</p>
+                                <div class="flex items-center justify-between mt-1">
+                                    <p class="text-xs text-gray-400">Sources: Notion, BREX, DEEL</p>
+                                    <button class="text-xs bg-purple-600 text-white font-semibold px-2 py-1 rounded hover:bg-purple-700">Review</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white p-6 sm:p-8 border border-gray-200 rounded-lg shadow-sm mb-8"><div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4"><h2 class="text-lg font-bold">Create Weekly Update</h2><span class="text-xs mono text-gray-500 mt-1 sm:mt-0">Voice Memo → AI Synthesis → Investor Report</span></div><div class="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6"><button id="start-recording-btn" class="w-16 h-16 bg-purple-700 text-white rounded-full flex items-center justify-center hover:bg-purple-800 transition-all transform hover:scale-105 shadow-lg flex-shrink-0"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path></svg></button><div class="flex-1"><p class="font-semibold">Record a 5-minute voice memo</p><p class="text-sm text-gray-600">Summarize your week: wins, challenges, and key metrics. Our AI will do the rest.</p></div></div></div>
                      <div class="bg-white p-6 sm:p-8 border border-gray-200 rounded-lg shadow-sm">
                         <h2 class="text-lg font-bold mb-4">Recent Activity</h2>
                         <div class="text-sm text-gray-500">No recent reports. Record an update to get started.</div>
@@ -323,7 +385,7 @@
                             <div id="guide-step-5" class="h-2 rounded-full bg-gray-300 guide-step-indicator"></div>
                             <div id="guide-step-6" class="h-2 rounded-full bg-gray-300 guide-step-indicator"></div>
                         </div>
-                        <div class="bg-white border border-gray-200 rounded-lg p-6 min-h-[300px]">
+                        <div class="bg-white border border-gray-200 rounded-lg p-6">
                             <h3 id="guide-step-title" class="text-lg font-bold mb-4"></h3>
                             <div id="guide-step-content" class="prose prose-sm max-w-none"></div>
                         </div>
@@ -339,7 +401,7 @@
                      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                         <div class="bg-white border border-gray-200 rounded-lg p-6 flex flex-col"><div class="flex items-center mb-4"><img src="https://placehold.co/40x40/000000/FFFFFF?text=N" class="w-10 h-10 mr-4"><h3 class="text-lg font-bold">Notion</h3></div><p class="text-sm text-gray-600 flex-1 mb-4">Sync your company wiki, roadmaps, and KPIs to provide context for AI analysis.</p><button class="w-full bg-green-500 text-white py-2 text-sm font-bold rounded-md">Connected</button></div>
                         <div class="bg-white border border-gray-200 rounded-lg p-6 flex flex-col"><div class="flex items-center mb-4"><img src="https://placehold.co/40x40/4A154B/FFFFFF?text=S" class="w-10 h-10 mr-4"><h3 class="text-lg font-bold">Slack</h3></div><p class="text-sm text-gray-600 flex-1 mb-4">Send report summaries and get notifications directly in your team's channels.</p><button class="w-full bg-gray-200 text-gray-800 py-2 text-sm font-bold hover:bg-gray-300 rounded-md">Connect</button></div>
-                        <div class="bg-white border border-gray-200 rounded-lg p-6 flex flex-col"><div class="flex items-center mb-4"><img src="httpshttps://placehold.co/40x40/635BFF/FFFFFF?text=S" class="w-10 h-10 mr-4"><h3 class="text-lg font-bold">Stripe</h3></div><p class="text-sm text-gray-600 flex-1 mb-4">Automatically pull in key financial metrics like ARR, MRR, and growth rates.</p><button class="w-full bg-gray-200 text-gray-800 py-2 text-sm font-bold hover:bg-gray-300 rounded-md">Connect</button></div>
+                        <div class="bg-white border border-gray-200 rounded-lg p-6 flex flex-col"><div class="flex items-center mb-4"><img src="https://placehold.co/40x40/635BFF/FFFFFF?text=S" class="w-10 h-10 mr-4"><h3 class="text-lg font-bold">Stripe</h3></div><p class="text-sm text-gray-600 flex-1 mb-4">Automatically pull in key financial metrics like ARR, MRR, and growth rates.</p><button class="w-full bg-gray-200 text-gray-800 py-2 text-sm font-bold hover:bg-gray-300 rounded-md">Connect</button></div>
                      </div>
                 </div>
                 
@@ -638,17 +700,8 @@
                     'dashboard': ui.pages.dashboard, 'recording': ui.pages.recording, 'reports': ui.pages.reports, 'playbooks': ui.pages.playbooks, 'integrations': ui.pages.integrations, 'settings': ui.pages.settings,
                     'vc-dashboard': ui.pages.vcDashboard, 'vc-playbooks': ui.pages.vcPlaybooks, 'vc-settings': ui.pages.vcSettings,
                 };
-                Object.values(pageMap).forEach(page => page?.classList.add('hidden'));
-                if (pageName !== 'playbooks') { // keep playbooks page always technically visible for layout
-                    pageMap[pageName]?.classList.remove('hidden');
-                }
-
-                if (pageName === 'playbooks' || pageName === 'dashboard') { // Hack to show playbooks when dashboard is selected
-                     ui.pages.playbooks.classList.remove('hidden');
-                     if(pageName === 'dashboard') {
-                         ui.pages.playbooks.classList.add('hidden')
-                     }
-                }
+                Object.values(ui.pages).forEach(page => page?.classList.add('hidden'));
+                pageMap[pageName]?.classList.remove('hidden');
 
                 const navMap = currentView === 'ceo' ? ui.navLinks.ceo : ui.navLinks.vc;
                 const navKey = pageName.replace('vc-', '');
@@ -734,7 +787,18 @@
                     `;
                 }).join('');
 
-                content.innerHTML = `<div class="prose prose-sm max-w-none">${stepsHtml}</div>`;
+                content.innerHTML = `<div class="prose prose-sm max-w-none">${stepsHtml}</div>
+                <div class="mt-8 pt-6 border-t border-gray-200 text-center">
+                    <button class="modal-start-guided-btn bg-purple-700 text-white font-bold py-3 px-6 rounded-md hover:bg-purple-800 transition-all transform hover:scale-105" data-playbook-id="${playbookId}">
+                        Start Guided Playbook →
+                    </button>
+                </div>`;
+
+                content.querySelector('.modal-start-guided-btn').addEventListener('click', (e) => {
+                    hideModal();
+                    // Timeout to allow modal to close before switching views
+                    setTimeout(() => showGuidedPlaybook(e.currentTarget.dataset.playbookId), 300);
+                });
                 
                 const titleHtml = `${playbook.title} <span class="ml-2 text-xs font-semibold uppercase mono px-2 py-1 bg-gray-200 text-gray-600 rounded-full">${playbook.stage}</span>`;
 
@@ -835,7 +899,7 @@
                     { title: 'Step 1: Understand the "Why"', content: playbook.diagnostic, type: 'ai', prompt: "First, let's confirm the diagnosis. Does this sound like what you're experiencing?" },
                     { title: 'Step 2: Review the High-Level Plan', content: playbook.actions, type: 'ai', prompt: "Here are the recommended actions. At a high level, does this approach make sense for your team?" },
                     { title: 'Step 3: Gut Check & Commit', content: playbook.validation, type: 'ai', prompt: "This is the commitment check. Are you and your team prepared to follow through on this?" },
-                    { title: 'Step 4: Create a Tactical Plan', content: playbook.implementation, type: 'user', prompt: "Now, let's make this tactical. How will you specifically implement these steps at Acme Inc.? Jot down some initial notes below." },
+                    { title: 'Step 4: Create a Tactical Plan', content: playbook.implementation, type: 'user', prompt: "Now, let's make this tactical. How will you specifically implement these steps at Acme Inc.?" },
                     { title: 'Step 5: Define the Desired Outcome', content: playbook.result, type: 'ai', prompt: "If we execute this correctly, this is the expected result. Does this outcome align with your strategic goals for this quarter?" },
                     { title: 'Step 6: Set Success Metrics', content: playbook.impact, type: 'user', prompt: "Finally, let's define success. Are these the right KPIs to track? Should we add or modify any?" },
                 ];
@@ -844,11 +908,23 @@
                 
                 ui.guide.stepTitle.textContent = currentStepData.title;
                 
-                let contentHtml = `<div class="flex items-start gap-3 mb-4"><div class="w-8 h-8 rounded-full bg-purple-100 text-purple-700 flex items-center justify-center flex-shrink-0 font-bold text-sm">AI</div><div class="p-4 rounded-lg ai-bubble"><p class="font-semibold mb-2">${currentStepData.prompt}</p><div class="text-gray-700">${marked.parse(currentStepData.content)}</div></div></div>`;
-
-                if (currentStepData.type === 'user') {
-                    contentHtml += `<div class="flex items-start gap-3 mt-6"><div class="w-8 h-8 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center flex-shrink-0 font-bold text-sm">YOU</div><div class="p-4 rounded-lg user-bubble flex-1"><textarea class="w-full h-24 p-2 text-sm bg-transparent border border-indigo-200 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-purple-500" placeholder="Type your notes here..."></textarea></div></div>`;
-                }
+                let contentHtml = `
+                    <div class="flex items-start gap-3 mb-4">
+                        <div class="w-8 h-8 rounded-full bg-purple-100 text-purple-700 flex items-center justify-center flex-shrink-0 font-bold text-sm">AI</div>
+                        <div class="p-4 rounded-lg ai-bubble flex-1">
+                            <p class="font-semibold mb-2">${currentStepData.prompt}</p>
+                            <div class="text-gray-700">${marked.parse(currentStepData.content)}</div>
+                        </div>
+                    </div>
+                    <div class="flex items-start gap-3 mt-6">
+                        <div class="w-8 h-8 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center flex-shrink-0 font-bold text-sm">YOU</div>
+                        <div class="p-4 rounded-lg user-bubble flex-1">
+                            <div class="input-wrapper">
+                                <textarea class="w-full h-24 p-2 text-sm bg-transparent border border-indigo-200 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-purple-500" placeholder="Type or speak your thoughts..."></textarea>
+                                <i class="fas fa-microphone mic-icon"></i>
+                            </div>
+                        </div>
+                    </div>`;
 
                 ui.guide.stepContent.innerHTML = contentHtml;
 
@@ -942,7 +1018,7 @@
             // initializeDictationService(savedApiKey); 
             populateCeoPlaybooks();
             populateVcPortfolio();
-            showPage('playbooks'); // Default to playbook view
+            showPage('dashboard'); // Default to dashboard view
         });
     </script>
 </body>
